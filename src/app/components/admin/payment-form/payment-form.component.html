@@ -1,0 +1,92 @@
+<div class="container">
+  <div class="header">
+    <h1 class="title">{{ isEditMode ? 'Edit Payment' : 'Create New Payment' }}</h1>
+  </div>
+
+  <mat-card>
+    <mat-card-content>
+      <div class="loading-shade" *ngIf="isLoading">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+
+      <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+        <div class="form-row two-column">
+          <mat-form-field appearance="outline">
+            <mat-label>Project</mat-label>
+            <mat-select formControlName="projectId" required [disabled]="isEditMode" (selectionChange)="onProjectChange()">
+              <mat-option *ngFor="let project of projects" [value]="project.id">
+                {{ project.title }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="paymentForm.get('projectId')?.hasError('required')">
+              Project is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Developer</mat-label>
+            <mat-select formControlName="developerId" required [disabled]="isEditMode">
+              <mat-option *ngFor="let developer of developers" [value]="developer.id">
+                {{ developer.name }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="paymentForm.get('developerId')?.hasError('required')">
+              Developer is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row two-column">
+          <mat-form-field appearance="outline">
+            <mat-label>Amount ($)</mat-label>
+            <input matInput type="number" formControlName="amount" required>
+            <mat-error *ngIf="paymentForm.get('amount')?.hasError('required')">
+              Amount is required
+            </mat-error>
+            <mat-error *ngIf="paymentForm.get('amount')?.hasError('min')">
+              Amount must be greater than 0
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Payment Date</mat-label>
+            <input matInput [matDatepicker]="paymentDatePicker" formControlName="paymentDate" required>
+            <mat-datepicker-toggle matSuffix [for]="paymentDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #paymentDatePicker></mat-datepicker>
+            <mat-error *ngIf="paymentForm.get('paymentDate')?.hasError('required')">
+              Payment date is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status" required>
+              <mat-option *ngFor="let status of paymentStatuses" [value]="status">
+                {{ status }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="paymentForm.get('status')?.hasError('required')">
+              Status is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Payment Details</mat-label>
+            <textarea matInput formControlName="paymentDetails" rows="3"></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="cancel()">Cancel</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="paymentForm.invalid || isLoading">
+            {{ isEditMode ? 'Update Payment' : 'Create Payment' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,114 @@
+<div class="container mt-4">
+  <h1 class="mb-4">Project Management Dashboard</h1>
+
+  <div *ngIf="isLoading" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!isLoading && !error">
+    <!-- Summary Cards -->
+    <div class="row mb-4" *ngIf="summary">
+      <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3">
+          <div class="card-header">Projects Overview</div>
+          <div class="card-body">
+            <h5 class="card-title">{{ summary.totalProjects }} Total Projects</h5>
+            <p class="card-text">
+              {{ summary.activeProjects }} Active |
+              {{ summary.completedProjects }} Completed
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-white bg-success mb-3">
+          <div class="card-header">Financial Summary</div>
+          <div class="card-body">
+            <h5 class="card-title">${{ summary.totalBudget.toFixed(2) }} Total Budget</h5>
+            <p class="card-text">
+              ${{ summary.totalDevPayment.toFixed(2) }} Developer Payments
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-white bg-info mb-3">
+          <div class="card-header">Net Profit</div>
+          <div class="card-body">
+            <h5 class="card-title">${{ summary.netProfit.toFixed(2) }}</h5>
+            <p class="card-text">
+              Margin: {{ (summary.netProfit / summary.totalBudget * 100).toFixed(1) }}%
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Projects -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Recent Projects</h5>
+          <a routerLink="/projects" class="btn btn-sm btn-primary">View All</a>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Project</th>
+                <th>Developer</th>
+                <th>Start Date</th>
+                <th>Budget</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let project of recentProjects">
+                <td>
+                  <a [routerLink]="['/projects', project.id]">{{ project.orderLink }}</a>
+                </td>
+                <td>{{ project.devName }}</td>
+                <td>{{ project.projectStartDate | date }}</td>
+                <td>${{ project.totalBudget.toFixed(2) }}</td>
+                <td>
+                  <span [ngClass]="getStatusClass(project.status)">
+                    {{ project.status }}
+                  </span>
+                </td>
+              </tr>
+              <tr *ngIf="recentProjects.length === 0">
+                <td colspan="5" class="text-center">No projects found</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Quick Actions</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+          <a routerLink="/projects/new" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>New Project
+          </a>
+          <a routerLink="/projects" class="btn btn-secondary">
+            <i class="bi bi-list-ul me-2"></i>Manage Projects
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

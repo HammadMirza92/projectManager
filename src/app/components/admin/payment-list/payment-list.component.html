@@ -1,0 +1,147 @@
+<div class="container">
+  <div class="header">
+    <h1 class="title">Manage Payments</h1>
+    <button mat-raised-button color="primary" (click)="addNewPayment()">
+      <mat-icon>add</mat-icon> Add Payment
+    </button>
+  </div>
+
+  <mat-card class="filter-card">
+    <mat-card-content>
+      <form [formGroup]="filterForm" (ngSubmit)="applyFilter()">
+        <div class="filter-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Start Date</mat-label>
+            <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>End Date</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <div class="filter-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Developer</mat-label>
+            <mat-select formControlName="developerId">
+              <mat-option [value]="null">All Developers</mat-option>
+              <mat-option *ngFor="let developer of developers" [value]="developer.id">
+                {{ developer.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Project</mat-label>
+            <mat-select formControlName="projectId">
+              <mat-option [value]="null">All Projects</mat-option>
+              <mat-option *ngFor="let project of projects" [value]="project.id">
+                {{ project.title }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status">
+              <mat-option [value]="null">All Statuses</mat-option>
+              <mat-option *ngFor="let status of paymentStatuses" [value]="status">
+                {{ status }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="filter-actions">
+          <button mat-button type="button" (click)="resetFilter()">Reset</button>
+          <button mat-raised-button color="primary" type="submit">Apply Filter</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="data-card">
+    <mat-card-content>
+      <div class="table-container">
+        <div class="loading-shade" *ngIf="isLoading">
+          <mat-spinner diameter="50"></mat-spinner>
+        </div>
+
+        <table mat-table [dataSource]="dataSource" matSort>
+          <!-- ID Column -->
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.id}} </td>
+          </ng-container>
+
+          <!-- Project Column -->
+          <ng-container matColumnDef="projectTitle">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Project </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.projectTitle}} </td>
+          </ng-container>
+
+          <!-- Developer Column -->
+          <ng-container matColumnDef="developerName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Developer </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.developerName}} </td>
+          </ng-container>
+
+          <!-- Amount Column -->
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.amount | currency}} </td>
+          </ng-container>
+
+          <!-- Payment Date Column -->
+          <ng-container matColumnDef="paymentDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Payment Date </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.paymentDate | date}} </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+            <td mat-cell *matCellDef="let payment">
+              <span class="status-badge" [ngClass]="getStatusBadgeClass(payment.status)">
+                {{payment.statusName}}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <td mat-cell *matCellDef="let payment">
+              <button mat-icon-button color="accent" (click)="editPayment(payment.id)" matTooltip="Edit">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="deletePayment(payment)" matTooltip="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+          <!-- Row shown when no data matches the filter -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="7">
+              <div class="no-data">
+                <mat-icon>warning</mat-icon>
+                <span>No payments found</span>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <mat-paginator [length]="totalPayments" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 50]" (page)="onPageChange($event)"></mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

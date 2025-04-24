@@ -1,0 +1,105 @@
+<div class="container">
+  <div class="header">
+    <h1 class="title">My Payments</h1>
+  </div>
+
+  <div class="summary-cards">
+    <mat-card>
+      <mat-card-content>
+        <div class="summary-label">Total Earnings</div>
+        <div class="summary-value">{{ totalEarnings | currency }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-content>
+        <div class="summary-label">Completed Payments</div>
+        <div class="summary-value">{{ completedPayments | currency }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-content>
+        <div class="summary-label">Pending Payments</div>
+        <div class="summary-value">{{ pendingPayments | currency }}</div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-card class="filter-card">
+    <mat-card-content>
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filter</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Search by project, details...">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="data-card">
+    <mat-card-content>
+      <div class="table-container">
+        <div class="loading-shade" *ngIf="isLoading">
+          <mat-spinner diameter="50"></mat-spinner>
+        </div>
+
+        <table mat-table [dataSource]="dataSource" matSort>
+          <!-- ID Column -->
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.id}} </td>
+          </ng-container>
+
+          <!-- Project Column -->
+          <ng-container matColumnDef="projectTitle">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Project </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.projectTitle}} </td>
+          </ng-container>
+
+          <!-- Amount Column -->
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.amount | currency}} </td>
+          </ng-container>
+
+          <!-- Payment Date Column -->
+          <ng-container matColumnDef="paymentDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Payment Date </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.paymentDate | date}} </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+            <td mat-cell *matCellDef="let payment">
+              <span class="status-badge" [ngClass]="getStatusBadgeClass(payment.status)">
+                {{payment.statusName}}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Payment Details Column -->
+          <ng-container matColumnDef="paymentDetails">
+            <th mat-header-cell *matHeaderCellDef> Details </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.paymentDetails || '-'}} </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+          <!-- Row shown when no data matches the filter -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="6">
+              <div class="no-data">
+                <mat-icon>warning</mat-icon>
+                <span>No payments found</span>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 50]"></mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

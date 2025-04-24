@@ -1,0 +1,204 @@
+.project-deadline {
+  text-align: right;
+
+  @media (max-width: 768px) {
+    text-align: left;
+  }
+}
+
+.deadline-label {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.deadline-date {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.deadline-days {
+  font-size: 14px;
+}
+
+.days-overdue {
+  color: #f44336;
+  font-weight: 500;
+}
+
+.days-critical {
+  color: #ff9800;
+  font-weight: 500;
+}
+
+.days-warning {
+  color: #ffc107;
+  font-weight: 500;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+  }
+
+  .tasks-card, .payments-card {
+    grid-column: span 2;
+
+    @media (max-width: 992px) {
+      grid-column: span 1;
+    }
+  }
+}
+
+.info-item {
+  margin-bottom: 16px;
+}
+
+.info-label {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.54);
+  margin-bottom: 4px;
+}
+
+.info-value {
+  font-size: 15px;
+
+  a {
+    color: #3f51b5;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.no-content {
+  color: rgba(0, 0, 0, 0.38);
+  font-style: italic;
+  padding: 20px 0;
+  text-align: center;
+}
+
+.header-with-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+mat-progress-bar {
+  margin: 16px 0;
+}
+
+.tasks-list {
+  margin-top: 16px;
+}
+
+.task-item {
+  padding: 12px;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+  margin-bottom: 12px;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.task-title {
+  font-weight: 500;
+}
+
+.task-status-badge {
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.task-todo {
+  background-color: #9e9e9e;
+  color: white;
+}
+
+.task-inprogress {
+  background-color: #2196f3;
+  color: white;
+}
+
+.task-done {
+  background-color: #4caf50;
+  color: white;
+}
+
+.task-blocked {
+  background-color: #f44336;
+  color: white;
+}
+
+.task-description {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.task-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.54);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+.payments-list {
+  margin-top: 16px;
+}
+
+.payment-item {
+  padding: 12px;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+  margin-bottom: 12px;
+}
+
+.payment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.payment-amount {
+  font-weight: 500;
+  font-size: 18px;
+}
+
+.payment-status-badge {
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.payment-details {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.payment-date, .payment-developer {
+  margin-bottom: 4px;
+}
+
+.payment-notes {
+  font-style: italic;
+}

@@ -1,0 +1,34 @@
+<div class="notifications-container">
+  <div class="notifications-header">
+    <h3>Notifications</h3>
+    <button mat-button color="primary" (click)="markAllAsRead()" [disabled]="!hasUnreadNotifications()">
+      Mark all as read
+    </button>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="notifications-content" *ngIf="notifications.length > 0">
+    <mat-list>
+      <div *ngFor="let notification of notifications">
+        <mat-list-item [ngClass]="{'unread': !notification.isRead}" (click)="markAsRead(notification)">
+          <mat-icon mat-list-icon [ngClass]="getNotificationIconClass(notification)">
+            {{ getNotificationIcon(notification) }}
+          </mat-icon>
+          <div mat-line class="notification-title">{{ notification.title }}</div>
+          <div mat-line class="notification-message">{{ notification.message }}</div>
+          <div mat-line class="notification-time">{{ notification.createdAt | date:'short' }}</div>
+          <button mat-icon-button (click)="deleteNotification(notification, $event)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+      </div>
+    </mat-list>
+  </div>
+
+  <div class="notifications-empty" *ngIf="notifications.length === 0">
+    <mat-icon>notifications_off</mat-icon>
+    <p>No notifications</p>
+  </div>
+</div>

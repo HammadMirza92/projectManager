@@ -1,0 +1,194 @@
+<div class="dashboard-container">
+  <h1 class="dashboard-title">Developer Dashboard</h1>
+
+  <!-- Stats Cards -->
+  <div class="stats-cards">
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon>work</mat-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ dashboardData?.totalProjects || 0 }}</div>
+          <div class="stat-label">Total Projects</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon active">
+          <mat-icon>trending_up</mat-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ dashboardData?.activeProjects || 0 }}</div>
+          <div class="stat-label">Active Projects</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon completed">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ dashboardData?.completedProjects || 0 }}</div>
+          <div class="stat-label">Completed Projects</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon money">
+          <mat-icon>attach_money</mat-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ dashboardData?.totalEarnings | currency }}</div>
+          <div class="stat-label">Total Earnings</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Upcoming Deadlines -->
+  <div class="upcoming-deadlines">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Upcoming Deadlines</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="dashboardData?.upcomingDeadlines || []" class="mat-elevation-z0">
+          <!-- Project Title Column -->
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef>Project</th>
+            <td mat-cell *matCellDef="let project">{{ project.title }}</td>
+          </ng-container>
+
+          <!-- End Date Column -->
+          <ng-container matColumnDef="endDate">
+            <th mat-header-cell *matHeaderCellDef>Deadline</th>
+            <td mat-cell *matCellDef="let project">{{ project.endDate | date }}</td>
+          </ng-container>
+
+          <!-- Days Remaining Column -->
+          <ng-container matColumnDef="daysRemaining">
+            <th mat-header-cell *matHeaderCellDef>Days Remaining</th>
+            <td mat-cell *matCellDef="let project" [ngClass]="{'urgent': project.daysRemaining <= 2}">
+              {{ project.daysRemaining }}
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let project">
+              <mat-chip-list>
+                <mat-chip [color]="getStatusColor(project.status)" selected>
+                  {{ project.statusName }}
+                </mat-chip>
+              </mat-chip-list>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let project">
+              <button mat-icon-button color="primary" [routerLink]="['/developer/projects', project.id]">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="deadlineColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: deadlineColumns;"></tr>
+
+          <!-- Row shown when no data matches the filter -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="5">No upcoming deadlines</td>
+          </tr>
+        </table>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-button color="primary" routerLink="/developer/projects">View All Projects</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Assigned Projects -->
+  <div class="assigned-projects">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Assigned Projects</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="dashboardData?.assignedProjects || []" class="mat-elevation-z0">
+          <!-- Project Title Column -->
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef>Project</th>
+            <td mat-cell *matCellDef="let project">{{ project.title }}</td>
+          </ng-container>
+
+          <!-- Client Column -->
+          <ng-container matColumnDef="clientName">
+            <th mat-header-cell *matHeaderCellDef>Client</th>
+            <td mat-cell *matCellDef="let project">{{ project.clientName }}</td>
+          </ng-container>
+
+          <!-- Start Date Column -->
+          <ng-container matColumnDef="startDate">
+            <th mat-header-cell *matHeaderCellDef>Start Date</th>
+            <td mat-cell *matCellDef="let project">{{ project.startDate | date }}</td>
+          </ng-container>
+
+          <!-- End Date Column -->
+          <ng-container matColumnDef="endDate">
+            <th mat-header-cell *matHeaderCellDef>End Date</th>
+            <td mat-cell *matCellDef="let project">{{ project.endDate | date }}</td>
+          </ng-container>
+
+          <!-- Amount Column -->
+          <ng-container matColumnDef="developerAmount">
+            <th mat-header-cell *matHeaderCellDef>Amount</th>
+            <td mat-cell *matCellDef="let project">{{ project.developerAmount | currency }}</td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let project">
+              <mat-chip-list>
+                <mat-chip [color]="getStatusColor(project.status)" selected>
+                  {{ project.statusName }}
+                </mat-chip>
+              </mat-chip-list>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let project">
+              <button mat-icon-button color="primary" [routerLink]="['/developer/projects', project.id]">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="projectColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: projectColumns;"></tr>
+
+          <!-- Row shown when no data matches the filter -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="7">No assigned projects</td>
+          </tr>
+        </table>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-button color="primary" routerLink="/developer/projects">View All Projects</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

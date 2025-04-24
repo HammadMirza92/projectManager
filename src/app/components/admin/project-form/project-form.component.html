@@ -1,0 +1,184 @@
+<div class="container">
+  <div class="header">
+    <h1 class="title">{{ isEditMode ? 'Edit Project' : 'Create New Project' }}</h1>
+  </div>
+
+  <mat-card>
+    <mat-card-content>
+      <div class="loading-shade" *ngIf="isLoading">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+
+      <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+        <div class="form-section">
+          <h2 class="section-title">Basic Information</h2>
+
+          <div class="form-row two-column">
+            <mat-form-field appearance="outline">
+              <mat-label>Project Title</mat-label>
+              <input matInput formControlName="title" required>
+              <mat-error *ngIf="projectForm.get('title')?.hasError('required')">
+                Title is required
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Order Link</mat-label>
+              <input matInput formControlName="orderLink" required>
+              <mat-error *ngIf="projectForm.get('orderLink')?.hasError('required')">
+                Order link is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Description</mat-label>
+              <textarea matInput formControlName="description" rows="3"></textarea>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row two-column">
+            <mat-form-field appearance="outline">
+              <mat-label>Developer</mat-label>
+              <mat-select formControlName="developerId" required>
+                <mat-option *ngFor="let developer of developers" [value]="developer.id">
+                  {{ developer.name }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="projectForm.get('developerId')?.hasError('required')">
+                Developer is required
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Client</mat-label>
+              <mat-select formControlName="clientId" required>
+                <mat-option *ngFor="let client of clients" [value]="client.id">
+                  {{ client.name }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="projectForm.get('clientId')?.hasError('required')">
+                Client is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row two-column">
+            <mat-form-field appearance="outline">
+              <mat-label>Website URL</mat-label>
+              <input matInput formControlName="websiteUrl">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Website Login</mat-label>
+              <input matInput formControlName="websiteLogin">
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2 class="section-title">Project Timeline</h2>
+
+          <div class="form-row two-column">
+            <mat-form-field appearance="outline">
+              <mat-label>Start Date</mat-label>
+              <input matInput [matDatepicker]="startPicker" formControlName="startDate" required>
+              <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+              <mat-datepicker #startPicker></mat-datepicker>
+              <mat-error *ngIf="projectForm.get('startDate')?.hasError('required')">
+                Start date is required
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>End Date</mat-label>
+              <input matInput [matDatepicker]="endPicker" formControlName="endDate" required>
+              <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+              <mat-datepicker #endPicker></mat-datepicker>
+              <mat-error *ngIf="projectForm.get('endDate')?.hasError('required')">
+                End date is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2 class="section-title">Project Details</h2>
+
+          <div class="form-row two-column">
+            <mat-form-field appearance="outline">
+              <mat-label>Source of Project</mat-label>
+              <input matInput formControlName="sourceOfProject">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Platform</mat-label>
+              <input matInput formControlName="platform">
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="status" required>
+                <mat-option *ngFor="let status of projectStatuses" [value]="status">
+                  {{ status }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="projectForm.get('status')?.hasError('required')">
+                Status is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2 class="section-title">Financial Details</h2>
+
+          <div class="form-row three-column">
+            <mat-form-field appearance="outline">
+              <mat-label>Total Budget ($)</mat-label>
+              <input matInput type="number" formControlName="totalBudget" required (input)="onTotalBudgetChange()">
+              <mat-error *ngIf="projectForm.get('totalBudget')?.hasError('required')">
+                Total budget is required
+              </mat-error>
+              <mat-error *ngIf="projectForm.get('totalBudget')?.hasError('min')">
+                Total budget must be greater than or equal to 0
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Total After Deduction ($)</mat-label>
+              <input matInput type="number" formControlName="totalAfterDeduction" required>
+              <mat-error *ngIf="projectForm.get('totalAfterDeduction')?.hasError('required')">
+                Total after deduction is required
+              </mat-error>
+              <mat-error *ngIf="projectForm.get('totalAfterDeduction')?.hasError('min')">
+                Total after deduction must be greater than or equal to 0
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Developer Amount ($)</mat-label>
+              <input matInput type="number" formControlName="developerAmount" required>
+              <mat-error *ngIf="projectForm.get('developerAmount')?.hasError('required')">
+                Developer amount is required
+              </mat-error>
+              <mat-error *ngIf="projectForm.get('developerAmount')?.hasError('min')">
+                Developer amount must be greater than or equal to 0
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="cancel()">Cancel</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="projectForm.invalid || isLoading">
+            {{ isEditMode ? 'Update Project' : 'Create Project' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

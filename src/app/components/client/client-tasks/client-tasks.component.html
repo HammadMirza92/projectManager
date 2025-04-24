@@ -1,0 +1,87 @@
+<div class="container">
+  <div class="header">
+    <h1 class="title">My Project Tasks</h1>
+  </div>
+
+  <mat-card class="filter-card">
+    <mat-card-content>
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filter</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Search by title, project...">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="data-card">
+    <mat-card-content>
+      <div class="table-container">
+        <div class="loading-shade" *ngIf="isLoading">
+          <mat-spinner diameter="50"></mat-spinner>
+        </div>
+
+        <table mat-table [dataSource]="dataSource" matSort>
+          <!-- ID Column -->
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+            <td mat-cell *matCellDef="let task"> {{task.id}} </td>
+          </ng-container>
+
+          <!-- Title Column -->
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Title </th>
+            <td mat-cell *matCellDef="let task"> {{task.title}} </td>
+          </ng-container>
+
+          <!-- Project Column -->
+          <ng-container matColumnDef="projectTitle">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Project </th>
+            <td mat-cell *matCellDef="let task" class="project-cell">
+              {{task.projectTitle}}
+              <button mat-icon-button color="primary" (click)="viewProject(task.projectId)" matTooltip="View Project">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <!-- Due Date Column -->
+          <ng-container matColumnDef="dueDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Due Date </th>
+            <td mat-cell *matCellDef="let task"> {{task.dueDate | date}} </td>
+          </ng-container>
+
+          <!-- Assigned To Column -->
+          <ng-container matColumnDef="assignedToName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Assigned To </th>
+            <td mat-cell *matCellDef="let task"> {{task.assignedToName || 'Not assigned'}} </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+            <td mat-cell *matCellDef="let task">
+              <span class="status-badge" [ngClass]="getStatusBadgeClass(task.status)">
+                {{task.statusName}}
+              </span>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+          <!-- Row shown when no data matches the filter -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="6">
+              <div class="no-data">
+                <mat-icon>warning</mat-icon>
+                <span>No tasks found</span>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 50]"></mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
