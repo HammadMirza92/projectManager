@@ -1,5 +1,4 @@
-<!-- components/layout/sidebar/sidebar.component.html -->
-<div class="sidenav-content">
+<div class="sidenav-content" *ngIf="isClient() || isDeveloper() || isAdmin()">
   <div class="sidenav-header">
     <h2>Project Management</h2>
   </div>
@@ -89,7 +88,7 @@
   <mat-divider class="spacer-divider"></mat-divider>
 
   <!-- Common Navigation -->
-  <mat-nav-list class="bottom-nav centered-nav">
+  <mat-nav-list class="bottom-nav centered-nav" >
     <a mat-list-item routerLink="/profile" routerLinkActive="active">
       <mat-icon style="margin-bottom: -5px;">person</mat-icon>
       <span style="margin-left: 10px;">Profile</span>
