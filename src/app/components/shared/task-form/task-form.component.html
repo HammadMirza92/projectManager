@@ -11,6 +11,11 @@
       {{ error }}
     </div>
 
+    <div class="project-display" *ngIf="taskForm.get('projectId')?.disabled && data.projectId">
+      <mat-label>Project:</mat-label>
+      <span>{{ getProjectName(data.projectId) }}</span>
+    </div>
+
     <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Title</mat-label>
@@ -43,19 +48,14 @@
         </mat-error>
       </mat-form-field>
 
-      <div class="project-display" *ngIf="taskForm.get('projectId')?.disabled && data.projectId">
-        <mat-label>Project:</mat-label>
-        <span>{{ getProjectName(data.projectId) }}</span>
-      </div>
-
-      <mat-form-field appearance="outline" class="full-width">
+      <mat-form-field appearance="outline" class="full-width" *ngIf="currentUserRole === 'Admin'">
         <mat-label>Due Date</mat-label>
         <input matInput [matDatepicker]="picker" formControlName="dueDate">
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
 
-      <mat-form-field appearance="outline" class="full-width">
+      <mat-form-field appearance="outline" class="full-width" *ngIf="currentUserRole === 'Admin'">
         <mat-label>Status</mat-label>
         <mat-select formControlName="status" required>
           <mat-option *ngFor="let option of taskStatusOptions" [value]="option.value">
@@ -67,7 +67,7 @@
         </mat-error>
       </mat-form-field>
 
-      <mat-form-field appearance="outline" class="full-width">
+      <mat-form-field appearance="outline" class="full-width" *ngIf="currentUserRole === 'Admin'">
         <mat-label>Assigned To</mat-label>
         <mat-select formControlName="assignedToId">
           <mat-option [value]="null">Unassigned</mat-option>

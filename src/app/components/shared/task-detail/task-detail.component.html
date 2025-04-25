@@ -1,16 +1,16 @@
 <div class="task-detail-container">
-  <mat-card class="task-card">
+  <mat-card class="task-card mat-elevation-z2">
     <div class="loading-shade" *ngIf="loading">
       <mat-spinner diameter="50"></mat-spinner>
     </div>
 
     <div class="error-container" *ngIf="error">
-      <mat-chip color="warn" selected>{{ error }}</mat-chip>
+      <mat-error>{{ error }}</mat-error>
     </div>
 
     <mat-card-header>
       <div class="header-actions">
-        <button mat-icon-button (click)="goBack()" matTooltip="Go Back">
+        <button mat-icon-button (click)="goBack()" matTooltip="Go Back" class="back-button">
           <mat-icon>arrow_back</mat-icon>
         </button>
       </div>
@@ -26,60 +26,93 @@
 
     <mat-card-content *ngIf="task">
       <div class="task-actions" *ngIf="canEditTask()">
-        <mat-label>Change Status:</mat-label>
-        <div class="status-buttons">
-          <button mat-stroked-button *ngIf="task?.status !== TaskStatus.ToDo"
-            (click)="updateTaskStatus(TaskStatus.ToDo)">
-            To Do
-          </button>
-          <button mat-stroked-button *ngIf="task?.status !== TaskStatus.InProgress"
-            (click)="updateTaskStatus(TaskStatus.InProgress)">
-            In Progress
-          </button>
-          <button mat-stroked-button *ngIf="task?.status !== TaskStatus.Done"
-            (click)="updateTaskStatus(TaskStatus.Done)">
-            Done
-          </button>
-          <button mat-stroked-button *ngIf="task?.status !== TaskStatus.OnHold"
-            (click)="updateTaskStatus(TaskStatus.OnHold)">
-            On Hold
-          </button>
-        </div>
+        <mat-card class="status-card mat-elevation-z1">
+          <mat-card-header>
+            <mat-card-title class="status-title">Status</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="status-buttons">
+              <button mat-stroked-button
+                      [ngClass]="{'active-status': task.status === TaskStatus.ToDo}"
+                      *ngIf="task?.status !== TaskStatus.ToDo"
+                      (click)="updateTaskStatus(TaskStatus.ToDo)">
+                <mat-icon>list</mat-icon> To Do
+              </button>
+              <button mat-stroked-button
+                      [ngClass]="{'active-status': task.status === TaskStatus.InProgress}"
+                      *ngIf="task?.status !== TaskStatus.InProgress"
+                      (click)="updateTaskStatus(TaskStatus.InProgress)">
+                <mat-icon>pending_actions</mat-icon> In Progress
+              </button>
+              <button mat-stroked-button
+                      [ngClass]="{'active-status': task.status === TaskStatus.Done}"
+                      *ngIf="task?.status !== TaskStatus.Done"
+                      (click)="updateTaskStatus(TaskStatus.Done)">
+                <mat-icon>check_circle</mat-icon> Done
+              </button>
+              <button mat-stroked-button
+                      [ngClass]="{'active-status': task.status === TaskStatus.OnHold}"
+                      *ngIf="task?.status !== TaskStatus.OnHold"
+                      (click)="updateTaskStatus(TaskStatus.OnHold)">
+                <mat-icon>pause_circle</mat-icon> On Hold
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
       </div>
 
-      <mat-divider></mat-divider>
-
       <div class="task-info">
-        <div class="info-section">
-          <h3>Description</h3>
-          <p>{{ task.description || 'No description provided.' }}</p>
-        </div>
+        <mat-card class="info-card description-card mat-elevation-z1">
+          <mat-card-header>
+            <mat-card-title class="section-title">Description</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p class="description-text">{{ task.description || 'No description provided.' }}</p>
+          </mat-card-content>
+        </mat-card>
 
-        <mat-divider></mat-divider>
+        <mat-card class="info-card details-card mat-elevation-z1">
+          <mat-card-header>
+            <mat-card-title class="section-title">Details</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="info-grid">
+              <div class="info-item">
+                <mat-icon class="info-icon">person</mat-icon>
+                <div class="info-content">
+                  <span class="info-label">Assigned To</span>
+                  <span class="info-value">{{ task.assignedToName || 'Unassigned' }}</span>
+                </div>
+              </div>
 
-        <div class="info-grid">
-          <div class="info-item">
-            <span class="info-label">Assigned To</span>
-            <span class="info-value">{{ task.assignedToName || 'Unassigned' }}</span>
-          </div>
+              <div class="info-item">
+                <mat-icon class="info-icon">event</mat-icon>
+                <div class="info-content">
+                  <span class="info-label">Due Date</span>
+                  <span class="info-value" [ngClass]="{'overdue': task.dueDate && task.dueDate < today && task.status !== TaskStatus.Done}">
+                    {{ task.dueDate | date:'mediumDate' || 'No due date' }}
+                  </span>
+                </div>
+              </div>
 
-          <div class="info-item">
-            <span class="info-label">Due Date</span>
-            <!-- <span class="info-value" [ngClass]="{'overdue': task?.dueDate && task?.dueDate < today && task?.status !== TaskStatus.Done}">
-              {{ task?.dueDate | date:'mediumDate' || 'No due date' }}
-            </span> -->
-          </div>
+              <div class="info-item">
+                <mat-icon class="info-icon">calendar_today</mat-icon>
+                <div class="info-content">
+                  <span class="info-label">Created</span>
+                  <span class="info-value">{{ task.createdAt | date:'medium' }}</span>
+                </div>
+              </div>
 
-          <div class="info-item">
-            <span class="info-label">Created</span>
-            <span class="info-value">{{ task.createdAt | date:'medium' }}</span>
-          </div>
-
-          <div class="info-item" *ngIf="task?.updatedAt">
-            <span class="info-label">Last Updated</span>
-            <span class="info-value">{{ task.updatedAt | date:'medium' }}</span>
-          </div>
-        </div>
+              <div class="info-item" *ngIf="task?.updatedAt">
+                <mat-icon class="info-icon">update</mat-icon>
+                <div class="info-content">
+                  <span class="info-label">Last Updated</span>
+                  <span class="info-value">{{ task.updatedAt | date:'medium' }}</span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
       </div>
     </mat-card-content>
 
