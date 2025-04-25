@@ -13,7 +13,7 @@ import { DeveloperEarning } from '../../../models/dashboard.model';
   styleUrls: ['./developer-earnings.component.scss']
 })
 export class DeveloperEarningsComponent implements OnInit {
-  displayedColumns: string[] = ['developerName', 'totalEarnings', 'paidAmount', 'pendingAmount', 'completedProjects'];
+  displayedColumns: string[] = ['developerName', 'totalEarnings', 'paidAmount', 'pendingAmount', 'completedProjects', 'actions'];
   dataSource = new MatTableDataSource<DeveloperEarning>([]);
   isLoading = false;
   totalEarnings = 0;
@@ -67,7 +67,6 @@ export class DeveloperEarningsComponent implements OnInit {
         }
       });
   }
-
   calculateTotals(earnings: DeveloperEarning[]) {
     this.totalEarnings = earnings.reduce((sum, dev) => sum + dev.totalEarnings, 0);
     this.totalPaid = earnings.reduce((sum, dev) => sum + dev.paidAmount, 0);
@@ -82,4 +81,40 @@ export class DeveloperEarningsComponent implements OnInit {
     this.dateFilterForm.reset();
     this.loadDeveloperEarnings();
   }
+  applySearch(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    // Update totals based on filtered data
+    this.updateTotalsFromFilteredData();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
+  /**
+   * Updates the summary totals based on currently filtered data
+   * This ensures totals reflect what's currently visible in the table
+   */
+  updateTotalsFromFilteredData(): void {
+    // Create a MatTableDataSource instance to leverage its filtering capability
+    const tempDataSource = new MatTableDataSource<DeveloperEarning>(this.dataSource.data);
+    tempDataSource.filter = this.dataSource.filter;
+
+    // Get the filtered data
+    const filteredData = tempDataSource.filteredData;
+
+    // Recalculate totals based on filtered data
+    this.totalEarnings = filteredData.reduce((sum, item) => sum + item.totalEarnings, 0);
+    this.totalPaid = filteredData.reduce((sum, item) => sum + item.paidAmount, 0);
+    this.totalPending = filteredData.reduce((sum, item) => sum + item.pendingAmount, 0);
+
+  }
+  generateReport(){}
+  viewDetails(earning:any){
+    console.log("asdddddddddasdddddddddddd")
+  }
+  downloadStatement(data:any){}
+  processPayment(data:any){}
 }

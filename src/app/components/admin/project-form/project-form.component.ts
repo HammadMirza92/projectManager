@@ -46,7 +46,6 @@ export class ProjectFormComponent implements OnInit {
   }
 
   loadUsers() {
-    debugger;
     this.userService.getDevelopers().subscribe(developers => this.developers = developers);
     this.userService.getClients().subscribe(clients => this.clients = clients);
   }

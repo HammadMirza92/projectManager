@@ -151,21 +151,23 @@
 
           <div class="tasks-list" *ngIf="tasks.length > 0">
             <div class="task-item" *ngFor="let task of tasks">
-              <div class="task-header">
-                <div class="task-title">{{ task.title }}</div>
-                <span class="task-status-badge" [ngClass]="getTaskStatusBadgeClass(task.status)">
-                  {{ task.statusName }}
-                </span>
-              </div>
-              <div class="task-description" *ngIf="task.description">{{ task.description }}</div>
-              <div class="task-footer">
-                <div class="task-assignee" *ngIf="task.assignedToName">
-                  Assigned to: {{ task.assignedToName }}
+              <a class="task-list-btn" routerLink="/admin/tasks/{{ task.id }}" style="text-decoration: none;">
+                <div class="task-header">
+                  <div class="task-title">{{ task.title }}</div>
+                  <span class="task-status-badge" [ngClass]="getTaskStatusBadgeClass(task.status)">
+                    {{ task.statusName }}
+                  </span>
                 </div>
-                <div class="task-due-date" *ngIf="task.dueDate">
-                  Due: {{ task.dueDate | date }}
+                <div class="task-description" *ngIf="task.description">{{ task.description }}</div>
+                <div class="task-footer">
+                  <div class="task-assignee" *ngIf="task.assignedToName">
+                    Assigned to: {{ task.assignedToName }}
+                  </div>
+                  <div class="task-due-date" *ngIf="task.dueDate">
+                    Due: {{ task.dueDate | date }}
+                  </div>
                 </div>
-              </div>
+              </a>
             </div>
           </div>
 
@@ -188,6 +190,8 @@
         <mat-card-content>
           <div class="payments-list" *ngIf="payments.length > 0">
             <div class="payment-item" *ngFor="let payment of payments">
+              <a class="task-list-btn" routerLink="/admin/payments/edit/{{ payment.id }}" style="text-decoration: none;">
+
               <div class="payment-header">
                 <div class="payment-amount">{{ payment.amount | currency }}</div>
                 <span class="payment-status-badge" [ngClass]="getPaymentStatusBadgeClass(payment.status)">
@@ -201,6 +205,7 @@
                   Details: {{ payment.paymentDetails }}
                 </div>
               </div>
+            </a>
             </div>
           </div>
 

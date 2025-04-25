@@ -17,7 +17,6 @@ export class DashboardComponent implements OnInit {
   constructor(private projectService: ProjectService) { }
 
   ngOnInit(): void {
-    debugger;
     this.loadDashboardData();
   }
 

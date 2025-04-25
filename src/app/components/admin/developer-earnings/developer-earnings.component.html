@@ -1,118 +1,256 @@
-<div class="container">
-  <div class="header">
-    <h1 class="title">Developer Earnings</h1>
+<!-- developer-earnings.component.html -->
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1 class="dashboard-title">Developer Earnings Dashboard</h1>
+      <p class="dashboard-subtitle">Track and analyze all developer payments and earnings</p>
+    </div>
+    <div class="header-actions">
+      <button mat-stroked-button class="report-button" (click)="generateReport()">
+        <mat-icon>description</mat-icon>
+        <span>Export Report</span>
+      </button>
+    </div>
   </div>
 
-  <mat-card class="filter-card">
-    <mat-card-content>
-      <form [formGroup]="dateFilterForm" (ngSubmit)="applyFilter()">
-        <div class="filter-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Start Date</mat-label>
-            <input matInput [matDatepicker]="startPicker" formControlName="startDate">
-            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
-            <mat-datepicker #startPicker></mat-datepicker>
-          </mat-form-field>
+  <div class="filter-section">
+    <mat-card class="filter-card mat-elevation-z2">
+      <mat-card-content>
+        <form [formGroup]="dateFilterForm" (ngSubmit)="applyFilter()">
+          <div class="filter-row">
+            <div class="date-fields">
+              <mat-form-field appearance="outline">
+                <mat-label>Start Date</mat-label>
+                <input matInput [matDatepicker]="startPicker" formControlName="startDate" placeholder="MM/DD/YYYY">
+                <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+                <mat-datepicker #startPicker></mat-datepicker>
+                <mat-hint>Filter from this date</mat-hint>
+              </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>End Date</mat-label>
-            <input matInput [matDatepicker]="endPicker" formControlName="endDate">
-            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-            <mat-datepicker #endPicker></mat-datepicker>
-          </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>End Date</mat-label>
+                <input matInput [matDatepicker]="endPicker" formControlName="endDate" placeholder="MM/DD/YYYY">
+                <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+                <mat-datepicker #endPicker></mat-datepicker>
+                <mat-hint>Filter to this date</mat-hint>
+              </mat-form-field>
+            </div>
 
-          <div class="filter-actions">
-            <button mat-button type="button" (click)="resetFilter()">Reset</button>
-            <button mat-raised-button color="primary" type="submit">Apply Filter</button>
+            <mat-form-field appearance="outline" class="developer-filter">
+              <mat-label>Developer</mat-label>
+              <mat-select formControlName="developer">
+                <mat-option value="">All Developers</mat-option>
+                <!-- <mat-option *ngFor="let dev of developers" [value]="dev.id">{{dev.name}}</mat-option> -->
+              </mat-select>
+              <mat-hint>Filter by developer</mat-hint>
+            </mat-form-field>
+
+            <div class="filter-actions">
+              <button mat-button type="button" class="reset-button" (click)="resetFilter()">
+                <mat-icon>refresh</mat-icon>
+                <span>Reset</span>
+              </button>
+              <button mat-raised-button color="primary" type="submit" class="apply-button">
+                <mat-icon>filter_list</mat-icon>
+                <span>Apply Filter</span>
+              </button>
+            </div>
           </div>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
-
-  <div class="summary-cards">
-    <mat-card>
-      <mat-card-content>
-        <div class="summary-label">Total Earnings</div>
-        <div class="summary-value">{{ totalEarnings | currency }}</div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card>
-      <mat-card-content>
-        <div class="summary-label">Total Paid</div>
-        <div class="summary-value">{{ totalPaid | currency }}</div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card>
-      <mat-card-content>
-        <div class="summary-label">Total Pending</div>
-        <div class="summary-value">{{ totalPending | currency }}</div>
+        </form>
       </mat-card-content>
     </mat-card>
   </div>
 
-  <mat-card class="data-card">
-    <mat-card-content>
-      <div class="table-container">
-        <div class="loading-shade" *ngIf="isLoading">
-          <mat-spinner diameter="50"></mat-spinner>
+  <div class="summary-section">
+    <div class="summary-cards">
+      <mat-card class="summary-card total-earnings mat-elevation-z2">
+        <mat-card-content>
+          <div class="card-icon">
+            <mat-icon>payments</mat-icon>
+          </div>
+          <div class="card-content">
+            <div class="summary-label">Total Earnings</div>
+            <div class="summary-value">{{ totalEarnings | currency }}</div>
+            <div class="summary-trend" >
+              <mat-icon class="trend-up">trending_up</mat-icon>
+              <span>100% from previous period</span>
+            </div>
+            <div class="summary-trend" >
+              <mat-icon class="trend-down">trending_down</mat-icon>
+              <span>456% from previous period</span>
+            </div>
+            <div class="summary-trend">
+              <mat-icon>trending_flat</mat-icon>
+              <span>No change from previous period</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card total-paid mat-elevation-z2">
+        <mat-card-content>
+          <div class="card-icon">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <div class="card-content">
+            <div class="summary-label">Total Paid</div>
+            <div class="summary-value">{{ totalPaid | currency }}</div>
+            <div class="summary-info">
+              <span>Last payment: 45</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card total-pending mat-elevation-z2">
+        <mat-card-content>
+          <div class="card-icon">
+            <mat-icon>pending</mat-icon>
+          </div>
+          <div class="card-content">
+            <div class="summary-label">Total Pending</div>
+            <div class="summary-value">{{ totalPending | currency }}</div>
+            <div class="summary-info">
+              <span>Due within: 20 days</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card completed-projects mat-elevation-z2">
+        <mat-card-content>
+          <div class="card-icon">
+            <mat-icon>assignment_turned_in</mat-icon>
+          </div>
+          <div class="card-content">
+            <div class="summary-label">Completed Projects</div>
+            <div class="summary-value">a452</div>
+            <div class="summary-info">
+              <span>Avg. value: 25</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <div class="data-section">
+    <mat-card class="data-card mat-elevation-z3">
+      <mat-card-header>
+        <mat-card-title>Developer Earnings Breakdown</mat-card-title>
+        <mat-card-subtitle>Detailed earnings information by developer</mat-card-subtitle>
+        <div class="header-actions">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Search</mat-label>
+            <input matInput (keyup)="applySearch($event)" placeholder="Search developers...">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
         </div>
+      </mat-card-header>
 
-        <table mat-table [dataSource]="dataSource" matSort>
-          <!-- Developer Name Column -->
-          <ng-container matColumnDef="developerName">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Developer </th>
-            <td mat-cell *matCellDef="let earning"> {{earning.developerName}} </td>
-            <td mat-footer-cell *matFooterCellDef> <strong>Total</strong> </td>
-          </ng-container>
+      <mat-card-content>
+        <div class="table-container">
+          <div class="loading-shade" *ngIf="isLoading">
+            <mat-spinner diameter="50"></mat-spinner>
+          </div>
 
-          <!-- Total Earnings Column -->
-          <ng-container matColumnDef="totalEarnings">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Earnings </th>
-            <td mat-cell *matCellDef="let earning"> {{earning.totalEarnings | currency}} </td>
-            <td mat-footer-cell *matFooterCellDef> <strong>{{totalEarnings | currency}}</strong> </td>
-          </ng-container>
+          <table mat-table [dataSource]="dataSource" matSort class="earnings-table">
+            <!-- Developer Name Column -->
+            <ng-container matColumnDef="developerName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Developer </th>
+              <td mat-cell *matCellDef="let earning">
+                <div class="developer-info">
+                  <div class="developer-avatar">
+                   <mat-icon>person</mat-icon>
+                  </div>
+                  <div class="developer-name">
+                    {{earning.developerName}}
+                  </div>
+                </div>
+              </td>
+              <td mat-footer-cell *matFooterCellDef> <strong>Total</strong> </td>
+            </ng-container>
 
-          <!-- Paid Amount Column -->
-          <ng-container matColumnDef="paidAmount">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Paid Amount </th>
-            <td mat-cell *matCellDef="let earning"> {{earning.paidAmount | currency}} </td>
-            <td mat-footer-cell *matFooterCellDef> <strong>{{totalPaid | currency}}</strong> </td>
-          </ng-container>
+            <!-- Total Earnings Column -->
+            <ng-container matColumnDef="totalEarnings">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Earnings </th>
+              <td mat-cell *matCellDef="let earning"> {{earning.totalEarnings | currency}} </td>
+              <td mat-footer-cell *matFooterCellDef> <strong>{{totalEarnings | currency}}</strong> </td>
+            </ng-container>
 
-          <!-- Pending Amount Column -->
-          <ng-container matColumnDef="pendingAmount">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Pending Amount </th>
-            <td mat-cell *matCellDef="let earning"> {{earning.pendingAmount | currency}} </td>
-            <td mat-footer-cell *matFooterCellDef> <strong>{{totalPending | currency}}</strong> </td>
-          </ng-container>
+            <!-- Paid Amount Column -->
+            <ng-container matColumnDef="paidAmount">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Paid Amount </th>
+              <td mat-cell *matCellDef="let earning"> {{earning.paidAmount | currency}} </td>
+              <td mat-footer-cell *matFooterCellDef> <strong>{{totalPaid | currency}}</strong> </td>
+            </ng-container>
 
-          <!-- Completed Projects Column -->
-          <ng-container matColumnDef="completedProjects">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Completed Projects </th>
-            <td mat-cell *matCellDef="let earning"> {{earning.completedProjects}} </td>
-            <td mat-footer-cell *matFooterCellDef></td>
-          </ng-container>
+            <!-- Pending Amount Column -->
+            <ng-container matColumnDef="pendingAmount">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Pending Amount </th>
+              <td mat-cell *matCellDef="let earning"> {{earning.pendingAmount | currency}} </td>
+              <td mat-footer-cell *matFooterCellDef> <strong>{{totalPending | currency}}</strong> </td>
+            </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-          <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+            <!-- Completed Projects Column -->
+            <ng-container matColumnDef="completedProjects">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Completed Projects </th>
+              <td mat-cell *matCellDef="let earning">
+                <div class="projects-column">
+                  <span class="project-count">{{earning.completedProjects}}</span>
+                  <mat-progress-bar mode="determinate" ></mat-progress-bar>
+                </div>
+              </td>
+              <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
 
-          <!-- Row shown when no data matches the filter -->
-          <tr class="mat-row" *matNoDataRow>
-            <td class="mat-cell" colspan="5">
-              <div class="no-data">
-                <mat-icon>warning</mat-icon>
-                <span>No developer earnings found</span>
-              </div>
-            </td>
-          </tr>
-        </table>
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef> Actions </th>
+              <td mat-cell *matCellDef="let earning">
+                <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Actions">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                  <button mat-menu-item (click)="viewDetails(earning)">
+                    <mat-icon>visibility</mat-icon>
+                    <span>View Details</span>
+                  </button>
+                  <button mat-menu-item (click)="downloadStatement(earning)">
+                    <mat-icon>receipt</mat-icon>
+                    <span>Download Statement</span>
+                  </button>
+                  <button mat-menu-item (click)="processPayment(earning)" [disabled]="earning.pendingAmount <= 0">
+                    <mat-icon>payments</mat-icon>
+                    <span>Process Payment</span>
+                  </button>
+                </mat-menu>
+              </td>
+              <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
 
-        <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 50]"></mat-paginator>
-      </div>
-    </mat-card-content>
-  </mat-card>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="earning-row" (click)="viewDetails(row)"></tr>
+            <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+
+            <!-- Row shown when no data matches the filter -->
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell" colspan="6">
+                <div class="no-data">
+                  <mat-icon>search_off</mat-icon>
+                  <div class="no-data-content">
+                    <h3>No results found</h3>
+                    <p>No developer earnings match your search criteria</p>
+                    <button mat-stroked-button color="primary" (click)="resetFilter()">Reset Filters</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </table>
+
+          <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 50]" showFirstLastButtons></mat-paginator>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
 </div>

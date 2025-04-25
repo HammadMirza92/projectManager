@@ -43,7 +43,6 @@ export class TaskFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    debugger;
     this.editMode = !!this.data.task;
     this.currentUser = localStorage.getItem('currentUser');
     const parsedUser = this.currentUser ? JSON.parse(this.currentUser) : null;
