@@ -59,6 +59,7 @@ const routes: Routes = [
       { path: 'payments', component: PaymentListComponent },
       { path: 'payments/add', component: PaymentFormComponent },
       { path: 'payments/edit/:id', component: PaymentFormComponent },
+      { path: 'developer-earnings', component: DeveloperEarningsComponent },
       { path: 'developer-earnings', component: DeveloperEarningsComponent }
     ]
   },
