@@ -1,0 +1,97 @@
+<div class="task-detail-container">
+  <mat-card class="task-card">
+    <div class="loading-shade" *ngIf="loading">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+
+    <div class="error-container" *ngIf="error">
+      <mat-chip color="warn" selected>{{ error }}</mat-chip>
+    </div>
+
+    <mat-card-header>
+      <div class="header-actions">
+        <button mat-icon-button (click)="goBack()" matTooltip="Go Back">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      </div>
+
+      <mat-card-title *ngIf="task">{{ task.title }}</mat-card-title>
+      <mat-card-subtitle *ngIf="task">
+        <div class="subtitle-container">
+          <span class="project-link" (click)="navigateToProject()">{{ task.projectTitle }}</span>
+          <span class="status-badge" [ngClass]="getStatusClass(task.status)">{{ task.statusName }}</span>
+        </div>
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content *ngIf="task">
+      <div class="task-actions" *ngIf="canEditTask()">
+        <mat-label>Change Status:</mat-label>
+        <div class="status-buttons">
+          <button mat-stroked-button *ngIf="task?.status !== TaskStatus.ToDo"
+            (click)="updateTaskStatus(TaskStatus.ToDo)">
+            To Do
+          </button>
+          <button mat-stroked-button *ngIf="task?.status !== TaskStatus.InProgress"
+            (click)="updateTaskStatus(TaskStatus.InProgress)">
+            In Progress
+          </button>
+          <button mat-stroked-button *ngIf="task?.status !== TaskStatus.Done"
+            (click)="updateTaskStatus(TaskStatus.Done)">
+            Done
+          </button>
+          <button mat-stroked-button *ngIf="task?.status !== TaskStatus.OnHold"
+            (click)="updateTaskStatus(TaskStatus.OnHold)">
+            On Hold
+          </button>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="task-info">
+        <div class="info-section">
+          <h3>Description</h3>
+          <p>{{ task.description || 'No description provided.' }}</p>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Assigned To</span>
+            <span class="info-value">{{ task.assignedToName || 'Unassigned' }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Due Date</span>
+            <!-- <span class="info-value" [ngClass]="{'overdue': task?.dueDate && task?.dueDate < today && task?.status !== TaskStatus.Done}">
+              {{ task?.dueDate | date:'mediumDate' || 'No due date' }}
+            </span> -->
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Created</span>
+            <span class="info-value">{{ task.createdAt | date:'medium' }}</span>
+          </div>
+
+          <div class="info-item" *ngIf="task?.updatedAt">
+            <span class="info-label">Last Updated</span>
+            <span class="info-value">{{ task.updatedAt | date:'medium' }}</span>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions *ngIf="task">
+      <div class="action-buttons">
+        <button mat-raised-button color="primary" (click)="editTask()" *ngIf="canEditTask()">
+          <mat-icon>edit</mat-icon> Edit Task
+        </button>
+        <button mat-raised-button color="warn" (click)="deleteTask()" *ngIf="isAdmin()">
+          <mat-icon>delete</mat-icon> Delete Task
+        </button>
+      </div>
+    </mat-card-actions>
+  </mat-card>
+</div>

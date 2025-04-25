@@ -1,4 +1,4 @@
-<!-- sidebar.component.html -->
+<!-- components/layout/sidebar/sidebar.component.html -->
 <div class="sidenav-content">
   <div class="sidenav-header">
     <h2>Project Management</h2>
@@ -27,6 +27,10 @@
         <mat-icon style="margin-bottom: -5px;">work</mat-icon>
         <span style="margin-left: 10px;">Projects</span>
       </a>
+      <a mat-list-item routerLink="/admin/tasks" routerLinkActive="active">
+        <mat-icon style="margin-bottom: -5px;">assignment</mat-icon>
+        <span style="margin-left: 10px;">Tasks</span>
+      </a>
       <a mat-list-item routerLink="/admin/users" routerLinkActive="active">
         <mat-icon style="margin-bottom: -5px;">people</mat-icon>
         <span style="margin-left: 10px;">Users</span>
@@ -52,6 +56,10 @@
       <a mat-list-item routerLink="/developer/projects" routerLinkActive="active">
         <mat-icon style="margin-bottom: -5px;">work</mat-icon>
         <span style="margin-left: 10px;">Projects</span>
+      </a>
+      <a mat-list-item routerLink="/developer/tasks" routerLinkActive="active">
+        <mat-icon style="margin-bottom: -5px;">assignment</mat-icon>
+        <span style="margin-left: 10px;">Tasks</span>
       </a>
       <a mat-list-item routerLink="/developer/payments" routerLinkActive="active">
         <mat-icon style="margin-bottom: -5px;">payment</mat-icon>

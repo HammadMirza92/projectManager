@@ -34,6 +34,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatDividerModule } from '@angular/material/divider';
 
 // Core Components
 import { LoginComponent } from './components/auth/login/login.component';
@@ -67,10 +69,14 @@ import { ClientTasksComponent } from './components/client/client-tasks/client-ta
 
 // Shared Components
 import { ProjectDetailsComponent } from './components/shared/project-details/project-details.component';
-// import { TaskListComponent } from './components/shared/task-list/task-list.component';
-// import { TaskFormComponent } from './components/shared/task-form/task-form.component';
-// import { ConfirmDialogComponent } from './components/shared/confirm-dialog/confirm-dialog.component';
-// import { LoadingSpinnerComponent } from './components/shared/loading-spinner/loading-spinner.component';
+import { TaskListComponent } from './components/shared/task-list/task-list.component';
+import { TaskFormComponent } from './components/shared/task-form/task-form.component';
+import { ConfirmDialogComponent } from './components/shared/confirm-dialog/confirm-dialog.component';
+import { LoadingSpinnerComponent } from './components/shared/loading-spinner/loading-spinner.component';
+import { AdminTaskFormComponent } from './components/admin/task-form/admin-task-form.component';
+import { AdminTaskListComponent } from './components/admin/task-list/admin-task-list.component';
+import { DeveloperTaskListComponent } from './components/developer/task-list/developer-task-list.component';
+import { TaskDetailComponent } from './components/shared/task-detail/task-detail.component';
 
 @NgModule({
   declarations: [
@@ -98,10 +104,14 @@ import { ProjectDetailsComponent } from './components/shared/project-details/pro
     ClientProjectDetailsComponent,
     ClientTasksComponent,
     ProjectDetailsComponent,
-    // TaskListComponent,
-    // TaskFormComponent,
-    // ConfirmDialogComponent,
-    // LoadingSpinnerComponent
+    TaskListComponent,
+    TaskFormComponent,
+    ConfirmDialogComponent,
+    LoadingSpinnerComponent,
+    AdminTaskFormComponent,
+    AdminTaskListComponent,
+    DeveloperTaskListComponent,
+    TaskDetailComponent
   ],
   imports: [
     BrowserModule,
@@ -133,7 +143,22 @@ import { ProjectDetailsComponent } from './components/shared/project-details/pro
     MatExpansionModule,
     MatTabsModule,
     MatProgressBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatButtonToggleModule,
+    MatDividerModule
+  ],
+  exports: [
+    AdminDashboardComponent,
+    UserListComponent,
+    UserFormComponent,
+    ProjectListComponent,
+    ProjectFormComponent,
+    PaymentListComponent,
+    PaymentFormComponent,
+    DeveloperEarningsComponent,
+    AdminTaskFormComponent,
+    AdminTaskListComponent,
+    DeveloperTaskListComponent
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

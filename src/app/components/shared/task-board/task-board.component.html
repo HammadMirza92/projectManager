@@ -1,0 +1,116 @@
+<div class="task-board-container">
+  <div class="task-board-header">
+    <h2>Task Board</h2>
+    <button mat-raised-button color="primary" *ngIf="canAddTask()" (click)="openTaskForm()">
+      <mat-icon>add</mat-icon> Add Task
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+
+  <div *ngIf="!loading && error" class="error-container">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="loadTasks()">Try Again</button>
+  </div>
+
+  <div *ngIf="!loading && !error" class="task-board">
+    <!-- To Do Column -->
+    <div class="task-column">
+      <div class="column-header">
+        <h3>To Do</h3>
+        <span class="task-count">{{ todoTasks.length }}</span>
+      </div>
+
+      <div
+        cdkDropList
+        #todoList="cdkDropList"
+        id="todo-list"
+        [cdkDropListData]="todoTasks"
+        [cdkDropListConnectedTo]="['in-progress-list', 'done-list']"
+        class="task-list"
+        (cdkDropListDropped)="drop($event)">
+
+        <div *ngIf="todoTasks.length === 0" class="empty-list">
+          <p>No tasks to do</p>
+        </div>
+
+        <div class="task-item" *ngFor="let task of todoTasks" cdkDrag>
+          <div class="task-drag-placeholder" *cdkDragPlaceholder></div>
+          <app-task-card
+            [task]="task"
+            [showProjectTitle]="!projectId"
+            (statusChanged)="onStatusChanged()"
+            (taskDeleted)="onTaskDeleted($event)">
+          </app-task-card>
+        </div>
+      </div>
+    </div>
+
+    <!-- In Progress Column -->
+    <div class="task-column">
+      <div class="column-header">
+        <h3>In Progress</h3>
+        <span class="task-count">{{ inProgressTasks.length }}</span>
+      </div>
+
+      <div
+        cdkDropList
+        #inProgressList="cdkDropList"
+        id="in-progress-list"
+        [cdkDropListData]="inProgressTasks"
+        [cdkDropListConnectedTo]="['todo-list', 'done-list']"
+        class="task-list"
+        (cdkDropListDropped)="drop($event)">
+
+        <div *ngIf="inProgressTasks.length === 0" class="empty-list">
+          <p>No tasks in progress</p>
+        </div>
+
+        <div class="task-item" *ngFor="let task of inProgressTasks" cdkDrag>
+          <div class="task-drag-placeholder" *cdkDragPlaceholder></div>
+          <app-task-card
+            [task]="task"
+            [showProjectTitle]="!projectId"
+            (statusChanged)="onStatusChanged()"
+            (taskDeleted)="onTaskDeleted($event)">
+          </app-task-card>
+        </div>
+      </div>
+    </div>
+
+    <!-- Done Column -->
+    <div class="task-column">
+      <div class="column-header">
+        <h3>Done</h3>
+        <span class="task-count">{{ doneTasks.length }}</span>
+      </div>
+
+      <div
+        cdkDropList
+        #doneList="cdkDropList"
+        id="done-list"
+        [cdkDropListData]="doneTasks"
+        [cdkDropListConnectedTo]="['todo-list', 'in-progress-list']"
+        class="task-list"
+        (cdkDropListDropped)="drop($event)">
+
+        <div *ngIf="doneTasks.length === 0" class="empty-list">
+          <p>No completed tasks</p>
+        </div>
+
+        <div class="task-item" *ngFor="let task of doneTasks" cdkDrag>
+          <div class="task-drag-placeholder" *cdkDragPlaceholder></div>
+          <app-task-card
+            [task]="task"
+            [showProjectTitle]="!projectId"
+            (statusChanged)="onStatusChanged()"
+            (taskDeleted)="onTaskDeleted($event)">
+          </app-task-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

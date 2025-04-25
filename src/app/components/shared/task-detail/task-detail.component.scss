@@ -1,0 +1,158 @@
+/* components/shared/task-detail/task-detail.component.scss */
+.task-detail-container {
+  padding: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+
+  .task-card {
+    position: relative;
+    overflow: visible;
+
+    .loading-shade {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.15);
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+    }
+
+    .error-container {
+      margin: 16px 0;
+    }
+
+    .header-actions {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+    }
+
+    mat-card-title {
+      margin-top: 16px;
+      font-size: 24px;
+    }
+
+    .subtitle-container {
+      display: flex;
+      align-items: center;
+      margin-top: 8px;
+
+      .project-link {
+        color: #3f51b5;
+        cursor: pointer;
+        text-decoration: underline;
+        margin-right: 16px;
+
+        &:hover {
+          color: #303f9f;
+        }
+      }
+
+      .status-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        text-transform: uppercase;
+      }
+
+      .status-todo {
+        background-color: #e0e0e0;
+        color: #616161;
+      }
+
+      .status-progress {
+        background-color: #bbdefb;
+        color: #1976d2;
+      }
+
+      .status-done {
+        background-color: #c8e6c9;
+        color: #388e3c;
+      }
+
+      .status-hold {
+        background-color: #ffe0b2;
+        color: #f57c00;
+      }
+    }
+
+    .task-actions {
+      margin: 16px 0;
+
+      mat-label {
+        font-weight: 500;
+        margin-right: 8px;
+      }
+
+      .status-buttons {
+        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+    }
+
+    mat-divider {
+      margin: 16px 0;
+    }
+
+    .task-info {
+      margin-top: 16px;
+
+      .info-section {
+        margin-bottom: 16px;
+
+        h3 {
+          margin-bottom: 8px;
+          font-weight: 500;
+          color: rgba(0, 0, 0, 0.87);
+        }
+
+        p {
+          white-space: pre-line;
+          color: rgba(0, 0, 0, 0.67);
+        }
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+
+        .info-item {
+          display: flex;
+          flex-direction: column;
+
+          .info-label {
+            font-size: 12px;
+            color: rgba(0, 0, 0, 0.54);
+            margin-bottom: 4px;
+          }
+
+          .info-value {
+            font-size: 16px;
+            color: rgba(0, 0, 0, 0.87);
+          }
+
+          .overdue {
+            color: #f44336;
+            font-weight: 500;
+          }
+        }
+      }
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+    }
+  }
+}

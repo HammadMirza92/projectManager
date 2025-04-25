@@ -1,0 +1,75 @@
+<!-- components/shared/project-task-summary/project-task-summary.component.html -->
+<div class="project-task-summary">
+  <div class="summary-header">
+    <h3>Task Summary</h3>
+    <button mat-button color="primary" (click)="viewAllTasks()" *ngIf="tasks.length > 0">
+      View All Tasks
+    </button>
+  </div>
+
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner diameter="30"></mat-spinner>
+  </div>
+
+  <div class="error-container" *ngIf="error">
+    <p class="error-message">{{ error }}</p>
+  </div>
+
+  <div class="no-tasks" *ngIf="!loading && tasks.length === 0 && !error">
+    <p>No tasks available for this project.</p>
+  </div>
+
+  <div class="summary-content" *ngIf="!loading && tasks.length > 0">
+    <div class="progress-section">
+      <div class="progress-header">
+        <span>Completion</span>
+        <span class="percentage">{{ getCompletionPercentage() }}%</span>
+      </div>
+      <mat-progress-bar
+        mode="determinate"
+        [value]="getCompletionPercentage()"
+        [color]="getCompletionPercentage() === 100 ? 'accent' : 'primary'">
+      </mat-progress-bar>
+    </div>
+
+    <div class="status-counts">
+      <div class="status-item">
+        <div class="status-label" [ngClass]="getStatusClass(0)">To Do</div>
+        <div class="status-value">{{ getStatusCount(0) }}</div>
+      </div>
+      <div class="status-item">
+        <div class="status-label" [ngClass]="getStatusClass(1)">In Progress</div>
+        <div class="status-value">{{ getStatusCount(1) }}</div>
+      </div>
+      <div class="status-item">
+        <div class="status-label" [ngClass]="getStatusClass(2)">Done</div>
+        <div class="status-value">{{ getStatusCount(2) }}</div>
+      </div>
+      <div class="status-item">
+        <div class="status-label" [ngClass]="getStatusClass(3)">On Hold</div>
+        <div class="status-value">{{ getStatusCount(3) }}</div>
+      </div>
+    </div>
+
+    <div class="recent-tasks">
+      <h4>Recent Tasks</h4>
+      <div class="task-list">
+        <div class="task-item" *ngFor="let task of tasks.slice(0, 3)">
+          <div class="task-status" [ngClass]="getStatusClass(task.status)"></div>
+          <div class="task-details">
+            <span class="task-title">{{ task.title }}</span>
+            <span class="task-assignee" *ngIf="task.assignedToName">
+              Assigned to: {{ task.assignedToName }}
+            </span>
+            <span class="task-assignee" *ngIf="!task.assignedToName">
+              Unassigned
+            </span>
+          </div>
+          <div class="task-due-date" *ngIf="task.dueDate">
+            Due: {{ task.dueDate | date:'mediumDate' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

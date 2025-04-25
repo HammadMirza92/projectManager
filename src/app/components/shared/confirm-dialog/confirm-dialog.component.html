@@ -1,8 +1,17 @@
-<h2 mat-dialog-title>{{ data.title }}</h2>
-<div mat-dialog-content>
-  <p>{{ data.message }}</p>
-</div>
-<div mat-dialog-actions align="end">
-  <button mat-button (click)="onCancel()">{{ data.cancelText }}</button>
-  <button mat-raised-button color="warn" (click)="onConfirm()">{{ data.confirmText }}</button>
+<!-- components/shared/confirm-dialog/confirm-dialog.component.html -->
+<div class="confirm-dialog-container">
+  <h2 mat-dialog-title>{{ data.title }}</h2>
+
+  <div mat-dialog-content>
+    <p>{{ data.message }}</p>
+  </div>
+
+  <div mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">
+      {{ data.cancelButtonText || 'Cancel' }}
+    </button>
+    <button mat-raised-button color="warn" (click)="onConfirm()">
+      {{ data.confirmButtonText }}
+    </button>
+  </div>
 </div>

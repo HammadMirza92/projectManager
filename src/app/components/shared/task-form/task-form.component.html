@@ -1,0 +1,88 @@
+<!-- components/shared/task-form/task-form.component.html -->
+<div class="task-form-container">
+  <h2 mat-dialog-title>{{ editMode ? 'Edit Task' : 'Create New Task' }}</h2>
+
+  <div mat-dialog-content>
+    <div class="loading-overlay" *ngIf="loading">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+
+    <div class="error-message" *ngIf="error">
+      {{ error }}
+    </div>
+
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Title</mat-label>
+        <input matInput formControlName="title" placeholder="Task title" required>
+        <mat-error *ngIf="taskForm.get('title')?.hasError('required')">
+          Title is required
+        </mat-error>
+        <mat-error *ngIf="taskForm.get('title')?.hasError('maxlength')">
+          Title cannot exceed 200 characters
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" rows="3" placeholder="Task description"></textarea>
+        <mat-error *ngIf="taskForm.get('description')?.hasError('maxlength')">
+          Description cannot exceed 500 characters
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width" *ngIf="!taskForm.get('projectId')?.disabled">
+        <mat-label>Project</mat-label>
+        <mat-select formControlName="projectId" required>
+          <mat-option *ngFor="let project of projects" [value]="project.id">
+            {{ project.title }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="taskForm.get('projectId')?.hasError('required')">
+          Project is required
+        </mat-error>
+      </mat-form-field>
+
+      <div class="project-display" *ngIf="taskForm.get('projectId')?.disabled && data.projectId">
+        <mat-label>Project:</mat-label>
+        <span>{{ getProjectName(data.projectId) }}</span>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Due Date</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="dueDate">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status" required>
+          <mat-option *ngFor="let option of taskStatusOptions" [value]="option.value">
+            {{ option.label }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="taskForm.get('status')?.hasError('required')">
+          Status is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Assigned To</mat-label>
+        <mat-select formControlName="assignedToId">
+          <mat-option [value]="null">Unassigned</mat-option>
+          <mat-option *ngFor="let developer of developers" [value]="developer.id">
+            {{ developer.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
+  </div>
+
+  <div mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" [disabled]="loading">Cancel</button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="loading || taskForm.invalid">
+      {{ editMode ? 'Update' : 'Create' }}
+    </button>
+  </div>
+</div>

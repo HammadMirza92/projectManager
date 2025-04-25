@@ -194,6 +194,7 @@ mat-progress-bar {
 
 .task-title {
   font-weight: 500;
+  color: Black;
 }
 
 .task-status-badge {
@@ -226,9 +227,13 @@ mat-progress-bar {
 .task-description {
   font-size: 14px;
   margin-bottom: 8px;
+  color: black;
 }
 
 .task-due-date {
   font-size: 13px;
   color: rgba(0, 0, 0, 0.54);
+}
+.task-list-btn{
+  cursor: pointer;
 }

@@ -1,0 +1,81 @@
+/* components/admin/task-form/admin-task-form.component.scss */
+.admin-task-form-container {
+  padding: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+
+  .form-card {
+    position: relative;
+    padding: 16px;
+
+    .loading-shade {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.7);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+    }
+
+    .header-actions {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+    }
+
+    mat-card-title {
+      margin-top: 16px;
+      margin-left: 40px;
+    }
+
+    mat-card-subtitle {
+      margin-left: 40px;
+    }
+
+    .error-message {
+      margin: 16px 0;
+    }
+
+    .form-row {
+      margin-bottom: 16px;
+
+      &.form-row-split {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+
+        @media (max-width: 600px) {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .full-width {
+        width: 100%;
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 24px;
+
+      button {
+        margin-left: 8px;
+        min-width: 120px;
+        position: relative;
+
+        .button-spinner {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+      }
+    }
+  }
+}

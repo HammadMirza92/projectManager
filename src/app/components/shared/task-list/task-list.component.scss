@@ -1,0 +1,122 @@
+/* components/shared/task-list/task-list.component.scss */
+.task-list-container {
+  padding: 16px;
+
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .search-container {
+      flex: 1;
+      mat-form-field {
+        width: 100%;
+        max-width: 500px;
+      }
+    }
+
+    .actions {
+      margin-left: 16px;
+    }
+  }
+
+  .table-container {
+    position: relative;
+    min-height: 200px;
+    overflow: auto;
+
+    .loading-shade {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.15);
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .error-container {
+      padding: 16px;
+
+      .error-message {
+        color: #f44336;
+      }
+    }
+  }
+
+  table {
+    width: 100%;
+
+    .mat-column-title {
+      width: 30%;
+      padding-right: 16px;
+    }
+
+    .mat-column-actions {
+      width: 120px;
+      text-align: center;
+    }
+
+    .task-title {
+      font-weight: 500;
+      cursor: pointer;
+      color: #3f51b5;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .task-description {
+      color: rgba(0, 0, 0, 0.54);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .status-wrapper {
+      display: flex;
+      align-items: center;
+
+      .status-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        text-transform: uppercase;
+      }
+
+      .status-actions {
+        margin-left: 4px;
+      }
+    }
+
+    .status-todo {
+      background-color: #e0e0e0;
+      color: #616161;
+    }
+
+    .status-progress {
+      background-color: #bbdefb;
+      color: #1976d2;
+    }
+
+    .status-done {
+      background-color: #c8e6c9;
+      color: #388e3c;
+    }
+
+    .status-hold {
+      background-color: #ffe0b2;
+      color: #f57c00;
+    }
+
+    .overdue {
+      color: #f44336;
+      font-weight: 500;
+    }
+  }
+}

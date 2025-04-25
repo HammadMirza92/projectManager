@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { ApiResponse, PaginatedResponse } from '../models/api-response.model';
-import { User, UserCreate, UserUpdate } from '../models/user.model';
+import { User, UserCreate, UserRole, UserUpdate } from '../models/user.model';
 import { environment } from '../environments/environment';
 
 @Injectable({
@@ -28,7 +28,17 @@ export class UserService {
         })
       );
   }
-
+  getUsersByRole(role: UserRole): Observable<User[]> {
+    return this.http.get<ApiResponse<User[]>>(`${this.apiUrl}/by-role/${role}`)
+      .pipe(
+        map(response => {
+          if (response.success && response.data) {
+            return response.data;
+          }
+          throw new Error(response.message || `Failed to fetch users with role ${UserRole[role]}`);
+        })
+      );
+  }
   getUserById(id: number): Observable<User> {
     return this.http.get<ApiResponse<User>>(`${this.apiUrl}/${id}`)
       .pipe(

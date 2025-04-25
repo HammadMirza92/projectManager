@@ -105,21 +105,23 @@
         </mat-card-header>
         <mat-card-content>
           <mat-progress-bar mode="determinate" [value]="getTaskCompletionPercentage()"></mat-progress-bar>
-
-          <div class="tasks-list" *ngIf="tasks.length > 0">
-            <div class="task-item" *ngFor="let task of tasks">
-              <div class="task-header">
-                <div class="task-title">{{ task.title }}</div>
-                <span class="task-status-badge" [ngClass]="getTaskStatusBadgeClass(task.status)">
-                  {{ task.statusName }}
-                </span>
-              </div>
-              <div class="task-description" *ngIf="task.description">{{ task.description }}</div>
-              <div class="task-due-date" *ngIf="task.dueDate">
-                Due: {{ task.dueDate | date }}
+            <div class="tasks-list" *ngIf="tasks.length > 0">
+              <div class="task-item" *ngFor="let task of tasks">
+                <a class="task-list-btn" routerLink="/developer/tasks/{{ task.id }}" style="text-decoration: none;">
+                <div class="task-header">
+                  <div class="task-title">{{ task.title }}</div>
+                  <span class="task-status-badge" [ngClass]="getTaskStatusBadgeClass(task.status)">
+                    {{ task.statusName }}
+                  </span>
+                </div>
+                <div class="task-description" *ngIf="task.description">{{ task.description }}</div>
+                <div class="task-due-date" *ngIf="task.dueDate">
+                  Due: {{ task.dueDate | date }}
+                </div>
+              </a>
               </div>
             </div>
-          </div>
+
 
           <div class="no-content" *ngIf="tasks.length === 0">No tasks assigned to this project</div>
         </mat-card-content>

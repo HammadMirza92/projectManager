@@ -1,0 +1,111 @@
+.task-board-container {
+  padding: 16px;
+}
+
+.task-board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.loading-container, .error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+
+  p {
+    margin: 16px 0;
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.task-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.task-column {
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+
+  h3 {
+    margin: 0;
+  }
+
+  .task-count {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    font-weight: bold;
+  }
+}
+
+.task-list {
+  min-height: 60vh;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.empty-list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-radius: 4px;
+
+  p {
+    color: rgba(0, 0, 0, 0.4);
+  }
+}
+
+.task-item {
+  margin-bottom: 16px;
+  cursor: move;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.task-drag-placeholder {
+  background: rgba(0, 0, 0, 0.1);
+  border: 1px dashed rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  min-height: 120px;
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  opacity: 0.9;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .task-item:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
