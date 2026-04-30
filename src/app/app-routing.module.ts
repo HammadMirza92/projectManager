@@ -10,10 +10,10 @@ import { AdminDashboardComponent } from './components/admin/admin-dashboard/admi
 import { UserListComponent } from './components/admin/user-list/user-list.component';
 import { UserFormComponent } from './components/admin/user-form/user-form.component';
 import { ProjectListComponent } from './components/admin/project-list/project-list.component';
-import { PaymentListComponent } from './components/admin/payment-list/payment-list.component';
 import { ProjectFormComponent } from './components/admin/project-form/project-form.component';
-import { PaymentFormComponent } from './components/admin/payment-form/payment-form.component';
 import { DeveloperEarningsComponent } from './components/admin/developer-earnings/developer-earnings.component';
+import { WithdrawalsComponent } from './components/admin/withdrawals/withdrawals.component';
+import { ExpensesComponent } from './components/admin/expenses/expenses.component';
 
 // Developer Components
 import { DeveloperDashboardComponent } from './components/developer/developer-dashboard/developer-dashboard.component';
@@ -56,10 +56,9 @@ const routes: Routes = [
       { path: 'projects/add', component: ProjectFormComponent },
       { path: 'projects/edit/:id', component: ProjectFormComponent },
       { path: 'projects/:id', component: ProjectDetailsComponent },
-      { path: 'payments', component: PaymentListComponent },
-      { path: 'payments/add', component: PaymentFormComponent },
-      { path: 'payments/edit/:id', component: PaymentFormComponent },
-      { path: 'developer-earnings', component: DeveloperEarningsComponent }
+      { path: 'developer-earnings', component: DeveloperEarningsComponent },
+      { path: 'withdrawals', component: WithdrawalsComponent },
+      { path: 'expenses', component: ExpensesComponent }
     ]
   },
 

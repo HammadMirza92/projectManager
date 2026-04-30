@@ -31,6 +31,9 @@ export class AuthService {
         map(response => {
           if (response.success && response.data) {
             localStorage.setItem('currentUser', JSON.stringify(response.data));
+            if (response.meta && response.meta['token']) {
+              localStorage.setItem('token', response.meta['token']);
+            }
             this.currentUserSubject.next(response.data);
             return response.data;
           }
@@ -53,6 +56,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('token');
     this.currentUserSubject.next(null);
   }
 

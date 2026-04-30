@@ -1,57 +1,61 @@
 .dashboard-container {
-  padding: 16px;
+  padding: 24px;
 }
 
 .dashboard-title {
-  margin-bottom: 24px;
-  color: #3f51b5;
+  margin: 0 0 28px;
+  font-size: 26px;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: -0.3px;
 }
 
 .stats-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .stat-card {
-  height: 100%;
+  border-radius: 12px !important;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: default;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1) !important;
+  }
 
   mat-card-content {
     display: flex;
     align-items: center;
-    padding: 16px;
+    padding: 20px !important;
+    gap: 16px;
   }
 }
 
 .stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background-color: #3f51b5;
-  color: white;
-  margin-right: 16px;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
 
   mat-icon {
-    font-size: 32px;
-    width: 32px;
-    height: 32px;
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+    color: white;
   }
 
-  &.active {
-    background-color: #4caf50;
-  }
-
-  &.completed {
-    background-color: #2196f3;
-  }
-
-  &.money {
-    background-color: #ff9800;
-  }
+  &.active { background: linear-gradient(135deg, #16a34a, #15803d); }
+  &.completed { background: linear-gradient(135deg, #4f46e5, #4338ca); }
+  &.money { background: linear-gradient(135deg, #f59e0b, #d97706); }
 }
 
 .stat-info {
@@ -60,18 +64,32 @@
 }
 
 .stat-value {
-  font-size: 28px;
-  font-weight: 500;
+  font-size: 26px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1;
+  margin-bottom: 4px;
 }
 
 .stat-label {
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.54);
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
 }
 
 .my-projects,
 .recent-tasks {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+}
+
+mat-card {
+  border-radius: 12px !important;
+}
+
+mat-card-title {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #1e293b;
 }
 
 table {

@@ -46,7 +46,6 @@ export class ProjectFormComponent implements OnInit {
   }
 
   loadUsers() {
-    debugger;
     this.userService.getDevelopers().subscribe(developers => this.developers = developers);
     this.userService.getClients().subscribe(clients => this.clients = clients);
   }
@@ -67,7 +66,18 @@ export class ProjectFormComponent implements OnInit {
       totalAfterDeduction: [0, [Validators.required, Validators.min(0)]],
       developerAmount: [0, [Validators.required, Validators.min(0)]],
       status: [ProjectStatus.Pending, [Validators.required]],
-      platform: ['']
+      platform: [''],
+      // Admin payment fields
+      paymentInDollarTotal: [0],
+      paymentInDollarAfterDeduction: [0],
+      paymentWrtDevTotal: [0],
+      paymentWrtDevAfterDeduction: [0],
+      tipAmount: [0],
+      devPayment: [0],
+      devPaymentStatus: [false],
+      paymentStatusOnFiverr: [''],
+      dollarRate: [0],
+      dollarRateWrtDev: [0]
     });
   }
 
@@ -93,7 +103,17 @@ export class ProjectFormComponent implements OnInit {
             totalAfterDeduction: project.totalAfterDeduction,
             developerAmount: project.developerAmount,
             status: project.status,
-            platform: project.platform
+            platform: project.platform,
+            paymentInDollarTotal: project.paymentInDollarTotal || 0,
+            paymentInDollarAfterDeduction: project.paymentInDollarAfterDeduction || 0,
+            paymentWrtDevTotal: project.paymentWrtDevTotal || 0,
+            paymentWrtDevAfterDeduction: project.paymentWrtDevAfterDeduction || 0,
+            tipAmount: project.tipAmount || 0,
+            devPayment: project.devPayment || 0,
+            devPaymentStatus: project.devPaymentStatus || false,
+            paymentStatusOnFiverr: project.paymentStatusOnFiverr || '',
+            dollarRate: project.dollarRate || 0,
+            dollarRateWrtDev: project.dollarRateWrtDev || 0
           });
           this.isLoading = false;
         },
@@ -120,22 +140,33 @@ export class ProjectFormComponent implements OnInit {
   }
 
   createProject() {
+    const v = this.projectForm.value;
     const projectData: ProjectCreate = {
-      title: this.projectForm.value.title,
-      description: this.projectForm.value.description,
-      orderLink: this.projectForm.value.orderLink,
-      developerId: this.projectForm.value.developerId,
-      clientId: this.projectForm.value.clientId,
-      websiteUrl: this.projectForm.value.websiteUrl,
-      websiteLogin: this.projectForm.value.websiteLogin,
-      startDate: this.projectForm.value.startDate,
-      endDate: this.projectForm.value.endDate,
-      sourceOfProject: this.projectForm.value.sourceOfProject,
-      totalBudget: this.projectForm.value.totalBudget,
-      totalAfterDeduction: this.projectForm.value.totalAfterDeduction,
-      developerAmount: this.projectForm.value.developerAmount,
-      status: this.projectForm.value.status,
-      platform: this.projectForm.value.platform
+      title: v.title,
+      description: v.description,
+      orderLink: v.orderLink,
+      developerId: v.developerId,
+      clientId: v.clientId,
+      websiteUrl: v.websiteUrl,
+      websiteLogin: v.websiteLogin,
+      startDate: v.startDate,
+      endDate: v.endDate,
+      sourceOfProject: v.sourceOfProject,
+      totalBudget: v.totalBudget,
+      totalAfterDeduction: v.totalAfterDeduction,
+      developerAmount: v.developerAmount,
+      status: v.status,
+      platform: v.platform,
+      paymentInDollarTotal: v.paymentInDollarTotal,
+      paymentInDollarAfterDeduction: v.paymentInDollarAfterDeduction,
+      paymentWrtDevTotal: v.paymentWrtDevTotal,
+      paymentWrtDevAfterDeduction: v.paymentWrtDevAfterDeduction,
+      tipAmount: v.tipAmount,
+      devPayment: v.devPayment,
+      devPaymentStatus: v.devPaymentStatus,
+      paymentStatusOnFiverr: v.paymentStatusOnFiverr,
+      dollarRate: v.dollarRate,
+      dollarRateWrtDev: v.dollarRateWrtDev
     };
 
     this.projectService.createProject(projectData)
@@ -154,21 +185,32 @@ export class ProjectFormComponent implements OnInit {
   updateProject() {
     if (!this.projectId) return;
 
+    const v = this.projectForm.value;
     const projectData: ProjectUpdate = {
-      title: this.projectForm.value.title,
-      description: this.projectForm.value.description,
-      orderLink: this.projectForm.value.orderLink,
-      developerId: this.projectForm.value.developerId,
-      websiteUrl: this.projectForm.value.websiteUrl,
-      websiteLogin: this.projectForm.value.websiteLogin,
-      startDate: this.projectForm.value.startDate,
-      endDate: this.projectForm.value.endDate,
-      sourceOfProject: this.projectForm.value.sourceOfProject,
-      totalBudget: this.projectForm.value.totalBudget,
-      totalAfterDeduction: this.projectForm.value.totalAfterDeduction,
-      developerAmount: this.projectForm.value.developerAmount,
-      status: this.projectForm.value.status,
-      platform: this.projectForm.value.platform
+      title: v.title,
+      description: v.description,
+      orderLink: v.orderLink,
+      developerId: v.developerId,
+      websiteUrl: v.websiteUrl,
+      websiteLogin: v.websiteLogin,
+      startDate: v.startDate,
+      endDate: v.endDate,
+      sourceOfProject: v.sourceOfProject,
+      totalBudget: v.totalBudget,
+      totalAfterDeduction: v.totalAfterDeduction,
+      developerAmount: v.developerAmount,
+      status: v.status,
+      platform: v.platform,
+      paymentInDollarTotal: v.paymentInDollarTotal,
+      paymentInDollarAfterDeduction: v.paymentInDollarAfterDeduction,
+      paymentWrtDevTotal: v.paymentWrtDevTotal,
+      paymentWrtDevAfterDeduction: v.paymentWrtDevAfterDeduction,
+      tipAmount: v.tipAmount,
+      devPayment: v.devPayment,
+      devPaymentStatus: v.devPaymentStatus,
+      paymentStatusOnFiverr: v.paymentStatusOnFiverr,
+      dollarRate: v.dollarRate,
+      dollarRateWrtDev: v.dollarRateWrtDev
     };
 
     this.projectService.updateProject(this.projectId, projectData)
@@ -186,15 +228,29 @@ export class ProjectFormComponent implements OnInit {
 
   onTotalBudgetChange() {
     const totalBudget = this.projectForm.get('totalBudget')?.value || 0;
-    // Calculate totalAfterDeduction as 90% of totalBudget (10% fee)
     const totalAfterDeduction = totalBudget * 0.9;
-    // Calculate developerAmount as 70% of totalAfterDeduction
     const developerAmount = totalAfterDeduction * 0.7;
+    this.projectForm.patchValue({ totalAfterDeduction, developerAmount }, { emitEvent: false });
+  }
 
+  onPaymentTotalChange() {
+    const total = this.projectForm.get('paymentInDollarTotal')?.value || 0;
+    const afterDeduction = Math.round(total * 0.8 * 100) / 100;
+    const wrtDevTotal = afterDeduction;
+    const wrtDevAfterDeduction = Math.round(afterDeduction * 0.8 * 100) / 100;
+    const devPayment = Math.round(wrtDevAfterDeduction * 0.5 * 100) / 100;
     this.projectForm.patchValue({
-      totalAfterDeduction: totalAfterDeduction,
-      developerAmount: developerAmount
-    });
+      paymentInDollarAfterDeduction: afterDeduction,
+      paymentWrtDevTotal: wrtDevTotal,
+      paymentWrtDevAfterDeduction: wrtDevAfterDeduction,
+      devPayment
+    }, { emitEvent: false });
+  }
+
+  onWrtDevChange() {
+    const wrtDevAfterDeduction = this.projectForm.get('paymentWrtDevAfterDeduction')?.value || 0;
+    const devPayment = Math.round(wrtDevAfterDeduction * 0.5 * 100) / 100;
+    this.projectForm.patchValue({ devPayment }, { emitEvent: false });
   }
 
   cancel() {

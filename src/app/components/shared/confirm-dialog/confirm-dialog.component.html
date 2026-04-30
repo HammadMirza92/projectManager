@@ -1,8 +1,40 @@
-<h2 mat-dialog-title>{{ data.title }}</h2>
-<div mat-dialog-content>
-  <p>{{ data.message }}</p>
-</div>
-<div mat-dialog-actions align="end">
-  <button mat-button (click)="onCancel()">{{ data.cancelText }}</button>
-  <button mat-raised-button color="warn" (click)="onConfirm()">{{ data.confirmText }}</button>
+<div class="dialog-wrap">
+
+  <!-- Icon header -->
+  <div class="dialog-icon-row" [class.danger]="data.isDanger">
+    <div class="dialog-icon">
+      <mat-icon>{{ data.isDanger ? 'delete_forever' : 'help_outline' }}</mat-icon>
+    </div>
+  </div>
+
+  <!-- Title -->
+  <h2 class="dialog-title">{{ data.title }}</h2>
+
+  <!-- Message -->
+  <p class="dialog-message">{{ data.message }}</p>
+
+  <!-- Item name highlight (optional) -->
+  <div class="item-name" *ngIf="data.itemName">
+    <mat-icon>folder_open</mat-icon>
+    <span>{{ data.itemName }}</span>
+  </div>
+
+  <!-- Warning note -->
+  <div class="dialog-warning" *ngIf="data.isDanger">
+    <mat-icon>warning_amber</mat-icon>
+    <span>This action cannot be undone.</span>
+  </div>
+
+  <!-- Actions -->
+  <div class="dialog-actions">
+    <button mat-stroked-button class="cancel-btn" (click)="onCancel()">
+      <mat-icon>close</mat-icon>
+      {{ data.cancelText }}
+    </button>
+    <button mat-flat-button class="confirm-btn" [class.danger-btn]="data.isDanger" (click)="onConfirm()">
+      <mat-icon>{{ data.isDanger ? 'delete' : 'check' }}</mat-icon>
+      {{ data.confirmText }}
+    </button>
+  </div>
+
 </div>

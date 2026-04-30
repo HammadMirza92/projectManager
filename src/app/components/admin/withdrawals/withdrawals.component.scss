@@ -1,0 +1,131 @@
+.page-wrapper { padding: 24px; background: #f5f7fa; min-height: 100vh; }
+
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+  h1 { margin: 0; font-size: 22px; font-weight: 600; }
+  .subtitle { font-size: 13px; color: #9aa0a6; }
+}
+
+.header-left { display: flex; align-items: center; gap: 12px; }
+.page-icon { font-size: 36px; width: 36px; height: 36px; color: #1967d2; }
+
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+  @media (max-width: 1200px) { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 768px) { grid-template-columns: 1fr 1fr; }
+}
+
+.summary-card mat-card-content {
+  display: flex; align-items: center; gap: 12px; padding: 16px !important;
+}
+
+.s-icon { font-size: 28px; width: 28px; height: 28px; border-radius: 8px; padding: 4px; }
+.balance-card  .s-icon { background: #e8f0fe; color: #1967d2; }
+.withdrawn-card .s-icon{ background: #fce8e6; color: #c5221f; }
+.fee-card      .s-icon { background: #fef3e2; color: #b06000; }
+.net-card      .s-icon { background: #e6f4ea; color: #137333; }
+.count-card    .s-icon { background: #f1f3f4; color: #5f6368; }
+
+.s-label { font-size: 11px; color: #9aa0a6; }
+.s-value { font-size: 20px; font-weight: 700; color: #202124; &.negative { color: #c5221f; } }
+.s-hint  { font-size: 10px; color: #bdc1c6; margin-top: 2px; }
+
+// Pending projects alert
+.pending-projects-card {
+  border-radius: 12px !important;
+  margin-bottom: 20px;
+  border-left: 4px solid #f29900 !important;
+  background: #fffbf2 !important;
+
+  .new-icon { color: #f29900; background: transparent; }
+}
+
+.pending-chips {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;
+}
+
+.pending-chip {
+  display: flex; align-items: center; gap: 4px;
+  background: #fef3e2; color: #b06000;
+  padding: 4px 10px; border-radius: 12px; font-size: 12px;
+  mat-icon { font-size: 14px; width: 14px; height: 14px; }
+}
+
+// Filter
+.filter-card {
+  border-radius: 12px !important; margin-bottom: 20px;
+  .filter-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .filter-actions { display: flex; gap: 8px; }
+}
+
+// Form
+.form-card { border-radius: 12px !important; margin-bottom: 20px; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 120px;
+  gap: 16px;
+  align-items: start;
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+
+  .span-2 { grid-column: span 2; }
+}
+
+.net-preview {
+  padding: 12px 16px; background: #e8f0fe; border-radius: 8px; text-align: center;
+  .net-label { font-size: 11px; color: #5f6368; }
+  .net-val   { font-size: 22px; font-weight: 700; color: #1967d2; }
+  .net-hint  { font-size: 10px; color: #9aa0a6; }
+}
+
+.form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 16px; }
+
+// History table
+.table-card { border-radius: 12px !important; margin-bottom: 20px; }
+
+table { width: 100%; }
+th.mat-header-cell { font-weight: 600; color: #5f6368; font-size: 12px; text-transform: uppercase; }
+.main-row { cursor: default; }
+
+.amount-col { font-weight: 600; color: #202124; }
+.fee-val    { color: #c5221f; }
+
+.proj-expand-btn {
+  font-size: 12px; color: #1967d2; padding: 0 4px;
+  mat-icon { font-size: 16px; }
+}
+
+.muted { color: #9aa0a6; font-size: 13px; }
+
+// Expanded project panel — rendered below the main table rows
+.project-expand-panel {
+  margin: 0 0 4px 0;
+  background: #f8faff;
+  border-left: 3px solid #1967d2;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+}
+
+.expand-header {
+  padding: 8px 16px;
+  font-size: 12px; font-weight: 600; color: #1967d2;
+  background: #e8f0fe;
+}
+
+.inner-table {
+  width: 100%;
+  th.mat-header-cell { font-size: 11px; padding: 4px 16px; }
+  td.mat-cell { padding: 4px 16px; font-size: 13px; }
+}
+
+.loading-row { display: flex; justify-content: center; padding: 40px; }
+
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 48px; color: #9aa0a6;
+  mat-icon { font-size: 48px; width: 48px; height: 48px; margin-bottom: 12px; }
+}

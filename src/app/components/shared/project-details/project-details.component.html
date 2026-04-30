@@ -1,212 +1,340 @@
-<div class="container">
-  <div class="header">
-    <button mat-icon-button (click)="navigateBack()">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <h1 class="title">Project Details</h1>
-    <div class="actions" *ngIf="isAdmin()">
-      <button mat-icon-button color="primary" (click)="editProject()" matTooltip="Edit Project">
-        <mat-icon>edit</mat-icon>
+<div class="page-wrapper">
+  <!-- Header Bar -->
+  <div class="page-header">
+    <div class="header-left">
+      <button mat-icon-button (click)="navigateBack()" class="back-btn">
+        <mat-icon>arrow_back</mat-icon>
       </button>
-      <button mat-icon-button color="warn" (click)="deleteProject()" matTooltip="Delete Project">
-        <mat-icon>delete</mat-icon>
+      <div class="header-title">
+        <h1>Project Details</h1>
+        <span class="breadcrumb">Projects / Details</span>
+      </div>
+    </div>
+    <div class="header-actions" *ngIf="isAdmin()">
+      <button mat-stroked-button color="primary" (click)="editProject()">
+        <mat-icon>edit</mat-icon> Edit
+      </button>
+      <button mat-stroked-button color="warn" (click)="deleteProject()">
+        <mat-icon>delete_outline</mat-icon> Delete
       </button>
     </div>
   </div>
 
+  <!-- Loading -->
   <div class="loading-container" *ngIf="isLoading">
-    <mat-spinner></mat-spinner>
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Loading project...</p>
   </div>
 
-  <div *ngIf="project && !isLoading">
-    <mat-card class="project-header-card">
+  <div *ngIf="project && !isLoading" class="content">
+
+    <!-- Hero Card -->
+    <mat-card class="hero-card">
       <mat-card-content>
-        <div class="project-header">
-          <div class="project-title">
-            <h2>{{ project.title }}</h2>
-            <span class="status-badge" [ngClass]="getStatusBadgeClass(project.status)">
-              {{ project.statusName }}
-            </span>
+        <div class="hero-inner">
+          <div class="hero-left">
+            <div class="project-icon">
+              <mat-icon>folder_open</mat-icon>
+            </div>
+            <div class="project-meta">
+              <h2 class="project-title">{{ project.title }}</h2>
+              <div class="project-tags">
+                <span class="status-chip" [ngClass]="getStatusBadgeClass(project.status)">
+                  {{ project.statusName }}
+                </span>
+                <span class="platform-chip" *ngIf="project.platform">
+                  <mat-icon>developer_board</mat-icon> {{ project.platform }}
+                </span>
+                <span class="source-chip" *ngIf="project.sourceOfProject">
+                  <mat-icon>source</mat-icon> {{ project.sourceOfProject }}
+                </span>
+              </div>
+              <p class="project-desc" *ngIf="project.description">{{ project.description }}</p>
+            </div>
           </div>
-          <div class="project-deadline">
-            <div class="deadline-label">Deadline</div>
-            <div class="deadline-date">{{ project.endDate | date }}</div>
-            <div class="deadline-days" [ngClass]="getDaysRemainingColor(project.daysRemaining)">
-              {{ project.daysRemaining }} days remaining
+          <div class="hero-right">
+            <div class="deadline-widget" [ngClass]="getDaysRemainingColor(project.daysRemaining)">
+              <mat-icon class="deadline-icon">schedule</mat-icon>
+              <div class="deadline-info">
+                <span class="deadline-label">Deadline</span>
+                <span class="deadline-date">{{ project.endDate | date:'mediumDate' }}</span>
+                <span class="deadline-days">
+                  {{ project.daysRemaining === 0 ? 'Due today' : project.daysRemaining + ' days left' }}
+                </span>
+              </div>
+            </div>
+            <div class="progress-widget">
+              <div class="progress-label">
+                <span>Task Progress</span>
+                <span class="progress-pct">{{ getTaskCompletionPercentage() }}%</span>
+              </div>
+              <mat-progress-bar mode="determinate" [value]="getTaskCompletionPercentage()" color="primary"></mat-progress-bar>
+              <span class="progress-sub">{{ getCompletedTaskCount() }} of {{ tasks.length }} tasks done</span>
             </div>
           </div>
         </div>
       </mat-card-content>
     </mat-card>
 
-    <div class="grid-container">
-      <mat-card class="info-card">
-        <mat-card-header>
-          <mat-card-title>Project Information</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="info-item">
-            <div class="info-label">Client</div>
-            <div class="info-value">{{ project.clientName }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Developer</div>
-            <div class="info-value">{{ project.developerName }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Source</div>
-            <div class="info-value">{{ project.sourceOfProject || 'Not specified' }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Platform</div>
-            <div class="info-value">{{ project.platform || 'Not specified' }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Start Date</div>
-            <div class="info-value">{{ project.startDate | date }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">End Date</div>
-            <div class="info-value">{{ project.endDate | date }}</div>
-          </div>
-        </mat-card-content>
-      </mat-card>
+    <!-- Main Grid -->
+    <div class="main-grid">
 
-      <mat-card class="financial-card">
-        <mat-card-header>
-          <mat-card-title>Financial Details</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="info-item">
-            <div class="info-label">Total Budget</div>
-            <div class="info-value">{{ project.totalBudget | currency }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Total After Deduction</div>
-            <div class="info-value">{{ project.totalAfterDeduction | currency }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Developer Amount</div>
-            <div class="info-value">{{ project.developerAmount | currency }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Paid Amount</div>
-            <div class="info-value">{{ getTotalPaidAmount() | currency }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Remaining Amount</div>
-            <div class="info-value">{{ getRemainingAmount() | currency }}</div>
-          </div>
-        </mat-card-content>
-      </mat-card>
+      <!-- Left Column -->
+      <div class="left-col">
 
-      <mat-card class="links-card">
-        <mat-card-header>
-          <mat-card-title>Project Links</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="info-item" *ngIf="project.orderLink">
-            <div class="info-label">Order Link</div>
-            <div class="info-value">
-              <a [href]="project.orderLink" target="_blank">{{ project.orderLink }}</a>
-            </div>
-          </div>
-          <div class="info-item" *ngIf="project.websiteUrl">
-            <div class="info-label">Website URL</div>
-            <div class="info-value">
-              <a [href]="project.websiteUrl" target="_blank">{{ project.websiteUrl }}</a>
-            </div>
-          </div>
-          <div class="info-item" *ngIf="project.websiteLogin">
-            <div class="info-label">Website Login</div>
-            <div class="info-value">{{ project.websiteLogin }}</div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="description-card">
-        <mat-card-header>
-          <mat-card-title>Project Description</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <p *ngIf="project.description">{{ project.description }}</p>
-          <p *ngIf="!project.description" class="no-content">No description provided</p>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="tasks-card">
-        <mat-card-header>
-          <div class="header-with-action">
-            <div>
-              <mat-card-title>Project Tasks</mat-card-title>
-              <mat-card-subtitle>Completion: {{ getTaskCompletionPercentage() }}%</mat-card-subtitle>
-            </div>
-            <button mat-mini-fab color="primary" *ngIf="isAdmin()" (click)="addTask()" matTooltip="Add Task">
-              <mat-icon>add</mat-icon>
-            </button>
-          </div>
-        </mat-card-header>
-        <mat-card-content>
-          <mat-progress-bar mode="determinate" [value]="getTaskCompletionPercentage()"></mat-progress-bar>
-
-          <div class="tasks-list" *ngIf="tasks.length > 0">
-            <div class="task-item" *ngFor="let task of tasks">
-              <div class="task-header">
-                <div class="task-title">{{ task.title }}</div>
-                <span class="task-status-badge" [ngClass]="getTaskStatusBadgeClass(task.status)">
-                  {{ task.statusName }}
-                </span>
+        <!-- Project Info Card -->
+        <mat-card class="section-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="card-icon info-icon">info_outline</mat-icon>
+            <mat-card-title>Project Information</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="info-grid">
+              <div class="info-row">
+                <span class="info-label"><mat-icon>person_outline</mat-icon> Client</span>
+                <span class="info-value">{{ project.clientName }}</span>
               </div>
-              <div class="task-description" *ngIf="task.description">{{ task.description }}</div>
-              <div class="task-footer">
-                <div class="task-assignee" *ngIf="task.assignedToName">
-                  Assigned to: {{ task.assignedToName }}
-                </div>
-                <div class="task-due-date" *ngIf="task.dueDate">
-                  Due: {{ task.dueDate | date }}
-                </div>
+              <div class="info-row">
+                <span class="info-label"><mat-icon>code</mat-icon> Developer</span>
+                <span class="info-value">{{ project.developerName }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label"><mat-icon>date_range</mat-icon> Start Date</span>
+                <span class="info-value">{{ project.startDate | date:'mediumDate' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label"><mat-icon>event</mat-icon> End Date</span>
+                <span class="info-value">{{ project.endDate | date:'mediumDate' }}</span>
+              </div>
+              <div class="info-row" *ngIf="project.orderLink">
+                <span class="info-label"><mat-icon>receipt_long</mat-icon> Order Link</span>
+                <a [href]="project.orderLink" target="_blank" class="link-value">View Order <mat-icon class="ext-icon">open_in_new</mat-icon></a>
+              </div>
+              <div class="info-row" *ngIf="project.websiteUrl">
+                <span class="info-label"><mat-icon>language</mat-icon> Website</span>
+                <a [href]="project.websiteUrl" target="_blank" class="link-value">Visit Site <mat-icon class="ext-icon">open_in_new</mat-icon></a>
+              </div>
+              <div class="info-row" *ngIf="project.websiteLogin">
+                <span class="info-label"><mat-icon>vpn_key</mat-icon> Login</span>
+                <span class="info-value mono">{{ project.websiteLogin }}</span>
               </div>
             </div>
-          </div>
+          </mat-card-content>
+        </mat-card>
 
-          <div class="no-content" *ngIf="tasks.length === 0">No tasks assigned to this project</div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="payments-card">
-        <mat-card-header>
-          <div class="header-with-action">
-            <div>
-              <mat-card-title>Project Payments</mat-card-title>
-              <mat-card-subtitle>Total: {{ getTotalPaidAmount() | currency }}</mat-card-subtitle>
+        <!-- Tasks Card -->
+        <mat-card class="section-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="card-icon tasks-icon">task_alt</mat-icon>
+            <mat-card-title>Tasks</mat-card-title>
+            <mat-card-subtitle>{{ getCompletedTaskCount() }}/{{ tasks.length }} completed</mat-card-subtitle>
+            <div class="card-action" *ngIf="isAdmin()">
+              <button mat-mini-fab color="primary" (click)="addTask()" matTooltip="Add Task">
+                <mat-icon>add</mat-icon>
+              </button>
             </div>
-            <button mat-mini-fab color="primary" *ngIf="isAdmin()" (click)="addPayment()" matTooltip="Add Payment">
-              <mat-icon>add</mat-icon>
-            </button>
-          </div>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="payments-list" *ngIf="payments.length > 0">
-            <div class="payment-item" *ngFor="let payment of payments">
-              <div class="payment-header">
-                <div class="payment-amount">{{ payment.amount | currency }}</div>
-                <span class="payment-status-badge" [ngClass]="getPaymentStatusBadgeClass(payment.status)">
+          </mat-card-header>
+          <mat-card-content>
+            <div class="tasks-list" *ngIf="tasks.length > 0; else noTasks">
+              <div class="task-item" *ngFor="let task of tasks" [ngClass]="'task-' + task.status.toLowerCase()">
+                <div class="task-left">
+                  <mat-icon class="task-check" [ngClass]="task.status === 'Done' ? 'done' : ''">
+                    {{ task.status === 'Done' ? 'check_circle' : 'radio_button_unchecked' }}
+                  </mat-icon>
+                  <div class="task-content">
+                    <div class="task-title" [ngClass]="{'strikethrough': task.status === 'Done'}">{{ task.title }}</div>
+                    <div class="task-sub" *ngIf="task.description">{{ task.description }}</div>
+                    <div class="task-footer-info">
+                      <span *ngIf="task.assignedToName" class="task-assignee">
+                        <mat-icon>person</mat-icon> {{ task.assignedToName }}
+                      </span>
+                      <span *ngIf="task.dueDate" class="task-due">
+                        <mat-icon>event</mat-icon> {{ task.dueDate | date:'shortDate' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <span class="task-badge" [ngClass]="getTaskStatusBadgeClass(task.status)">{{ task.statusName }}</span>
+              </div>
+            </div>
+            <ng-template #noTasks>
+              <div class="empty-state">
+                <mat-icon>assignment</mat-icon>
+                <p>No tasks yet</p>
+              </div>
+            </ng-template>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Payments Card -->
+        <mat-card class="section-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="card-icon pay-icon">payments</mat-icon>
+            <mat-card-title>Developer Payments</mat-card-title>
+            <mat-card-subtitle>Total paid: {{ getTotalPaidAmount() | currency }}</mat-card-subtitle>
+            <div class="card-action" *ngIf="isAdmin()">
+              <button mat-mini-fab color="primary" (click)="addPayment()" matTooltip="Add Payment">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="payments-list" *ngIf="payments.length > 0; else noPay">
+              <div class="payment-item" *ngFor="let payment of payments">
+                <div class="payment-left">
+                  <mat-icon class="payment-icon">account_balance_wallet</mat-icon>
+                  <div class="payment-info">
+                    <div class="payment-amount">{{ payment.amount | currency }}</div>
+                    <div class="payment-detail">{{ payment.paymentDate | date:'mediumDate' }} · {{ payment.developerName }}</div>
+                    <div class="payment-note" *ngIf="payment.paymentDetails">{{ payment.paymentDetails }}</div>
+                  </div>
+                </div>
+                <span class="pay-status-badge" [ngClass]="getPaymentStatusBadgeClass(payment.status)">
                   {{ payment.statusName }}
                 </span>
               </div>
-              <div class="payment-details">
-                <div class="payment-date">Date: {{ payment.paymentDate | date }}</div>
-                <div class="payment-developer">To: {{ payment.developerName }}</div>
-                <div class="payment-notes" *ngIf="payment.paymentDetails">
-                  Details: {{ payment.paymentDetails }}
-                </div>
+            </div>
+            <ng-template #noPay>
+              <div class="empty-state">
+                <mat-icon>payments</mat-icon>
+                <p>No payments recorded</p>
+              </div>
+            </ng-template>
+          </mat-card-content>
+        </mat-card>
+
+      </div><!-- /left-col -->
+
+      <!-- Right Column -->
+      <div class="right-col">
+
+        <!-- Payment Summary Card (Admin only) -->
+        <mat-card class="section-card admin-only" *ngIf="isAdmin()">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="card-icon finance-icon">account_balance</mat-icon>
+            <mat-card-title>Payment Summary</mat-card-title>
+            <mat-card-subtitle>Admin view only</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+
+            <div class="finance-section">
+              <div class="finance-section-title">Fiverr Earnings</div>
+              <div class="finance-row highlight-row">
+                <span>Payment ($) Total</span>
+                <span class="finance-val">${{ project.paymentInDollarTotal | number:'1.2-2' }}</span>
+              </div>
+              <div class="finance-row">
+                <span>After Fiverr Deduction</span>
+                <span class="finance-val">${{ project.paymentInDollarAfterDeduction | number:'1.2-2' }}</span>
+              </div>
+              <div class="finance-row tip-row" *ngIf="project.tipAmount > 0">
+                <span><mat-icon>thumb_up</mat-icon> Tip</span>
+                <span class="finance-val tip-val">+${{ project.tipAmount | number:'1.2-2' }}</span>
               </div>
             </div>
-          </div>
 
-          <div class="no-content" *ngIf="payments.length === 0">No payments recorded for this project</div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  </div>
+            <mat-divider></mat-divider>
+
+            <div class="finance-section">
+              <div class="finance-section-title">Developer Share (WRT Dev)</div>
+              <div class="finance-row">
+                <span>WRT Dev Total</span>
+                <span class="finance-val">${{ project.paymentWrtDevTotal | number:'1.2-2' }}</span>
+              </div>
+              <div class="finance-row">
+                <span>WRT Dev After Deduction</span>
+                <span class="finance-val">${{ project.paymentWrtDevAfterDeduction | number:'1.2-2' }}</span>
+              </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="finance-section">
+              <div class="finance-section-title">Developer Payment</div>
+              <div class="finance-row big-row">
+                <span>Dev Payment ($)</span>
+                <span class="finance-val amount-big">${{ project.devPayment | number:'1.2-2' }}</span>
+              </div>
+              <div class="finance-row">
+                <span>Dollar Rate</span>
+                <span class="finance-val">{{ project.dollarRate | number:'1.0-0' }} PKR</span>
+              </div>
+              <div class="finance-row">
+                <span>Dollar Rate (WRT Dev)</span>
+                <span class="finance-val">{{ project.dollarRateWrtDev | number:'1.0-0' }} PKR</span>
+              </div>
+              <div class="finance-row">
+                <span>WTR to Dev (PKR)</span>
+                <span class="finance-val">{{ project.wtrToDevInPkr | number:'1.0-0' }} PKR</span>
+              </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="finance-section">
+              <div class="finance-section-title">Status</div>
+              <div class="finance-row">
+                <span>Dev Payment Status</span>
+                <span class="status-pill" [ngClass]="project.devPaymentStatus ? 'paid' : 'unpaid'">
+                  {{ project.devPaymentStatus ? 'Paid' : 'Unpaid' }}
+                </span>
+              </div>
+              <div class="finance-row" *ngIf="project.paymentStatusOnFiverr">
+                <span>Fiverr Status</span>
+                <span class="finance-val">{{ project.paymentStatusOnFiverr }}</span>
+              </div>
+            </div>
+
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Financial Summary Card -->
+        <mat-card class="section-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="card-icon budget-icon">pie_chart</mat-icon>
+            <mat-card-title>Financial Overview</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="finance-section">
+              <div class="finance-row">
+                <span>Total Budget</span>
+                <span class="finance-val">{{ project.totalBudget | currency }}</span>
+              </div>
+              <div class="finance-row">
+                <span>After Platform Deduction</span>
+                <span class="finance-val">{{ project.totalAfterDeduction | currency }}</span>
+              </div>
+              <div class="finance-row">
+                <span>Developer Amount</span>
+                <span class="finance-val">{{ project.developerAmount | currency }}</span>
+              </div>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="finance-section">
+              <div class="finance-row">
+                <span>Paid to Developer</span>
+                <span class="finance-val paid-val">{{ getTotalPaidAmount() | currency }}</span>
+              </div>
+              <div class="finance-row">
+                <span>Remaining</span>
+                <span class="finance-val remaining-val">{{ getRemainingAmount() | currency }}</span>
+              </div>
+            </div>
+
+            <!-- Payment progress bar -->
+            <div class="pay-progress" *ngIf="project.developerAmount > 0">
+              <div class="pay-progress-label">
+                <span>Payment Progress</span>
+                <span>{{ getPaymentPercentage() }}%</span>
+              </div>
+              <mat-progress-bar mode="determinate" [value]="getPaymentPercentage()" [color]="getPaymentPercentage() >= 100 ? 'accent' : 'primary'"></mat-progress-bar>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+      </div><!-- /right-col -->
+
+    </div><!-- /main-grid -->
+
+  </div><!-- /content -->
 </div>

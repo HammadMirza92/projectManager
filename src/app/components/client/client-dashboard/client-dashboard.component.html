@@ -6,7 +6,7 @@
     <mat-card class="stat-card">
       <mat-card-content>
         <div class="stat-icon">
-          <mat-icon>work</mat-icon>
+          <mat-icon>work_outline</mat-icon>
         </div>
         <div class="stat-info">
           <div class="stat-value">{{ dashboardData?.totalProjects || 0 }}</div>
@@ -30,11 +30,11 @@
     <mat-card class="stat-card">
       <mat-card-content>
         <div class="stat-icon completed">
-          <mat-icon>check_circle</mat-icon>
+          <mat-icon>check_circle_outline</mat-icon>
         </div>
         <div class="stat-info">
           <div class="stat-value">{{ dashboardData?.completedProjects || 0 }}</div>
-          <div class="stat-label">Completed Projects</div>
+          <div class="stat-label">Completed</div>
         </div>
       </mat-card-content>
     </mat-card>
@@ -42,7 +42,7 @@
     <mat-card class="stat-card">
       <mat-card-content>
         <div class="stat-icon money">
-          <mat-icon>attach_money</mat-icon>
+          <mat-icon>account_balance_wallet</mat-icon>
         </div>
         <div class="stat-info">
           <div class="stat-value">{{ dashboardData?.totalSpent | currency }}</div>
@@ -59,65 +59,54 @@
         <mat-card-title>My Projects</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <table mat-table [dataSource]="dashboardData?.projects || []" class="mat-elevation-z0">
-          <!-- Project Title Column -->
+        <table mat-table [dataSource]="dashboardData?.projects || []">
           <ng-container matColumnDef="title">
             <th mat-header-cell *matHeaderCellDef>Project</th>
             <td mat-cell *matCellDef="let project">{{ project.title }}</td>
           </ng-container>
 
-          <!-- Developer Column -->
           <ng-container matColumnDef="developerName">
             <th mat-header-cell *matHeaderCellDef>Developer</th>
             <td mat-cell *matCellDef="let project">{{ project.developerName }}</td>
           </ng-container>
 
-          <!-- Start Date Column -->
           <ng-container matColumnDef="startDate">
             <th mat-header-cell *matHeaderCellDef>Start Date</th>
-            <td mat-cell *matCellDef="let project">{{ project.startDate | date }}</td>
+            <td mat-cell *matCellDef="let project">{{ project.startDate | date:'mediumDate' }}</td>
           </ng-container>
 
-          <!-- End Date Column -->
           <ng-container matColumnDef="endDate">
-            <th mat-header-cell *matHeaderCellDef>End Date</th>
-            <td mat-cell *matCellDef="let project">{{ project.endDate | date }}</td>
+            <th mat-header-cell *matHeaderCellDef>Deadline</th>
+            <td mat-cell *matCellDef="let project">{{ project.endDate | date:'mediumDate' }}</td>
           </ng-container>
 
-          <!-- Budget Column -->
           <ng-container matColumnDef="totalBudget">
             <th mat-header-cell *matHeaderCellDef>Budget</th>
             <td mat-cell *matCellDef="let project">{{ project.totalBudget | currency }}</td>
           </ng-container>
 
-          <!-- Status Column -->
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef>Status</th>
             <td mat-cell *matCellDef="let project">
-              <mat-chip-set>
-                <mat-chip [color]="getStatusColor(project.status)" selected>
-                  {{ project.statusName }}
-                </mat-chip>
-              </mat-chip-set>
+              <span class="status-badge" [ngClass]="'status-' + project.statusName?.toLowerCase()">
+                {{ project.statusName }}
+              </span>
             </td>
           </ng-container>
 
-          <!-- Actions Column -->
           <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <th mat-header-cell *matHeaderCellDef></th>
             <td mat-cell *matCellDef="let project">
-              <button mat-icon-button color="primary" [routerLink]="['/client/projects', project.id]">
-                <mat-icon>visibility</mat-icon>
+              <button mat-icon-button color="primary" [routerLink]="['/client/projects', project.id]" matTooltip="View project">
+                <mat-icon>chevron_right</mat-icon>
               </button>
             </td>
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="projectColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: projectColumns;"></tr>
-
-          <!-- Row shown when no data matches the filter -->
           <tr class="mat-row" *matNoDataRow>
-            <td class="mat-cell" colspan="7">No projects found</td>
+            <td class="mat-cell" colspan="7" style="padding:24px; text-align:center; color:#64748b;">No projects found</td>
           </tr>
         </table>
       </mat-card-content>
@@ -134,49 +123,40 @@
         <mat-card-title>Recent Tasks</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <table mat-table [dataSource]="dashboardData?.recentTasks || []" class="mat-elevation-z0">
-          <!-- Task Title Column -->
+        <table mat-table [dataSource]="dashboardData?.recentTasks || []">
           <ng-container matColumnDef="title">
             <th mat-header-cell *matHeaderCellDef>Task</th>
             <td mat-cell *matCellDef="let task">{{ task.title }}</td>
           </ng-container>
 
-          <!-- Project Column -->
           <ng-container matColumnDef="projectTitle">
             <th mat-header-cell *matHeaderCellDef>Project</th>
             <td mat-cell *matCellDef="let task">{{ task.projectTitle }}</td>
           </ng-container>
 
-          <!-- Assigned To Column -->
           <ng-container matColumnDef="assignedToName">
             <th mat-header-cell *matHeaderCellDef>Assigned To</th>
             <td mat-cell *matCellDef="let task">{{ task.assignedToName || 'Unassigned' }}</td>
           </ng-container>
 
-          <!-- Due Date Column -->
           <ng-container matColumnDef="dueDate">
             <th mat-header-cell *matHeaderCellDef>Due Date</th>
-            <td mat-cell *matCellDef="let task">{{ task.dueDate | date }}</td>
+            <td mat-cell *matCellDef="let task">{{ task.dueDate | date:'mediumDate' }}</td>
           </ng-container>
 
-          <!-- Status Column -->
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef>Status</th>
             <td mat-cell *matCellDef="let task">
-              <mat-chip-set>
-                <mat-chip [color]="getTaskStatusColor(task.status)" selected>
-                  {{ task.statusName }}
-                </mat-chip>
-              </mat-chip-set>
+              <span class="status-badge" [ngClass]="'status-' + task.statusName?.toLowerCase()">
+                {{ task.statusName }}
+              </span>
             </td>
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="taskColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: taskColumns;"></tr>
-
-          <!-- Row shown when no data matches the filter -->
           <tr class="mat-row" *matNoDataRow>
-            <td class="mat-cell" colspan="5">No recent tasks</td>
+            <td class="mat-cell" colspan="5" style="padding:24px; text-align:center; color:#64748b;">No recent tasks</td>
           </tr>
         </table>
       </mat-card-content>

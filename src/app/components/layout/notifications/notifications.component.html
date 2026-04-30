@@ -1,34 +1,58 @@
-<div class="notifications-container">
-  <div class="notifications-header">
-    <h3>Notifications</h3>
-    <button mat-button color="primary" (click)="markAllAsRead()" [disabled]="!hasUnreadNotifications()">
-      Mark all as read
+<div class="notif-panel">
+
+  <!-- Header -->
+  <div class="notif-header">
+    <div class="notif-header-left">
+      <mat-icon class="notif-header-icon">notifications</mat-icon>
+      <span class="notif-title">Notifications</span>
+      <span class="unread-badge" *ngIf="hasUnreadNotifications()">
+        {{ getUnreadCount() }}
+      </span>
+    </div>
+    <button mat-button class="mark-all-btn"
+      (click)="markAllAsRead()"
+      [disabled]="!hasUnreadNotifications()">
+      Mark all read
     </button>
   </div>
 
   <mat-divider></mat-divider>
 
-  <div class="notifications-content" *ngIf="notifications.length > 0">
-    <mat-list>
-      <div *ngFor="let notification of notifications">
-        <mat-list-item [ngClass]="{'unread': !notification.isRead}" (click)="markAsRead(notification)">
-          <mat-icon mat-list-icon [ngClass]="getNotificationIconClass(notification)">
-            {{ getNotificationIcon(notification) }}
-          </mat-icon>
-          <div mat-line class="notification-title">{{ notification.title }}</div>
-          <div mat-line class="notification-message">{{ notification.message }}</div>
-          <div mat-line class="notification-time">{{ notification.createdAt | date:'short' }}</div>
-          <button mat-icon-button (click)="deleteNotification(notification, $event)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </mat-list-item>
-        <mat-divider></mat-divider>
+  <!-- List -->
+  <div class="notif-list" *ngIf="notifications.length > 0">
+    <div class="notif-item" *ngFor="let n of notifications" [class.unread]="!n.isRead">
+      <div class="notif-icon-wrap" [ngClass]="getNotificationIconClass(n)">
+        <mat-icon>{{ getNotificationIcon(n) }}</mat-icon>
       </div>
-    </mat-list>
+
+      <div class="notif-body">
+        <div class="notif-item-title">{{ n.title }}</div>
+        <div class="notif-message">{{ n.message }}</div>
+        <div class="notif-time">{{ n.createdAt | date:'MMM d, h:mm a' }}</div>
+      </div>
+
+      <div class="notif-actions">
+        <button mat-icon-button
+          class="read-btn"
+          *ngIf="!n.isRead"
+          matTooltip="Mark as read"
+          (click)="markAsRead(n)">
+          <mat-icon>done</mat-icon>
+        </button>
+        <button mat-icon-button
+          class="delete-btn"
+          matTooltip="Delete"
+          (click)="deleteNotification(n, $event)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div class="notifications-empty" *ngIf="notifications.length === 0">
-    <mat-icon>notifications_off</mat-icon>
-    <p>No notifications</p>
+  <!-- Empty state -->
+  <div class="notif-empty" *ngIf="notifications.length === 0">
+    <mat-icon>notifications_none</mat-icon>
+    <p>You're all caught up!</p>
   </div>
+
 </div>

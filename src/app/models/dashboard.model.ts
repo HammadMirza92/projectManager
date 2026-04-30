@@ -9,6 +9,9 @@ export interface AdminDashboard {
   totalRevenue: number;
   totalPaidToDevelopers: number;
   pendingPayments: number;
+  fiverrBalance: number;
+  totalWithdrawn: number;
+  totalExpenses: number;
   topDevelopers: DeveloperEarning[];
   upcomingDeadlines: Project[];
 }
@@ -32,11 +35,36 @@ export interface ClientDashboard {
   recentTasks: Task[];
 }
 
+export interface DevProjectEarning {
+  projectId: number;
+  projectTitle: string;
+  status: string;
+  paymentInDollarTotal: number;
+  paymentInDollarAfterDeduction: number;
+  paymentWrtDevAfterDeduction: number;
+  devPayment: number;
+  devPaymentInPkr: number;
+  ourShareInPkr: number;
+  dollarRate: number;
+  dollarRateWrtDev: number;
+  devPaymentStatus: boolean;
+  endDate: Date;
+}
+
 export interface DeveloperEarning {
   developerId: number;
   developerName: string;
+  developerEmail: string;
   totalEarnings: number;
   paidAmount: number;
   pendingAmount: number;
   completedProjects: number;
+  totalProjects: number;
+  activeProjects: number;
+  manualPaymentAdjustment: number;
+  totalEarningsInPkr: number;
+  ourShareInPkr: number;
+  avgDollarRate: number;
+  avgDollarRateWrtDev: number;
+  projects: DevProjectEarning[];
 }

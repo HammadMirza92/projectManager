@@ -34,6 +34,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 // Core Components
 import { LoginComponent } from './components/auth/login/login.component';
@@ -49,9 +51,9 @@ import { UserListComponent } from './components/admin/user-list/user-list.compon
 import { UserFormComponent } from './components/admin/user-form/user-form.component';
 import { ProjectListComponent } from './components/admin/project-list/project-list.component';
 import { ProjectFormComponent } from './components/admin/project-form/project-form.component';
-import { PaymentListComponent } from './components/admin/payment-list/payment-list.component';
-import { PaymentFormComponent } from './components/admin/payment-form/payment-form.component';
 import { DeveloperEarningsComponent } from './components/admin/developer-earnings/developer-earnings.component';
+import { WithdrawalsComponent } from './components/admin/withdrawals/withdrawals.component';
+import { ExpensesComponent } from './components/admin/expenses/expenses.component';
 
 // Developer Components
 import { DeveloperDashboardComponent } from './components/developer/developer-dashboard/developer-dashboard.component';
@@ -69,7 +71,7 @@ import { ClientTasksComponent } from './components/client/client-tasks/client-ta
 import { ProjectDetailsComponent } from './components/shared/project-details/project-details.component';
 // import { TaskListComponent } from './components/shared/task-list/task-list.component';
 // import { TaskFormComponent } from './components/shared/task-form/task-form.component';
-// import { ConfirmDialogComponent } from './components/shared/confirm-dialog/confirm-dialog.component';
+import { ConfirmDialogComponent } from './components/shared/confirm-dialog/confirm-dialog.component';
 // import { LoadingSpinnerComponent } from './components/shared/loading-spinner/loading-spinner.component';
 
 @NgModule({
@@ -86,9 +88,9 @@ import { ProjectDetailsComponent } from './components/shared/project-details/pro
     UserFormComponent,
     ProjectListComponent,
     ProjectFormComponent,
-    PaymentListComponent,
-    PaymentFormComponent,
     DeveloperEarningsComponent,
+    WithdrawalsComponent,
+    ExpensesComponent,
     DeveloperDashboardComponent,
     DeveloperProjectsComponent,
     DeveloperProjectDetailsComponent,
@@ -100,7 +102,7 @@ import { ProjectDetailsComponent } from './components/shared/project-details/pro
     ProjectDetailsComponent,
     // TaskListComponent,
     // TaskFormComponent,
-    // ConfirmDialogComponent,
+    ConfirmDialogComponent,
     // LoadingSpinnerComponent
   ],
   imports: [
@@ -133,7 +135,9 @@ import { ProjectDetailsComponent } from './components/shared/project-details/pro
     MatExpansionModule,
     MatTabsModule,
     MatProgressBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatDividerModule,
+    MatSlideToggleModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

@@ -2,49 +2,140 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background: #fff !important;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  height: 60px;
+  color: #1e293b;
+  padding: 0 12px;
 }
 
-.logo {
-  text-decoration: none;
-  color: white;
-  font-size: 18px;
-  font-weight: 500;
+.menu-btn {
+  color: #64748b;
+  margin-right: 4px;
+  flex-shrink: 0;
 }
 
-.spacer {
-  flex: 1 1 auto;
-}
-
-.header-actions, .auth-actions {
+/* ── Logo ────────────────────────────────────── */
+.logo-area {
   display: flex;
   align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
-.user-menu-btn {
+.logo-icon {
+  color: #2563eb;
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+}
+
+.logo-text {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+}
+
+.spacer { flex: 1 1 auto; }
+
+/* ── Right-side actions ──────────────────────── */
+.header-actions {
   display: flex;
   align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
-.user-info {
+.icon-btn {
+  color: #64748b;
+  &:hover { color: #2563eb; background: rgba(37,99,235,0.06); }
+}
+
+/* ── Avatar button in toolbar ────────────────── */
+.avatar-btn {
+  width: 38px;
+  height: 38px;
+  padding: 0 !important;
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ── Dropdown menu header ────────────────────── */
+::ng-deep .mat-mdc-menu-panel {
+  min-width: 220px !important;
+}
+
+.user-menu-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  pointer-events: none;
+}
+
+.menu-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.menu-user-info {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  margin-right: 8px;
+  min-width: 0;
 }
 
-.user-name {
+.menu-name {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.user-role {
+.menu-role {
   font-size: 12px;
-  opacity: 0.8;
+  color: #64748b;
+  margin-top: 1px;
 }
 
-.notifications-menu {
-  width: 300px;
-  max-height: 400px;
-  overflow-y: auto;
+/* ── Logout item ─────────────────────────────── */
+::ng-deep .logout-item {
+  color: #ef4444 !important;
+  mat-icon { color: #ef4444 !important; }
 }
+
+/* ── Auth buttons ────────────────────────────── */
+.auth-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.login-btn  { color: #2563eb; font-weight: 500; }
+.register-btn { background: #2563eb; color: #fff; font-weight: 500; border-radius: 6px; }

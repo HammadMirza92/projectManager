@@ -38,7 +38,6 @@ export class ProjectDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentUser = this.authService.currentUserValue;
-
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.projectId = +params['id'];
@@ -51,128 +50,93 @@ export class ProjectDetailsComponent implements OnInit {
 
   loadProject() {
     this.isLoading = true;
-    this.projectService.getProjectById(this.projectId)
-      .subscribe({
-        next: (project) => {
-          this.project = project;
-          this.isLoading = false;
-        },
-        error: (error) => {
-          this.snackBar.open('Failed to load project', 'Close', { duration: 5000 });
-          this.isLoading = false;
-          this.navigateBack();
-        }
-      });
+    this.projectService.getProjectById(this.projectId).subscribe({
+      next: (project) => { this.project = project; this.isLoading = false; },
+      error: () => {
+        this.snackBar.open('Failed to load project', 'Close', { duration: 5000 });
+        this.isLoading = false;
+        this.navigateBack();
+      }
+    });
   }
 
   loadTasks() {
-    this.taskService.getTasksByProject(this.projectId)
-      .subscribe({
-        next: (tasks) => {
-          this.tasks = tasks;
-        },
-        error: (error) => {
-          this.snackBar.open('Failed to load tasks', 'Close', { duration: 5000 });
-        }
-      });
+    this.taskService.getTasksByProject(this.projectId).subscribe({
+      next: (tasks) => { this.tasks = tasks; },
+      error: () => this.snackBar.open('Failed to load tasks', 'Close', { duration: 5000 })
+    });
   }
 
   loadPayments() {
-    this.paymentService.getPaymentsByProject(this.projectId)
-      .subscribe({
-        next: (payments) => {
-          this.payments = payments;
-        },
-        error: (error) => {
-          this.snackBar.open('Failed to load payments', 'Close', { duration: 5000 });
-        }
-      });
+    this.paymentService.getPaymentsByProject(this.projectId).subscribe({
+      next: (payments) => { this.payments = payments; },
+      error: () => this.snackBar.open('Failed to load payments', 'Close', { duration: 5000 })
+    });
   }
 
   getStatusBadgeClass(status: ProjectStatus): string {
-    switch (status) {
-      case ProjectStatus.Completed:
-        return 'status-completed';
-      case ProjectStatus.Started:
-        return 'status-started';
-      case ProjectStatus.Pending:
-        return 'status-pending';
-      case ProjectStatus.Hold:
-        return 'status-hold';
-      case ProjectStatus.Revision:
-        return 'status-revision';
-      case ProjectStatus.Cancelled:
-        return 'status-cancelled';
-      default:
-        return '';
-    }
+    const map: Record<string, string> = {
+      [ProjectStatus.Completed]: 'status-completed',
+      [ProjectStatus.Started]: 'status-started',
+      [ProjectStatus.Pending]: 'status-pending',
+      [ProjectStatus.Hold]: 'status-hold',
+      [ProjectStatus.Revision]: 'status-revision',
+      [ProjectStatus.Cancelled]: 'status-cancelled'
+    };
+    return map[status] || '';
   }
 
-  getTaskStatusBadgeClass(status: TaskStatus): string {
-    switch (status) {
-      case TaskStatus.ToDo:
-        return 'task-todo';
-      case TaskStatus.InProgress:
-        return 'task-inprogress';
-      case TaskStatus.Done:
-        return 'task-done';
-      case TaskStatus.Blocked:
-        return 'task-blocked';
-      default:
-        return '';
-    }
+  getTaskStatusBadgeClass(status: TaskStatus | string): string {
+    const map: Record<string, string> = {
+      [TaskStatus.ToDo]: 'task-todo',
+      [TaskStatus.InProgress]: 'task-inprogress',
+      [TaskStatus.Done]: 'task-done',
+      [TaskStatus.Blocked]: 'task-blocked',
+      'OnHold': 'task-onhold'
+    };
+    return map[status] || '';
   }
 
-  getPaymentStatusBadgeClass(status: PaymentStatus): string {
-    switch (status) {
-      case PaymentStatus.Completed:
-        return 'status-completed';
-      case PaymentStatus.Pending:
-        return 'status-pending';
-      case PaymentStatus.Cancelled:
-        return 'status-cancelled';
-      default:
-        return '';
-    }
+  getPaymentStatusBadgeClass(status: PaymentStatus | string): string {
+    const map: Record<string, string> = {
+      [PaymentStatus.Completed]: 'pay-completed',
+      [PaymentStatus.Pending]: 'pay-pending',
+      [PaymentStatus.Cancelled]: 'pay-cancelled'
+    };
+    return map[status] || '';
   }
 
   getDaysRemainingColor(daysRemaining: number): string {
-    if (daysRemaining <= 0) {
-      return 'days-overdue';
-    } else if (daysRemaining <= 3) {
-      return 'days-critical';
-    } else if (daysRemaining <= 7) {
-      return 'days-warning';
-    } else {
-      return '';
-    }
+    if (daysRemaining <= 0) return 'deadline-overdue';
+    if (daysRemaining <= 3) return 'deadline-critical';
+    if (daysRemaining <= 7) return 'deadline-warning';
+    return 'deadline-ok';
   }
 
   getTaskCompletionPercentage(): number {
-    if (!this.tasks || this.tasks.length === 0) {
-      return 0;
-    }
+    if (!this.tasks?.length) return 0;
+    const done = this.tasks.filter(t => t.status === TaskStatus.Done).length;
+    return Math.round((done / this.tasks.length) * 100);
+  }
 
-    const doneTasks = this.tasks.filter(t => t.status === TaskStatus.Done).length;
-    return Math.round((doneTasks / this.tasks.length) * 100);
+  getCompletedTaskCount(): number {
+    return this.tasks.filter(t => t.status === TaskStatus.Done).length;
   }
 
   getTotalPaidAmount(): number {
-    if (!this.payments || this.payments.length === 0) {
-      return 0;
-    }
-
     return this.payments
       .filter(p => p.status === PaymentStatus.Completed)
-      .reduce((sum, payment) => sum + payment.amount, 0);
+      .reduce((sum, p) => sum + p.amount, 0);
   }
 
   getRemainingAmount(): number {
-    if (!this.project) {
-      return 0;
-    }
-
+    if (!this.project) return 0;
     return this.project.developerAmount - this.getTotalPaidAmount();
+  }
+
+  getPaymentPercentage(): number {
+    if (!this.project || this.project.developerAmount === 0) return 0;
+    return Math.min(100, Math.round((this.getTotalPaidAmount() / this.project.developerAmount) * 100));
   }
 
   isAdmin(): boolean {
@@ -186,67 +150,48 @@ export class ProjectDetailsComponent implements OnInit {
   }
 
   deleteProject() {
-    if (this.isAdmin() && this.project) {
-      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-        width: '400px',
-        data: {
-          title: 'Confirm Delete',
-          message: `Are you sure you want to delete project "${this.project.title}"? This action cannot be undone.`,
-          confirmText: 'Delete',
-          cancelText: 'Cancel'
-        }
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        if (result && this.project) {
-          this.projectService.deleteProject(this.project.id)
-            .subscribe({
-              next: () => {
-                this.snackBar.open('Project deleted successfully', 'Close', { duration: 3000 });
-                this.navigateBack();
-              },
-              error: (error) => {
-                this.snackBar.open('Failed to delete project', 'Close', { duration: 5000 });
-              }
-            });
-        }
-      });
-    }
+    if (!this.isAdmin() || !this.project) return;
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Confirm Delete',
+        message: `Are you sure you want to delete "${this.project.title}"? This cannot be undone.`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && this.project) {
+        this.projectService.deleteProject(this.project.id).subscribe({
+          next: () => {
+            this.snackBar.open('Project deleted', 'Close', { duration: 3000 });
+            this.navigateBack();
+          },
+          error: () => this.snackBar.open('Failed to delete project', 'Close', { duration: 5000 })
+        });
+      }
+    });
   }
 
   addTask() {
     if (this.isAdmin() && this.project) {
-      this.router.navigate(['/admin/tasks/add'], {
-        queryParams: { projectId: this.project.id }
-      });
+      this.router.navigate(['/admin/tasks/add'], { queryParams: { projectId: this.project.id } });
     }
   }
 
   addPayment() {
     if (this.isAdmin() && this.project) {
-      this.router.navigate(['/admin/payments/add'], {
-        queryParams: { projectId: this.project.id }
-      });
+      this.router.navigate(['/admin/payments/add'], { queryParams: { projectId: this.project.id } });
     }
   }
 
   navigateBack() {
-    if (this.currentUser) {
-      switch (this.currentUser.role) {
-        case UserRole.Admin:
-          this.router.navigate(['/admin/projects']);
-          break;
-        case UserRole.Developer:
-          this.router.navigate(['/developer/projects']);
-          break;
-        case UserRole.Client:
-          this.router.navigate(['/client/projects']);
-          break;
-        default:
-          this.router.navigate(['/']);
-      }
-    } else {
-      this.router.navigate(['/']);
+    if (!this.currentUser) { this.router.navigate(['/']); return; }
+    switch (this.currentUser.role) {
+      case UserRole.Admin: this.router.navigate(['/admin/projects']); break;
+      case UserRole.Developer: this.router.navigate(['/developer/projects']); break;
+      case UserRole.Client: this.router.navigate(['/client/projects']); break;
+      default: this.router.navigate(['/']);
     }
   }
 }

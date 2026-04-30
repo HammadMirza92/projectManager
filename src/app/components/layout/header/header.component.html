@@ -1,52 +1,57 @@
-<mat-toolbar color="primary" class="app-header">
-  <button
-    mat-icon-button
-    (click)="onToggleSidenav()"
-    *ngIf="currentUser">
+<mat-toolbar class="app-header">
+
+  <button mat-icon-button class="menu-btn" (click)="onToggleSidenav()" *ngIf="currentUser">
     <mat-icon>menu</mat-icon>
   </button>
 
-  <a routerLink="/" class="logo">
-    <span>Project Management</span>
-  </a>
+  <div class="logo-area" routerLink="/">
+    <mat-icon class="logo-icon">rocket_launch</mat-icon>
+    <span class="logo-text">ProjectPro</span>
+  </div>
 
   <span class="spacer"></span>
 
   <div *ngIf="currentUser" class="header-actions">
-    <!-- Notifications -->
-    <button mat-icon-button [matMenuTriggerFor]="notificationsMenu" class="notification-btn">
-      <mat-icon [matBadge]="unreadCount" [matBadgeHidden]="unreadCount === 0" matBadgeColor="accent">notifications</mat-icon>
+
+    <button mat-icon-button class="icon-btn" [matMenuTriggerFor]="notificationsMenu" matTooltip="Notifications">
+      <mat-icon [matBadge]="unreadCount" [matBadgeHidden]="unreadCount === 0" matBadgeColor="warn" matBadgeSize="small">
+        notifications_none
+      </mat-icon>
     </button>
-    <mat-menu #notificationsMenu="matMenu" class="notifications-menu">
+
+    <mat-menu #notificationsMenu="matMenu">
       <app-notifications></app-notifications>
     </mat-menu>
 
-    <!-- User Menu -->
-    <button mat-button [matMenuTriggerFor]="userMenu" class="user-menu-btn">
-      <div class="user-info">
-        <span class="user-name">{{ currentUser.name }}</span>
-        <span class="user-role">{{ currentUser.role }}</span>
-      </div>
-      <mat-icon>keyboard_arrow_down</mat-icon>
+    <button mat-icon-button class="avatar-btn" [matMenuTriggerFor]="userMenu" matTooltip="{{ currentUser.name }} ({{ currentUser.role }})">
+      <div class="user-avatar">{{ getUserInitials() }}</div>
     </button>
-    <mat-menu #userMenu="matMenu">
+
+    <mat-menu #userMenu="matMenu" xPosition="before">
+      <div class="user-menu-header">
+        <div class="menu-avatar">{{ getUserInitials() }}</div>
+        <div class="menu-user-info">
+          <div class="menu-name">{{ currentUser.name }}</div>
+          <div class="menu-role">{{ currentUser.role }}</div>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
       <button mat-menu-item (click)="navigateToDashboard()">
         <mat-icon>dashboard</mat-icon>
         <span>Dashboard</span>
       </button>
-      <button mat-menu-item routerLink="/profile">
-        <mat-icon>person</mat-icon>
-        <span>Profile</span>
-      </button>
-      <button mat-menu-item (click)="logout()">
-        <mat-icon>exit_to_app</mat-icon>
-        <span>Logout</span>
+      <mat-divider></mat-divider>
+      <button mat-menu-item class="logout-item" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Sign Out</span>
       </button>
     </mat-menu>
+
   </div>
 
   <div *ngIf="!currentUser" class="auth-actions">
-    <button mat-button routerLink="/login">Login</button>
-    <button mat-raised-button color="accent" routerLink="/register">Register</button>
+    <button mat-button routerLink="/login" class="login-btn">Log In</button>
+    <button mat-raised-button routerLink="/register" class="register-btn">Get Started</button>
   </div>
+
 </mat-toolbar>

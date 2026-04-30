@@ -133,12 +133,15 @@ export class ProjectListComponent implements OnInit {
 
   deleteProject(project: Project) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '400px',
+      width: '420px',
+      panelClass: 'confirm-dialog-panel',
       data: {
-        title: 'Confirm Delete',
-        message: `Are you sure you want to delete project "${project.title}"?`,
+        title: 'Delete Project',
+        message: 'Are you sure you want to permanently delete this project? All associated tasks and payments will also be removed.',
+        itemName: project.title,
         confirmText: 'Delete',
-        cancelText: 'Cancel'
+        cancelText: 'Cancel',
+        isDanger: true
       }
     });
 

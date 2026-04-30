@@ -1,4 +1,3 @@
-
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
@@ -7,6 +6,8 @@ export interface ConfirmDialogData {
   message: string;
   confirmText: string;
   cancelText: string;
+  itemName?: string;
+  isDanger?: boolean;
 }
 
 @Component({
@@ -18,7 +19,9 @@ export class ConfirmDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<ConfirmDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ConfirmDialogData
-  ) {}
+  ) {
+    if (data.isDanger === undefined) data.isDanger = true;
+  }
 
   onConfirm(): void {
     this.dialogRef.close(true);

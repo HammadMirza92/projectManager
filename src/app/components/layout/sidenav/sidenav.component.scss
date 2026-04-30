@@ -1,65 +1,176 @@
 .sidenav-content {
-  width: 250px;
+  width: 260px;
   height: 100%;
   display: flex;
   flex-direction: column;
+  background: #1a1f2e;
 }
 
+/* ── Brand header ─────────────────────────────── */
 .sidenav-header {
-  padding: 16px;
-  background-color: #3f51b5;
-  color: white;
-  text-align: center;
+  padding: 18px 16px;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  flex-shrink: 0;
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-icon {
+  font-size: 26px;
+  width: 26px;
+  height: 26px;
+  color: #fff;
+}
+
+.brand-text { display: flex; flex-direction: column; }
+
+.brand-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
+}
+
+.brand-tagline {
+  font-size: 10px;
+  color: rgba(255,255,255,0.7);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ── User info ───────────────────────────────── */
 .sidenav-user {
   display: flex;
   align-items: center;
-  padding: 16px;
+  padding: 14px 16px;
+  background: #242938;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .user-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #3f51b5;
-  color: white;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 12px;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
 }
 
-.user-info {
-  display: flex;
-  flex-direction: column;
-}
+.user-info { display: flex; flex-direction: column; min-width: 0; }
 
 .user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role-badge {
+  font-size: 11px;
   font-weight: 500;
+  color: #60a5fa;
+  margin-top: 3px;
 }
 
-.user-role {
-  font-size: 12px;
-  color: rgba(0, 0, 0, 0.54);
+/* ── Divider ─────────────────────────────────── */
+mat-divider {
+  border-color: rgba(255,255,255,0.08) !important;
 }
 
-.mat-nav-list {
-  padding-top: 0;
+/* ── Section labels ──────────────────────────── */
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #4e5b73;
+  letter-spacing: 1.5px;
+  padding: 16px 20px 4px;
+  margin: 0;
+}
 
-  a {
-    display: flex;
-    align-items: center;
-    height: 48px;
+/* ── Nav list items ──────────────────────────── */
+mat-nav-list {
+  padding-top: 0 !important;
+}
 
-    mat-icon {
-      margin-right: 16px;
-    }
-  }
+/* Force light text on every nav link via ::ng-deep */
+::ng-deep .sidenav-content mat-nav-list a.mdc-list-item {
+  border-radius: 8px;
+  margin: 2px 8px;
+  height: 46px;
+  color: #cbd5e1 !important;
+  transition: background 0.15s ease, color 0.15s ease;
+}
 
-  .active {
-    background-color: rgba(63, 81, 181, 0.1);
-    color: #3f51b5;
-  }
+::ng-deep .sidenav-content mat-nav-list a.mdc-list-item .mdc-list-item__primary-text {
+  color: #cbd5e1 !important;
+}
+
+::ng-deep .sidenav-content mat-nav-list a.mdc-list-item .mat-mdc-list-item-unscoped-content mat-icon,
+::ng-deep .sidenav-content mat-nav-list a.mdc-list-item mat-icon {
+  color: #64748b !important;
+}
+
+/* Hover state */
+::ng-deep .sidenav-content mat-nav-list a.mdc-list-item:hover {
+  background: rgba(37,99,235,0.12) !important;
+  color: #fff !important;
+}
+
+::ng-deep .sidenav-content mat-nav-list a.mdc-list-item:hover .mdc-list-item__primary-text {
+  color: #fff !important;
+}
+
+::ng-deep .sidenav-content mat-nav-list a.mdc-list-item:hover mat-icon {
+  color: #60a5fa !important;
+}
+
+/* Active state */
+::ng-deep .sidenav-content mat-nav-list a.mdc-list-item.active-link {
+  background: rgba(37,99,235,0.18) !important;
+  border-left: 3px solid #2563eb;
+  color: #60a5fa !important;
+}
+
+::ng-deep .sidenav-content mat-nav-list a.mdc-list-item.active-link .mdc-list-item__primary-text {
+  color: #60a5fa !important;
+  font-weight: 600;
+}
+
+::ng-deep .sidenav-content mat-nav-list a.mdc-list-item.active-link mat-icon {
+  color: #2563eb !important;
+}
+
+/* ── Footer (logout) ──────────────────────────── */
+.sidenav-footer {
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+::ng-deep .sidenav-content .sidenav-footer mat-nav-list a.mdc-list-item {
+  color: #f87171 !important;
+}
+
+::ng-deep .sidenav-content .sidenav-footer mat-nav-list a.mdc-list-item .mdc-list-item__primary-text {
+  color: #f87171 !important;
+}
+
+::ng-deep .sidenav-content .sidenav-footer mat-nav-list a.mdc-list-item mat-icon {
+  color: #f87171 !important;
+}
+
+::ng-deep .sidenav-content .sidenav-footer mat-nav-list a.mdc-list-item:hover {
+  background: rgba(248,113,113,0.1) !important;
 }

@@ -77,7 +77,11 @@ export class NotificationsComponent implements OnInit {
   }
 
   hasUnreadNotifications(): boolean {
-    return this.notifications.some(notification => !notification.isRead);
+    return this.notifications.some(n => !n.isRead);
+  }
+
+  getUnreadCount(): number {
+    return this.notifications.filter(n => !n.isRead).length;
   }
 
   getNotificationIcon(notification: Notification): string {

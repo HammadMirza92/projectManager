@@ -1,0 +1,136 @@
+<div class="page-wrapper">
+  <div class="page-header">
+    <div class="header-left">
+      <mat-icon class="page-icon">receipt_long</mat-icon>
+      <div>
+        <h1>Expense Tracking</h1>
+        <span class="subtitle">Track Fiverr ads and other expenses</span>
+      </div>
+    </div>
+    <button mat-raised-button color="primary" (click)="toggleForm()">
+      <mat-icon>{{ showForm ? 'close' : 'add' }}</mat-icon>
+      {{ showForm ? 'Cancel' : 'Add Expense' }}
+    </button>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary-row">
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <mat-icon class="s-icon">money_off</mat-icon>
+        <div class="s-info">
+          <div class="s-label">Total Expenses</div>
+          <div class="s-value">${{ getTotalExpenses() | number:'1.2-2' }}</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <mat-icon class="s-icon">list_alt</mat-icon>
+        <div class="s-info">
+          <div class="s-label">Total Entries</div>
+          <div class="s-value">{{ expenses.length }}</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Add Expense Form -->
+  <mat-card class="form-card" *ngIf="showForm">
+    <mat-card-header>
+      <mat-card-title>Add Expense</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="expenseForm" (ngSubmit)="submitExpense()">
+        <div class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Description</mat-label>
+            <input matInput formControlName="description" placeholder="e.g. Fiverr Ads">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Amount ($)</mat-label>
+            <input matInput type="number" formControlName="amount">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Date</mat-label>
+            <input matInput [matDatepicker]="expPicker" formControlName="expenseDate">
+            <mat-datepicker-toggle matSuffix [for]="expPicker"></mat-datepicker-toggle>
+            <mat-datepicker #expPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Linked Project (optional)</mat-label>
+            <mat-select formControlName="projectId">
+              <mat-option [value]="null">No specific project</mat-option>
+              <mat-option *ngFor="let p of projects" [value]="p.id">{{ p.title }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Notes</mat-label>
+            <input matInput formControlName="notes" placeholder="Optional">
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="toggleForm()">Cancel</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="expenseForm.invalid">Save Expense</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Expenses Table -->
+  <mat-card class="table-card">
+    <mat-card-header>
+      <mat-card-title>Expense History</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="isLoading" class="loading-row"><mat-spinner diameter="40"></mat-spinner></div>
+
+      <table mat-table [dataSource]="expenses" *ngIf="!isLoading && expenses.length > 0">
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef>Date</th>
+          <td mat-cell *matCellDef="let e">{{ e.expenseDate | date:'mediumDate' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef>Description</th>
+          <td mat-cell *matCellDef="let e"><strong>{{ e.description }}</strong></td>
+        </ng-container>
+        <ng-container matColumnDef="amount">
+          <th mat-header-cell *matHeaderCellDef>Amount</th>
+          <td mat-cell *matCellDef="let e" class="amount-val">${{ e.amount | number:'1.2-2' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="project">
+          <th mat-header-cell *matHeaderCellDef>Project</th>
+          <td mat-cell *matCellDef="let e">
+            <span *ngIf="e.projectTitle" class="proj-tag">{{ e.projectTitle }}</span>
+            <span *ngIf="!e.projectTitle" class="muted">General</span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="notes">
+          <th mat-header-cell *matHeaderCellDef>Notes</th>
+          <td mat-cell *matCellDef="let e"><span class="muted">{{ e.notes || '—' }}</span></td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let e">
+            <button mat-icon-button color="warn" (click)="deleteExpense(e.id)" matTooltip="Delete">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <div class="empty-state" *ngIf="!isLoading && expenses.length === 0">
+        <mat-icon>receipt_long</mat-icon>
+        <p>No expenses recorded yet</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

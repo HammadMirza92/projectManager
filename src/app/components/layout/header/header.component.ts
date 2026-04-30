@@ -58,6 +58,14 @@ export class HeaderComponent implements OnInit {
     }
   }
 
+  getUserInitials(): string {
+    if (!this.currentUser?.name) return '';
+    const parts = this.currentUser.name.split(' ');
+    return parts.length === 1
+      ? parts[0].charAt(0).toUpperCase()
+      : (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  }
+
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);

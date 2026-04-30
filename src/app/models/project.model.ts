@@ -30,6 +30,19 @@ export interface Project {
   daysRemaining: number;
   paidAmount: number;
   remainingAmount: number;
+  // Admin-only payment tracking fields
+  paymentInDollarTotal: number;
+  paymentInDollarAfterDeduction: number;
+  paymentWrtDevTotal: number;
+  paymentWrtDevAfterDeduction: number;
+  tipAmount: number;
+  devPayment: number;
+  devPaymentStatus: boolean;
+  paymentStatusOnFiverr: string;
+  dollarRate: number;
+  dollarRateWrtDev: number;
+  devPaymentInPkr: number;
+  wtrToDevInPkr: number;
 }
 
 export interface ProjectCreate {
@@ -48,6 +61,16 @@ export interface ProjectCreate {
   developerAmount: number;
   status: ProjectStatus;
   platform: string;
+  paymentInDollarTotal?: number;
+  paymentInDollarAfterDeduction?: number;
+  paymentWrtDevTotal?: number;
+  paymentWrtDevAfterDeduction?: number;
+  tipAmount?: number;
+  devPayment?: number;
+  devPaymentStatus?: boolean;
+  paymentStatusOnFiverr?: string;
+  dollarRate?: number;
+  dollarRateWrtDev?: number;
 }
 
 export interface ProjectUpdate {
@@ -65,6 +88,16 @@ export interface ProjectUpdate {
   developerAmount?: number;
   status?: ProjectStatus;
   platform?: string;
+  paymentInDollarTotal?: number;
+  paymentInDollarAfterDeduction?: number;
+  paymentWrtDevTotal?: number;
+  paymentWrtDevAfterDeduction?: number;
+  tipAmount?: number;
+  devPayment?: number;
+  devPaymentStatus?: boolean;
+  paymentStatusOnFiverr?: string;
+  dollarRate?: number;
+  dollarRateWrtDev?: number;
 }
 
 export interface ProjectFilter {

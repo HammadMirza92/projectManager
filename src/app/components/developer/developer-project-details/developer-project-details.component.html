@@ -1,29 +1,44 @@
-<div class="container">
-  <div class="header">
-    <button mat-icon-button (click)="goBack()">
+<div class="details-container">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <button mat-icon-button class="back-btn" (click)="goBack()" matTooltip="Back to Projects">
       <mat-icon>arrow_back</mat-icon>
     </button>
-    <h1 class="title">Project Details</h1>
+    <div>
+      <h1 class="page-title">Project Details</h1>
+      <p class="page-subtitle">Manage tasks and track progress</p>
+    </div>
   </div>
 
-  <div class="loading-container" *ngIf="isLoading">
-    <mat-spinner></mat-spinner>
+  <!-- Loading -->
+  <div class="loading-wrap" *ngIf="isLoading">
+    <mat-spinner diameter="48"></mat-spinner>
   </div>
 
-  <div *ngIf="project && !isLoading">
-    <mat-card class="project-header-card">
+  <ng-container *ngIf="project && !isLoading">
+
+    <!-- Hero Card -->
+    <mat-card class="hero-card">
       <mat-card-content>
-        <div class="project-header">
-          <div class="project-title">
-            <h2>{{ project.title }}</h2>
+        <div class="hero-body">
+          <div class="hero-left">
+            <div class="project-name">{{ project.title }}</div>
+            <div class="project-meta">
+              <span class="meta-item">
+                <mat-icon>person</mat-icon>{{ project.clientName }}
+              </span>
+              <span class="meta-item">
+                <mat-icon>calendar_today</mat-icon>
+                {{ project.startDate | date:'mediumDate' }} — {{ project.endDate | date:'mediumDate' }}
+              </span>
+            </div>
+          </div>
+          <div class="hero-right">
             <span class="status-badge" [ngClass]="getStatusBadgeClass(project.status)">
               {{ project.statusName }}
             </span>
-          </div>
-          <div class="project-deadline">
-            <div class="deadline-label">Deadline</div>
-            <div class="deadline-date">{{ project.endDate | date }}</div>
-            <div class="deadline-days" [ngClass]="getDaysRemainingColor(project.daysRemaining)">
+            <div class="days-chip" [ngClass]="getDaysRemainingColor(project.daysRemaining)">
               {{ project.daysRemaining }} days remaining
             </div>
           </div>
@@ -31,99 +46,144 @@
       </mat-card-content>
     </mat-card>
 
-    <div class="grid-container">
+    <div class="grid">
+
+      <!-- Project Info -->
       <mat-card class="info-card">
         <mat-card-header>
+          <div class="card-icon blue"><mat-icon>info_outline</mat-icon></div>
           <mat-card-title>Project Information</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-          <div class="info-item">
-            <div class="info-label">Client</div>
-            <div class="info-value">{{ project.clientName }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Source</div>
-            <div class="info-value">{{ project.sourceOfProject || 'Not specified' }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Platform</div>
-            <div class="info-value">{{ project.platform || 'Not specified' }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Start Date</div>
-            <div class="info-value">{{ project.startDate | date }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">End Date</div>
-            <div class="info-value">{{ project.endDate | date }}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Developer Amount</div>
-            <div class="info-value">{{ project.developerAmount | currency }}</div>
+          <div class="info-row"><span class="label">Client</span><span class="value">{{ project.clientName }}</span></div>
+          <div class="info-row"><span class="label">Platform</span><span class="value">{{ project.platform || '—' }}</span></div>
+          <div class="info-row"><span class="label">Source</span><span class="value">{{ project.sourceOfProject || '—' }}</span></div>
+          <div class="info-row"><span class="label">Developer Amount</span><span class="value highlight">{{ project.developerAmount | currency }}</span></div>
+          <div class="info-row" *ngIf="project.description">
+            <span class="label">Description</span>
+            <span class="value">{{ project.description }}</span>
           </div>
         </mat-card-content>
       </mat-card>
 
-      <mat-card class="links-card">
+      <!-- Links -->
+      <mat-card class="info-card">
         <mat-card-header>
+          <div class="card-icon indigo"><mat-icon>link</mat-icon></div>
           <mat-card-title>Project Links</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-          <div class="info-item" *ngIf="project.orderLink">
-            <div class="info-label">Order Link</div>
-            <div class="info-value">
-              <a [href]="project.orderLink" target="_blank">{{ project.orderLink }}</a>
-            </div>
+          <div class="info-row" *ngIf="project.orderLink">
+            <span class="label">Order Link</span>
+            <span class="value"><a [href]="project.orderLink" target="_blank" class="link">View order</a></span>
           </div>
-          <div class="info-item" *ngIf="project.websiteUrl">
-            <div class="info-label">Website URL</div>
-            <div class="info-value">
-              <a [href]="project.websiteUrl" target="_blank">{{ project.websiteUrl }}</a>
-            </div>
+          <div class="info-row" *ngIf="project.websiteUrl">
+            <span class="label">Website</span>
+            <span class="value"><a [href]="project.websiteUrl" target="_blank" class="link">{{ project.websiteUrl }}</a></span>
           </div>
-          <div class="info-item" *ngIf="project.websiteLogin">
-            <div class="info-label">Website Login</div>
-            <div class="info-value">{{ project.websiteLogin }}</div>
+          <div class="info-row" *ngIf="project.websiteLogin">
+            <span class="label">Login</span>
+            <span class="value">{{ project.websiteLogin }}</span>
+          </div>
+          <div class="empty-state" *ngIf="!project.orderLink && !project.websiteUrl && !project.websiteLogin">
+            <mat-icon>link_off</mat-icon>
+            <span>No links provided</span>
           </div>
         </mat-card-content>
       </mat-card>
 
-      <mat-card class="description-card">
-        <mat-card-header>
-          <mat-card-title>Project Description</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <p *ngIf="project.description">{{ project.description }}</p>
-          <p *ngIf="!project.description" class="no-content">No description provided</p>
-        </mat-card-content>
-      </mat-card>
-
+      <!-- Tasks -->
       <mat-card class="tasks-card">
         <mat-card-header>
-          <mat-card-title>Project Tasks</mat-card-title>
-          <mat-card-subtitle>Completion: {{ getTaskCompletionPercentage() }}%</mat-card-subtitle>
+          <div class="card-icon-wrap">
+            <div class="card-icon green"><mat-icon>task_alt</mat-icon></div>
+            <div>
+              <mat-card-title>Tasks</mat-card-title>
+              <mat-card-subtitle>{{ getTaskCompletionPercentage() }}% complete</mat-card-subtitle>
+            </div>
+          </div>
+          <button mat-stroked-button color="primary" class="add-task-btn" (click)="toggleTaskForm()">
+            <mat-icon>{{ showTaskForm ? 'close' : 'add' }}</mat-icon>
+            {{ showTaskForm ? 'Cancel' : 'Add Task' }}
+          </button>
         </mat-card-header>
-        <mat-card-content>
-          <mat-progress-bar mode="determinate" [value]="getTaskCompletionPercentage()"></mat-progress-bar>
 
-          <div class="tasks-list" *ngIf="tasks.length > 0">
-            <div class="task-item" *ngFor="let task of tasks">
-              <div class="task-header">
-                <div class="task-title">{{ task.title }}</div>
-                <span class="task-status-badge" [ngClass]="getTaskStatusBadgeClass(task.status)">
-                  {{ task.statusName }}
-                </span>
+        <mat-card-content>
+          <mat-progress-bar mode="determinate" [value]="getTaskCompletionPercentage()" class="progress"></mat-progress-bar>
+
+          <!-- Add Task Form -->
+          <div class="task-form-panel" *ngIf="showTaskForm">
+            <form [formGroup]="taskForm" (ngSubmit)="submitTask()">
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="field-title">
+                  <mat-label>Task Title *</mat-label>
+                  <input matInput formControlName="title" placeholder="Enter task title">
+                  <mat-error *ngIf="taskForm.get('title')?.hasError('required')">Title is required</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="field-status">
+                  <mat-label>Status</mat-label>
+                  <mat-select formControlName="status">
+                    <mat-option *ngFor="let s of taskStatuses" [value]="s.value">{{ s.label }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
               </div>
-              <div class="task-description" *ngIf="task.description">{{ task.description }}</div>
-              <div class="task-due-date" *ngIf="task.dueDate">
-                Due: {{ task.dueDate | date }}
+
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="field-desc">
+                  <mat-label>Description</mat-label>
+                  <textarea matInput formControlName="description" rows="2" placeholder="Optional description"></textarea>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="field-date">
+                  <mat-label>Due Date</mat-label>
+                  <input matInput [matDatepicker]="picker" formControlName="dueDate">
+                  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+              </div>
+
+              <div class="form-actions">
+                <button mat-flat-button color="primary" type="submit" [disabled]="taskForm.invalid || isSavingTask">
+                  <mat-icon>save</mat-icon>
+                  {{ isSavingTask ? 'Saving…' : 'Save Task' }}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Task List -->
+          <div *ngIf="tasks.length > 0" class="task-list">
+            <div class="task-item" *ngFor="let task of tasks">
+              <div class="task-row">
+                <span class="task-name">{{ task.title }}</span>
+                <div class="task-status-control">
+                  <mat-form-field appearance="outline" class="status-field">
+                    <mat-select
+                      [value]="task.status"
+                      [disabled]="updatingTaskId === task.id"
+                      (selectionChange)="updateTaskStatus(task, $event.value)">
+                      <mat-option *ngFor="let s of taskStatuses" [value]="s.value">{{ s.label }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-spinner *ngIf="updatingTaskId === task.id" diameter="16" class="status-spinner"></mat-spinner>
+                </div>
+              </div>
+              <div class="task-sub-row">
+                <span class="task-desc" *ngIf="task.description">{{ task.description }}</span>
+                <span class="task-meta" *ngIf="task.dueDate">Due {{ task.dueDate | date:'mediumDate' }}</span>
               </div>
             </div>
           </div>
 
-          <div class="no-content" *ngIf="tasks.length === 0">No tasks assigned to this project</div>
+          <div class="empty-state" *ngIf="tasks.length === 0 && !showTaskForm">
+            <mat-icon>assignment</mat-icon>
+            <span>No tasks yet — add one above</span>
+          </div>
         </mat-card-content>
       </mat-card>
+
     </div>
-  </div>
+  </ng-container>
+
 </div>
