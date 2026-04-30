@@ -463,6 +463,18 @@
 .paid-val      { color: #137333; }
 .remaining-val { color: #b06000; }
 
+.dev-share-row { background: #fce8e6; border-radius: 6px; padding: 8px; margin: 4px -8px; }
+.dev-share-val { color: #c5221f; }
+
+.our-share-row {
+  background: linear-gradient(90deg, #e6f4ea, #f0fff4);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 4px -8px;
+  border-left: 3px solid #137333;
+}
+.our-share-val { color: #137333; font-size: 16px; }
+
 .status-pill {
   padding: 4px 12px;
   border-radius: 20px;

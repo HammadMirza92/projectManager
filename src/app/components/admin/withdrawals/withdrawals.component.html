@@ -13,11 +13,11 @@
     </button>
   </div>
 
-  <!-- Summary Cards -->
+  <!-- Summary Cards Row -->
   <div class="summary-row">
     <mat-card class="summary-card balance-card">
       <mat-card-content>
-        <mat-icon class="s-icon">account_balance</mat-icon>
+        <div class="s-icon-wrap balance-icon"><mat-icon>account_balance</mat-icon></div>
         <div class="s-info">
           <div class="s-label">Fiverr Balance</div>
           <div class="s-value" [class.negative]="fiverrBalance < 0">${{ fiverrBalance | number:'1.2-2' }}</div>
@@ -25,61 +25,152 @@
         </div>
       </mat-card-content>
     </mat-card>
+
     <mat-card class="summary-card withdrawn-card">
       <mat-card-content>
-        <mat-icon class="s-icon">moving</mat-icon>
+        <div class="s-icon-wrap withdrawn-icon"><mat-icon>moving</mat-icon></div>
         <div class="s-info">
-          <div class="s-label">Total Gross Withdrawn</div>
+          <div class="s-label">Total Withdrawn</div>
           <div class="s-value">${{ getTotalWithdrawn() | number:'1.2-2' }}</div>
-          <div class="s-hint">Full amount deducted from Fiverr</div>
+          <div class="s-hint">Full gross deducted from Fiverr</div>
         </div>
       </mat-card-content>
     </mat-card>
+
     <mat-card class="summary-card fee-card">
       <mat-card-content>
-        <mat-icon class="s-icon">toll</mat-icon>
+        <div class="s-icon-wrap fee-icon"><mat-icon>toll</mat-icon></div>
         <div class="s-info">
-          <div class="s-label">Total Fiverr Fees</div>
+          <div class="s-label">Total Fees Paid</div>
           <div class="s-value">${{ getTotalFees() | number:'1.2-2' }}</div>
           <div class="s-hint">$3 per withdrawal</div>
         </div>
       </mat-card-content>
     </mat-card>
+
     <mat-card class="summary-card net-card">
       <mat-card-content>
-        <mat-icon class="s-icon">savings</mat-icon>
+        <div class="s-icon-wrap net-icon"><mat-icon>savings</mat-icon></div>
         <div class="s-info">
           <div class="s-label">Net Received</div>
           <div class="s-value">${{ getTotalNet() | number:'1.2-2' }}</div>
-          <div class="s-hint">Actual amount received in bank</div>
+          <div class="s-hint">In bank after fees</div>
         </div>
       </mat-card-content>
     </mat-card>
+
+    <!-- Expenses Card — clickable to open popup -->
+    <mat-card class="summary-card expense-card clickable" (click)="showExpenseDialog = true" matTooltip="Click to manage expenses">
+      <mat-card-content>
+        <div class="s-icon-wrap expense-icon"><mat-icon>receipt_long</mat-icon></div>
+        <div class="s-info">
+          <div class="s-label">Total Expenses</div>
+          <div class="s-value expense-val">${{ totalExpenses | number:'1.2-2' }}</div>
+          <div class="s-hint s-hint-action">
+            <mat-icon class="hint-icon">add_circle_outline</mat-icon> Click to add / view
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
     <mat-card class="summary-card count-card">
       <mat-card-content>
-        <mat-icon class="s-icon">receipt_long</mat-icon>
+        <div class="s-icon-wrap count-icon"><mat-icon>format_list_numbered</mat-icon></div>
         <div class="s-info">
-          <div class="s-label">Withdrawal Count</div>
+          <div class="s-label">Withdrawals</div>
           <div class="s-value">{{ filteredWithdrawals.length }}</div>
         </div>
       </mat-card-content>
     </mat-card>
   </div>
 
-  <!-- Pending projects not yet withdrawn -->
-  <mat-card class="pending-projects-card" *ngIf="getUnwithdrawProjects().length > 0">
-    <mat-card-header>
-      <mat-icon mat-card-avatar class="new-icon">new_releases</mat-icon>
-      <mat-card-title>Projects With Earnings Not Yet Withdrawn</mat-card-title>
-      <mat-card-subtitle>{{ getUnwithdrawProjects().length }} project(s) have Fiverr earnings not linked to any withdrawal</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="pending-chips">
-        <span class="pending-chip" *ngFor="let p of getUnwithdrawProjects()">
-          <mat-icon>work</mat-icon> {{ p.title }}
-        </span>
+  <!-- ── EXPENSE DIALOG (inline overlay) ─────────────────────────── -->
+  <div class="dialog-overlay" *ngIf="showExpenseDialog" (click)="showExpenseDialog = false">
+    <mat-card class="expense-dialog" (click)="$event.stopPropagation()">
+      <div class="dialog-header">
+        <div class="dialog-title-row">
+          <mat-icon class="dialog-icon">receipt_long</mat-icon>
+          <div>
+            <div class="dialog-title">Expense Tracker</div>
+            <div class="dialog-subtitle">Total: <strong>${{ totalExpenses | number:'1.2-2' }}</strong></div>
+          </div>
+        </div>
+        <button mat-icon-button (click)="showExpenseDialog = false"><mat-icon>close</mat-icon></button>
       </div>
-    </mat-card-content>
+
+      <!-- Add Expense Form -->
+      <form [formGroup]="expenseForm" (ngSubmit)="submitExpense()" class="expense-form">
+        <div class="exp-form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Description</mat-label>
+            <input matInput formControlName="description" placeholder="e.g. Fiverr Ads">
+            <mat-error>Required</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Amount ($)</mat-label>
+            <input matInput type="number" formControlName="amount">
+            <mat-error>Enter valid amount</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Date</mat-label>
+            <input matInput [matDatepicker]="expPicker" formControlName="expenseDate">
+            <mat-datepicker-toggle matSuffix [for]="expPicker"></mat-datepicker-toggle>
+            <mat-datepicker #expPicker></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Linked Project</mat-label>
+            <mat-select formControlName="projectId">
+              <mat-option [value]="null">No project</mat-option>
+              <mat-option *ngFor="let p of projects" [value]="p.id">{{ p.title }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="span-2">
+            <mat-label>Notes</mat-label>
+            <input matInput formControlName="notes" placeholder="Optional">
+          </mat-form-field>
+        </div>
+        <div class="exp-form-actions">
+          <button mat-raised-button color="primary" type="submit" [disabled]="expenseForm.invalid">
+            <mat-icon>add</mat-icon> Add Expense
+          </button>
+        </div>
+      </form>
+
+      <!-- Expenses List -->
+      <div class="exp-list" *ngIf="expenses.length > 0">
+        <div class="exp-list-header">Recent Expenses</div>
+        <div class="exp-item" *ngFor="let e of expenses">
+          <div class="exp-item-left">
+            <div class="exp-desc">{{ e.description }}</div>
+            <div class="exp-meta">{{ e.expenseDate | date:'mediumDate' }}
+              <span *ngIf="e.projectTitle" class="exp-proj-tag">{{ e.projectTitle }}</span>
+            </div>
+          </div>
+          <div class="exp-amount">${{ e.amount | number:'1.2-2' }}</div>
+          <button mat-icon-button color="warn" (click)="deleteExpense(e.id)" matTooltip="Delete">
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </div>
+      </div>
+      <div class="exp-empty" *ngIf="expenses.length === 0">
+        <mat-icon>receipt_long</mat-icon><p>No expenses yet</p>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Pending projects without withdrawal -->
+  <mat-card class="alert-card" *ngIf="getUnwithdrawProjects().length > 0">
+    <div class="alert-inner">
+      <mat-icon class="alert-icon">new_releases</mat-icon>
+      <div class="alert-text">
+        <strong>{{ getUnwithdrawProjects().length }} project(s)</strong> have Fiverr earnings not linked to any withdrawal
+      </div>
+    </div>
+    <div class="pending-chips">
+      <span class="pending-chip" *ngFor="let p of getUnwithdrawProjects()">
+        <mat-icon>work</mat-icon> {{ p.title }}
+      </span>
+    </div>
   </mat-card>
 
   <!-- Date Filter -->
@@ -100,19 +191,23 @@
             <mat-datepicker #fp2></mat-datepicker>
           </mat-form-field>
           <div class="filter-actions">
-            <button mat-stroked-button type="button" (click)="resetFilter()"><mat-icon>clear</mat-icon> Reset</button>
-            <button mat-raised-button color="primary" type="submit"><mat-icon>filter_list</mat-icon> Apply</button>
+            <button mat-stroked-button type="button" (click)="resetFilter()">
+              <mat-icon>clear</mat-icon> Reset
+            </button>
+            <button mat-raised-button color="primary" type="submit">
+              <mat-icon>filter_list</mat-icon> Apply
+            </button>
           </div>
         </div>
       </form>
     </mat-card-content>
   </mat-card>
 
-  <!-- Add Withdrawal Form -->
+  <!-- New Withdrawal Form -->
   <mat-card class="form-card" *ngIf="showForm">
     <mat-card-header>
       <mat-card-title>Record New Withdrawal</mat-card-title>
-      <mat-card-subtitle>Fiverr deducts the full Amount from your balance (including their $3 fee)</mat-card-subtitle>
+      <mat-card-subtitle>Fiverr deducts the full gross amount from your account balance</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
       <form [formGroup]="withdrawalForm" (ngSubmit)="submitWithdrawal()">
@@ -120,7 +215,7 @@
           <mat-form-field appearance="outline">
             <mat-label>Gross Amount ($)</mat-label>
             <input matInput type="number" formControlName="amount">
-            <mat-hint>Total amount Fiverr deducts from balance</mat-hint>
+            <mat-hint>Full amount Fiverr deducts from balance</mat-hint>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
@@ -143,11 +238,12 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="span-2">
-            <mat-label>Link to Projects (optional, multi-select)</mat-label>
-            <mat-select formControlName="projectIds" multiple>
+            <mat-label>Link Projects (required — multi-select)</mat-label>
+            <mat-select formControlName="projectIds" multiple required>
               <mat-option *ngFor="let p of projects" [value]="p.id">{{ p.title }}</mat-option>
             </mat-select>
-            <mat-hint>Which projects does this withdrawal cover?</mat-hint>
+            <mat-hint>Select all projects covered by this withdrawal</mat-hint>
+            <mat-error>At least one project is required</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="span-2">
@@ -159,24 +255,24 @@
         <div class="form-actions">
           <button mat-button type="button" (click)="toggleForm()">Cancel</button>
           <button mat-raised-button color="primary" type="submit" [disabled]="withdrawalForm.invalid">
-            Save Withdrawal
+            <mat-icon>save</mat-icon> Save Withdrawal
           </button>
         </div>
       </form>
     </mat-card-content>
   </mat-card>
 
-  <!-- Withdrawal History -->
+  <!-- Withdrawal History Table -->
   <mat-card class="table-card">
     <mat-card-header>
       <mat-card-title>Withdrawal History</mat-card-title>
-      <mat-card-subtitle>Click a row to expand and see linked projects</mat-card-subtitle>
+      <mat-card-subtitle>Click the projects column to see linked projects</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
       <div *ngIf="isLoading" class="loading-row"><mat-spinner diameter="40"></mat-spinner></div>
 
       <div *ngIf="!isLoading && filteredWithdrawals.length > 0">
-        <table mat-table [dataSource]="filteredWithdrawals">
+        <table mat-table [dataSource]="filteredWithdrawals" class="history-table">
           <ng-container matColumnDef="date">
             <th mat-header-cell *matHeaderCellDef>Date</th>
             <td mat-cell *matCellDef="let w">{{ w.withdrawalDate | date:'mediumDate' }}</td>
@@ -191,13 +287,13 @@
           </ng-container>
           <ng-container matColumnDef="netAmount">
             <th mat-header-cell *matHeaderCellDef>Net Received</th>
-            <td mat-cell *matCellDef="let w"><strong>${{ w.netAmount | number:'1.2-2' }}</strong></td>
+            <td mat-cell *matCellDef="let w" class="net-col"><strong>${{ w.netAmount | number:'1.2-2' }}</strong></td>
           </ng-container>
           <ng-container matColumnDef="projectCount">
             <th mat-header-cell *matHeaderCellDef>Projects</th>
             <td mat-cell *matCellDef="let w">
               <button mat-button class="proj-expand-btn" (click)="toggleExpand(w.id)" *ngIf="w.projects?.length">
-                <mat-icon>{{ expandedWithdrawal === w.id ? 'expand_less' : 'expand_more' }}</mat-icon>
+                <mat-icon>{{ expandedWithdrawal === w.id ? 'expand_less' : 'folder_open' }}</mat-icon>
                 {{ w.projects.length }} project(s)
               </button>
               <span *ngIf="!w.projects?.length" class="muted">—</span>
@@ -217,32 +313,35 @@
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="main-row"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
-
-        <!-- Expanded project details below each row -->
-        <ng-container *ngFor="let w of filteredWithdrawals">
-          <div class="project-expand-panel" *ngIf="expandedWithdrawal === w.id && w.projects?.length">
-            <div class="expand-header">Projects covered by withdrawal on {{ w.withdrawalDate | date:'mediumDate' }}</div>
-            <table mat-table [dataSource]="w.projects" class="inner-table">
-              <ng-container matColumnDef="projectTitle">
-                <th mat-header-cell *matHeaderCellDef>Project</th>
-                <td mat-cell *matCellDef="let p"><strong>{{ p.projectTitle }}</strong></td>
-              </ng-container>
-              <ng-container matColumnDef="amount">
-                <th mat-header-cell *matHeaderCellDef>Amount Allocated</th>
-                <td mat-cell *matCellDef="let p">${{ p.amount | number:'1.2-2' }}</td>
-              </ng-container>
-              <tr mat-header-row *matHeaderRowDef="['projectTitle', 'amount']"></tr>
-              <tr mat-row *matRowDef="let row; columns: ['projectTitle', 'amount'];"></tr>
-            </table>
-          </div>
-        </ng-container>
       </div>
+
+      <!-- Expanded project panels -->
+      <ng-container *ngFor="let w of filteredWithdrawals">
+        <div class="project-expand-panel" *ngIf="expandedWithdrawal === w.id && w.projects?.length">
+          <div class="expand-header">
+            <mat-icon>folder_open</mat-icon>
+            Projects in withdrawal — {{ w.withdrawalDate | date:'mediumDate' }}
+          </div>
+          <table mat-table [dataSource]="w.projects" class="inner-table">
+            <ng-container matColumnDef="projectTitle">
+              <th mat-header-cell *matHeaderCellDef>Project</th>
+              <td mat-cell *matCellDef="let p"><strong>{{ p.projectTitle }}</strong></td>
+            </ng-container>
+            <ng-container matColumnDef="amount">
+              <th mat-header-cell *matHeaderCellDef>Amount Allocated</th>
+              <td mat-cell *matCellDef="let p">${{ p.amount | number:'1.2-2' }}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="['projectTitle', 'amount']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['projectTitle', 'amount'];"></tr>
+          </table>
+        </div>
+      </ng-container>
 
       <div class="empty-state" *ngIf="!isLoading && filteredWithdrawals.length === 0">
         <mat-icon>account_balance_wallet</mat-icon>
-        <p>No withdrawals recorded for the selected period</p>
+        <p>No withdrawals for this period</p>
       </div>
     </mat-card-content>
   </mat-card>

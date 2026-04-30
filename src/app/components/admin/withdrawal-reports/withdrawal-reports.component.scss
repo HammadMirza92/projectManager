@@ -1,0 +1,162 @@
+.page-wrapper { padding: 24px; background: #f5f7fa; min-height: 100vh; }
+
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px;
+  h1 { margin: 0; font-size: 22px; font-weight: 600; }
+  .subtitle { font-size: 13px; color: #9aa0a6; }
+}
+
+.header-left { display: flex; align-items: center; gap: 12px; }
+.page-icon { font-size: 36px; width: 36px; height: 36px; color: #1a73e8; }
+
+.filter-card {
+  border-radius: 12px !important; margin-bottom: 24px;
+  .filter-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .search-field { flex: 1; min-width: 200px; }
+  .filter-actions { display: flex; gap: 8px; }
+}
+
+.loading-center { display: flex; justify-content: center; padding: 64px; }
+
+.reports-list { display: flex; flex-direction: column; gap: 20px; }
+
+// Report card
+.report-card {
+  border-radius: 14px !important;
+  border-left: 4px solid #1a73e8 !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.report-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px; flex-wrap: wrap; gap: 12px;
+}
+
+.report-title-block {
+  display: flex; align-items: center; gap: 14px;
+}
+
+.report-icon-wrap {
+  width: 48px; height: 48px;
+  background: #e8f0fe; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.report-icon { color: #1a73e8; font-size: 26px; }
+
+.report-title { font-size: 18px; font-weight: 700; color: #202124; }
+
+.report-period {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 13px; color: #5f6368; margin-top: 2px;
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+}
+
+.report-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.badge {
+  padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;
+}
+.proj-badge    { background: #e8f0fe; color: #1967d2; }
+.unpaid-badge  { background: #fce8e6; color: #c5221f; }
+.all-paid-badge{ background: #e6f4ea; color: #137333; }
+
+// Summary numbers grid
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0;
+  padding: 20px 24px;
+  background: #fafafa;
+
+  @media (max-width: 1200px) { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 768px)  { grid-template-columns: repeat(2, 1fr); }
+}
+
+.sum-item {
+  padding: 12px 16px;
+  border-right: 1px solid #e8eaed;
+  &:last-child { border-right: none; }
+}
+
+.sum-label { font-size: 11px; color: #9aa0a6; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
+.sum-val   { font-size: 18px; font-weight: 700; color: #202124; }
+
+.fiverr-color  { color: #1967d2; }
+.dev-color     { color: #c5221f; }
+.our-color     { color: #137333; }
+.expense-color { color: #7b1fa2; }
+.muted         { color: #9aa0a6; }
+
+.exp-split-hint {
+  display: block; font-size: 10px; color: #9aa0a6; font-weight: 400; margin-top: 2px;
+}
+
+.net-dev-col { color: #1967d2; }
+
+// Expenses breakdown section inside expanded panel
+.expenses-section {
+  border-top: 1px solid #e8eaed;
+  background: #fdf8ff;
+  padding: 12px 0;
+}
+
+.exp-section-header {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 16px 12px;
+  font-size: 13px; font-weight: 600; color: #7b1fa2;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}
+
+.exp-table {
+  width: 100%;
+  th.mat-header-cell { background: #f3e8ff !important; }
+}
+
+.withdrawal-item .sum-val { font-size: 14px; }
+.w-gross { color: #5f6368; }
+.w-arrow { color: #9aa0a6; }
+.w-net   { color: #137333; font-weight: 700; }
+.w-fee   { color: #c5221f; font-size: 12px; }
+
+// Expand button
+.expand-btn {
+  width: 100%; border-radius: 0 !important;
+  color: #1967d2; font-size: 13px;
+  border-top: 1px solid #e8eaed !important;
+}
+
+// Project breakdown table
+.project-table-wrap {
+  border-top: 1px solid #e8eaed;
+  background: #f8faff;
+}
+
+.table-scroll { overflow-x: auto; }
+
+table { width: 100%; }
+th.mat-header-cell {
+  font-size: 11px; font-weight: 600; color: #5f6368;
+  text-transform: uppercase; background: #e8f0fe; white-space: nowrap;
+}
+td.mat-cell { padding: 8px 16px; font-size: 13px; }
+
+.status-chip {
+  padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600;
+  &.s-completed { background: #e6f4ea; color: #137333; }
+  &.s-started   { background: #e8f0fe; color: #1967d2; }
+  &.s-pending   { background: #fef3e2; color: #b06000; }
+  &.s-hold, &.s-revision, &.s-cancelled { background: #fce8e6; color: #c5221f; }
+}
+
+.paid-icon   { color: #137333; font-size: 18px; width: 18px; height: 18px; }
+.unpaid-icon { color: #dadce0; font-size: 18px; width: 18px; height: 18px; }
+
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 64px; color: #9aa0a6; text-align: center;
+  mat-icon { font-size: 56px; width: 56px; height: 56px; margin-bottom: 12px; }
+}

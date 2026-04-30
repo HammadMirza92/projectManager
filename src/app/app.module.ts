@@ -54,6 +54,8 @@ import { ProjectFormComponent } from './components/admin/project-form/project-fo
 import { DeveloperEarningsComponent } from './components/admin/developer-earnings/developer-earnings.component';
 import { WithdrawalsComponent } from './components/admin/withdrawals/withdrawals.component';
 import { ExpensesComponent } from './components/admin/expenses/expenses.component';
+import { WithdrawalReportsComponent } from './components/admin/withdrawal-reports/withdrawal-reports.component';
+import { DevPaymentsComponent } from './components/admin/dev-payments/dev-payments.component';
 
 // Developer Components
 import { DeveloperDashboardComponent } from './components/developer/developer-dashboard/developer-dashboard.component';
@@ -91,6 +93,8 @@ import { ConfirmDialogComponent } from './components/shared/confirm-dialog/confi
     DeveloperEarningsComponent,
     WithdrawalsComponent,
     ExpensesComponent,
+    WithdrawalReportsComponent,
+    DevPaymentsComponent,
     DeveloperDashboardComponent,
     DeveloperProjectsComponent,
     DeveloperProjectDetailsComponent,

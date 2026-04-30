@@ -39,10 +39,13 @@ export interface DevProjectEarning {
   projectId: number;
   projectTitle: string;
   status: string;
+  actualPrice: number;
   paymentInDollarTotal: number;
   paymentInDollarAfterDeduction: number;
+  paymentWrtDev: number;
   paymentWrtDevAfterDeduction: number;
   devPayment: number;
+  tipAmount: number;
   devPaymentInPkr: number;
   ourShareInPkr: number;
   dollarRate: number;

@@ -1,0 +1,225 @@
+<div class="page-wrapper">
+  <div class="page-header">
+    <div class="header-left">
+      <mat-icon class="page-icon">summarize</mat-icon>
+      <div>
+        <h1>Withdrawal Reports</h1>
+        <span class="subtitle">Auto-generated reports for each Fiverr withdrawal — covering all linked projects</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search & Filter -->
+  <mat-card class="filter-card">
+    <mat-card-content>
+      <form [formGroup]="searchForm" (ngSubmit)="applySearch()">
+        <div class="filter-row">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Search reports</mat-label>
+            <input matInput formControlName="search" placeholder="Report title, notes...">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Period From</mat-label>
+            <input matInput [matDatepicker]="p1" formControlName="startDate">
+            <mat-datepicker-toggle matSuffix [for]="p1"></mat-datepicker-toggle>
+            <mat-datepicker #p1></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Period To</mat-label>
+            <input matInput [matDatepicker]="p2" formControlName="endDate">
+            <mat-datepicker-toggle matSuffix [for]="p2"></mat-datepicker-toggle>
+            <mat-datepicker #p2></mat-datepicker>
+          </mat-form-field>
+          <div class="filter-actions">
+            <button mat-stroked-button type="button" (click)="resetSearch()"><mat-icon>clear</mat-icon> Reset</button>
+            <button mat-raised-button color="primary" type="submit"><mat-icon>search</mat-icon> Search</button>
+          </div>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <div *ngIf="isLoading" class="loading-center"><mat-spinner diameter="48"></mat-spinner></div>
+
+  <!-- Reports List -->
+  <div class="reports-list" *ngIf="!isLoading">
+    <div *ngIf="reports.length === 0" class="empty-state">
+      <mat-icon>summarize</mat-icon>
+      <p>No reports yet. Reports are auto-generated when you create a withdrawal.</p>
+    </div>
+
+    <mat-card class="report-card" *ngFor="let r of reports">
+      <!-- Report Header -->
+      <div class="report-header">
+        <div class="report-title-block">
+          <div class="report-icon-wrap">
+            <mat-icon class="report-icon">receipt_long</mat-icon>
+          </div>
+          <div>
+            <div class="report-title">{{ r.reportTitle }}</div>
+            <div class="report-period">
+              <mat-icon>date_range</mat-icon>
+              {{ r.periodStart | date:'mediumDate' }} — {{ r.periodEnd | date:'mediumDate' }}
+            </div>
+          </div>
+        </div>
+        <div class="report-badges">
+          <span class="badge proj-badge">{{ r.totalProjects }} project(s)</span>
+          <span class="badge unpaid-badge" *ngIf="getUnpaidProjects(r) > 0">
+            {{ getUnpaidProjects(r) }} dev unpaid
+          </span>
+          <span class="badge all-paid-badge" *ngIf="getUnpaidProjects(r) === 0 && r.totalProjects > 0">
+            All devs paid
+          </span>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Summary Grid -->
+      <div class="summary-grid">
+        <div class="sum-item">
+          <div class="sum-label">Fiverr Earnings (gross)</div>
+          <div class="sum-val fiverr-color">${{ r.totalFiverrEarnings | number:'1.2-2' }}</div>
+        </div>
+        <div class="sum-item">
+          <div class="sum-label">After Fiverr Deduction</div>
+          <div class="sum-val">${{ r.totalAfterFiverrDeduction | number:'1.2-2' }}</div>
+        </div>
+        <div class="sum-item">
+          <div class="sum-label">Total Tips</div>
+          <div class="sum-val">${{ r.totalTips | number:'1.2-2' }}</div>
+        </div>
+        <div class="sum-item">
+          <div class="sum-label">Dev Payment (gross)</div>
+          <div class="sum-val dev-color">${{ r.totalDevPayment | number:'1.2-2' }}</div>
+        </div>
+        <div class="sum-item" *ngIf="r.totalExpenses > 0">
+          <div class="sum-label">Period Expenses</div>
+          <div class="sum-val expense-color">
+            -${{ r.totalExpenses | number:'1.2-2' }}
+            <span class="exp-split-hint">(Dev: ${{ r.totalDevExpenseShare | number:'1.2-2' }} / Admin: ${{ r.totalAdminExpenseShare | number:'1.2-2' }})</span>
+          </div>
+        </div>
+        <div class="sum-item">
+          <div class="sum-label">Admin Net Share (USD)</div>
+          <div class="sum-val our-color">${{ r.totalAdminShare | number:'1.2-2' }}</div>
+        </div>
+        <div class="sum-item withdrawal-item">
+          <div class="sum-label">Withdrawal (gross → net)</div>
+          <div class="sum-val">
+            <span class="w-gross">${{ r.withdrawalAmount | number:'1.2-2' }}</span>
+            <span class="w-arrow"> → </span>
+            <span class="w-net">${{ r.netReceived | number:'1.2-2' }}</span>
+            <span class="w-fee"> (-${{ r.fiverrFee | number:'1.2-2' }} fee)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expand Project Table -->
+      <button mat-button class="expand-btn" (click)="toggleExpand(r.id)" *ngIf="r.projects?.length">
+        <mat-icon>{{ expandedReport === r.id ? 'expand_less' : 'expand_more' }}</mat-icon>
+        {{ expandedReport === r.id ? 'Hide' : 'View' }} Project Breakdown
+      </button>
+
+      <div class="project-table-wrap" *ngIf="expandedReport === r.id && r.projects?.length">
+        <div class="table-scroll">
+          <table mat-table [dataSource]="r.projects">
+            <ng-container matColumnDef="projectTitle">
+              <th mat-header-cell *matHeaderCellDef>Project</th>
+              <td mat-cell *matCellDef="let p"><strong>{{ p.projectTitle }}</strong></td>
+            </ng-container>
+            <ng-container matColumnDef="developerName">
+              <th mat-header-cell *matHeaderCellDef>Developer</th>
+              <td mat-cell *matCellDef="let p">{{ p.developerName }}</td>
+            </ng-container>
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let p">
+                <span class="status-chip s-{{ p.status.toLowerCase() }}">{{ p.status }}</span>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="paymentInDollarTotal">
+              <th mat-header-cell *matHeaderCellDef>Order ($)</th>
+              <td mat-cell *matCellDef="let p">${{ p.paymentInDollarTotal | number:'1.2-2' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="paymentInDollarAfterDeduction">
+              <th mat-header-cell *matHeaderCellDef>After 20% ($)</th>
+              <td mat-cell *matCellDef="let p">${{ p.paymentInDollarAfterDeduction | number:'1.2-2' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="devPayment">
+              <th mat-header-cell *matHeaderCellDef>Dev Gross ($)</th>
+              <td mat-cell *matCellDef="let p" class="dev-color">${{ p.devPayment | number:'1.2-2' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="devExpenseDeduction">
+              <th mat-header-cell *matHeaderCellDef>Exp. Deduction</th>
+              <td mat-cell *matCellDef="let p" class="expense-color">
+                <span *ngIf="p.devExpenseDeduction > 0">-${{ p.devExpenseDeduction | number:'1.2-2' }}</span>
+                <span *ngIf="!p.devExpenseDeduction" class="muted">—</span>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="netDevPayment">
+              <th mat-header-cell *matHeaderCellDef>Net Dev Pay ($)</th>
+              <td mat-cell *matCellDef="let p"><strong class="net-dev-col">${{ p.netDevPayment | number:'1.2-2' }}</strong></td>
+            </ng-container>
+            <ng-container matColumnDef="devPaymentInPkr">
+              <th mat-header-cell *matHeaderCellDef>Dev Pay (PKR)</th>
+              <td mat-cell *matCellDef="let p" class="dev-color">{{ p.devPaymentInPkr | number:'1.0-0' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="adminShareInPkr">
+              <th mat-header-cell *matHeaderCellDef>Our Share (PKR)</th>
+              <td mat-cell *matCellDef="let p" class="our-color">{{ p.adminShareInPkr | number:'1.0-0' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="devPaymentStatus">
+              <th mat-header-cell *matHeaderCellDef>Dev Paid?</th>
+              <td mat-cell *matCellDef="let p">
+                <mat-icon [class]="p.devPaymentStatus ? 'paid-icon' : 'unpaid-icon'">
+                  {{ p.devPaymentStatus ? 'check_circle' : 'radio_button_unchecked' }}
+                </mat-icon>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="projectColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: projectColumns;"></tr>
+          </table>
+        </div>
+
+        <!-- Expenses breakdown (if any) -->
+        <div class="expenses-section" *ngIf="r.expenses?.length > 0">
+          <div class="exp-section-header">
+            <mat-icon>receipt_long</mat-icon>
+            Period Expenses — Split 50/50 between admin and developer
+          </div>
+          <table mat-table [dataSource]="r.expenses" class="exp-table">
+            <ng-container matColumnDef="description">
+              <th mat-header-cell *matHeaderCellDef>Description</th>
+              <td mat-cell *matCellDef="let e"><strong>{{ e.description }}</strong></td>
+            </ng-container>
+            <ng-container matColumnDef="amount">
+              <th mat-header-cell *matHeaderCellDef>Total ($)</th>
+              <td mat-cell *matCellDef="let e">${{ e.amount | number:'1.2-2' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="devShare">
+              <th mat-header-cell *matHeaderCellDef>Dev Share (50%)</th>
+              <td mat-cell *matCellDef="let e" class="dev-color">-${{ e.devShare | number:'1.2-2' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="adminShare">
+              <th mat-header-cell *matHeaderCellDef>Admin Share (50%)</th>
+              <td mat-cell *matCellDef="let e" class="expense-color">-${{ e.adminShare | number:'1.2-2' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="expenseDate">
+              <th mat-header-cell *matHeaderCellDef>Date</th>
+              <td mat-cell *matCellDef="let e">{{ e.expenseDate | date:'mediumDate' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="projectTitle">
+              <th mat-header-cell *matHeaderCellDef>Linked Project</th>
+              <td mat-cell *matCellDef="let e" class="muted">{{ e.projectTitle || '—' }}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="expenseColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: expenseColumns;"></tr>
+          </table>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+</div>

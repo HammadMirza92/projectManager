@@ -1,0 +1,487 @@
+<div class="page-wrapper">
+  <div class="page-header">
+    <div class="header-left">
+      <mat-icon class="page-icon">payments</mat-icon>
+      <div>
+        <h1>Developer Payments</h1>
+        <span class="subtitle">Track payments to developers, Fiverr deposits, and your personal withdrawals</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button mat-stroked-button (click)="showDepositForm = !showDepositForm">
+        <mat-icon>add_circle_outline</mat-icon> Add Fiverr Deposit
+      </button>
+      <button mat-stroked-button color="accent" (click)="showAdminWithdrawalForm = !showAdminWithdrawalForm">
+        <mat-icon>move_to_inbox</mat-icon> My Withdrawal
+      </button>
+      <button mat-raised-button color="primary" (click)="showPayForm = !showPayForm">
+        <mat-icon>send</mat-icon> Pay Developer
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Cards (5 cards) -->
+  <div class="summary-row">
+    <mat-card class="sum-card fiverr-card">
+      <mat-card-content>
+        <div class="s-icon-wrap fiverr-icon"><mat-icon>account_balance</mat-icon></div>
+        <div class="s-info">
+          <div class="s-label">Fiverr Balance</div>
+          <div class="s-value" [class.neg]="fiverrBalance < 0">${{ fiverrBalance | number:'1.2-2' }}</div>
+          <div class="s-hint">Available on Fiverr</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="sum-card our-card">
+      <mat-card-content>
+        <div class="s-icon-wrap our-icon"><mat-icon>trending_up</mat-icon></div>
+        <div class="s-info">
+          <div class="s-label">Our Total Earnings</div>
+          <div class="s-value our-val">${{ getTotalOurEarnings() | number:'1.2-2' }}</div>
+          <div class="s-hint">{{ getTotalOurEarningsPkr() | number:'1.0-0' }} PKR</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="sum-card owed-card">
+      <mat-card-content>
+        <div class="s-icon-wrap owed-icon"><mat-icon>pending_actions</mat-icon></div>
+        <div class="s-info">
+          <div class="s-label">Total Owed to Devs</div>
+          <div class="s-value">${{ getTotalOwed() | number:'1.2-2' }}</div>
+          <div class="s-hint">USD — across all devs</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="sum-card paid-card">
+      <mat-card-content>
+        <div class="s-icon-wrap paid-icon"><mat-icon>check_circle_outline</mat-icon></div>
+        <div class="s-info">
+          <div class="s-label">Total Paid to Devs</div>
+          <div class="s-value paid-val">${{ getTotalPaid() | number:'1.2-2' }}</div>
+          <div class="s-hint">USD transferred</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="sum-card rem-card">
+      <mat-card-content>
+        <div class="s-icon-wrap rem-icon"><mat-icon>account_balance_wallet</mat-icon></div>
+        <div class="s-info">
+          <div class="s-label">Remaining to Pay</div>
+          <div class="s-value" [class.neg]="getTotalBalance() < 0">${{ getTotalBalance() | number:'1.2-2' }}</div>
+          <div class="s-hint">Still owed to devs</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Inline rate settings -->
+  <mat-card class="rate-card">
+    <mat-card-content>
+      <div class="rate-row">
+        <mat-icon class="rate-icon">currency_exchange</mat-icon>
+        <span class="rate-label">Conversion Rates:</span>
+        <div class="rate-field-wrap">
+          <label>Admin Rate (PKR/$)</label>
+          <input type="number" class="rate-input" [(ngModel)]="globalDollarRate" (change)="recalcPayAmount()">
+        </div>
+        <div class="rate-field-wrap">
+          <label>Dev Rate (PKR/$)</label>
+          <input type="number" class="rate-input" [(ngModel)]="globalDollarRateWrtDev" (change)="recalcPayAmount()">
+        </div>
+        <span class="rate-note">Used when project-specific rates are not set</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Fiverr Deposit Form -->
+  <mat-card class="form-card deposit-form-card" *ngIf="showDepositForm">
+    <mat-card-header>
+      <mat-card-title><mat-icon>add_circle_outline</mat-icon> Add Manual Fiverr Balance</mat-card-title>
+      <mat-card-subtitle>Record any money added to your Fiverr account (outside of project earnings)</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="depositForm" (ngSubmit)="submitDeposit()">
+        <div class="form-grid-3">
+          <mat-form-field appearance="outline">
+            <mat-label>Amount ($)</mat-label>
+            <input matInput type="number" formControlName="amount">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Date</mat-label>
+            <input matInput [matDatepicker]="dp1" formControlName="depositDate">
+            <mat-datepicker-toggle matSuffix [for]="dp1"></mat-datepicker-toggle>
+            <mat-datepicker #dp1></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Source</mat-label>
+            <input matInput formControlName="source" placeholder="e.g. Fiverr promo, Direct client">
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="span-3">
+            <mat-label>Notes</mat-label>
+            <input matInput formControlName="notes">
+          </mat-form-field>
+        </div>
+        <div class="form-actions">
+          <button mat-button type="button" (click)="showDepositForm = false">Cancel</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="depositForm.invalid">Add to Balance</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Admin Personal Withdrawal Form -->
+  <mat-card class="form-card admin-wd-card" *ngIf="showAdminWithdrawalForm">
+    <mat-card-header>
+      <mat-card-title><mat-icon>move_to_inbox</mat-icon> My Personal Withdrawal</mat-card-title>
+      <mat-card-subtitle>Record when you withdraw money from your bank after receiving from Fiverr</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="adminWithdrawalForm" (ngSubmit)="submitAdminWithdrawal()">
+        <div class="form-grid-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Amount (USD)</mat-label>
+            <input matInput type="number" formControlName="amount">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Dollar Rate (PKR)</mat-label>
+            <input matInput type="number" formControlName="dollarRateUsed">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Amount (PKR)</mat-label>
+            <input matInput type="number" formControlName="amountPkr" readonly>
+            <mat-hint>Auto-calculated</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Date</mat-label>
+            <input matInput [matDatepicker]="awdp" formControlName="withdrawalDate">
+            <mat-datepicker-toggle matSuffix [for]="awdp"></mat-datepicker-toggle>
+            <mat-datepicker #awdp></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Method</mat-label>
+            <mat-select formControlName="method">
+              <mat-option *ngFor="let m of paymentMethods" [value]="m">{{ m }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="span-3">
+            <mat-label>Notes</mat-label>
+            <input matInput formControlName="notes">
+          </mat-form-field>
+        </div>
+        <div class="form-actions">
+          <button mat-button type="button" (click)="showAdminWithdrawalForm = false">Cancel</button>
+          <button mat-raised-button color="accent" type="submit" [disabled]="adminWithdrawalForm.invalid">Record Withdrawal</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Pay Developer Form — multi-project required, auto-populate -->
+  <mat-card class="form-card pay-form-card" *ngIf="showPayForm">
+    <mat-card-header>
+      <mat-card-title><mat-icon>send</mat-icon> Pay Developer</mat-card-title>
+      <mat-card-subtitle>Select a developer and their projects — amounts are auto-calculated from earnings</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="payForm" (ngSubmit)="submitPayment()">
+        <div class="form-grid-4">
+          <!-- Row 1: Developer + Projects -->
+          <mat-form-field appearance="outline">
+            <mat-label>Developer</mat-label>
+            <mat-select formControlName="developerId">
+              <mat-option *ngFor="let d of developers" [value]="d.id">{{ d.name }}</mat-option>
+            </mat-select>
+            <mat-error>Required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="span-3">
+            <mat-label>Projects (required — multi-select)</mat-label>
+            <mat-select formControlName="projectIds" multiple required>
+              <mat-option
+                *ngFor="let p of getDevProjects()"
+                [value]="p.projectId">
+                {{ p.projectTitle }} — ${{ p.devPayment | number:'1.2-2' }}
+              </mat-option>
+            </mat-select>
+            <mat-hint>Select all projects included in this payment</mat-hint>
+            <mat-error>At least one project is required</mat-error>
+          </mat-form-field>
+
+          <!-- Auto-populated amounts -->
+          <div class="auto-amount-box">
+            <div class="auto-label">Amount (USD)</div>
+            <div class="auto-val">${{ payForm.getRawValue().amountUsd | number:'1.2-2' }}</div>
+            <div class="auto-hint">From selected projects</div>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Dev Rate (PKR/$)</mat-label>
+            <input matInput type="number" formControlName="dollarRateUsed">
+            <mat-hint>Rate applied to dev payment</mat-hint>
+          </mat-form-field>
+
+          <div class="auto-amount-box pkr-box">
+            <div class="auto-label">Amount (PKR)</div>
+            <div class="auto-val">{{ payForm.getRawValue().amountPkr | number:'1.0-0' }}</div>
+            <div class="auto-hint">USD × Rate</div>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Transfer Date</mat-label>
+            <input matInput [matDatepicker]="tdp" formControlName="transferDate">
+            <mat-datepicker-toggle matSuffix [for]="tdp"></mat-datepicker-toggle>
+            <mat-datepicker #tdp></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Method</mat-label>
+            <mat-select formControlName="method">
+              <mat-option *ngFor="let m of paymentMethods" [value]="m">{{ m }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="span-3">
+            <mat-label>Notes</mat-label>
+            <input matInput formControlName="notes">
+          </mat-form-field>
+        </div>
+        <div class="form-actions">
+          <button mat-button type="button" (click)="showPayForm = false">Cancel</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="payForm.invalid || !payForm.get('projectIds')?.value?.length">
+            <mat-icon>send</mat-icon> Record Payment
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <div *ngIf="isLoading" class="loading-center"><mat-spinner diameter="48"></mat-spinner></div>
+
+  <!-- ── Earnings Breakdown by Developer ───────────────────────────────── -->
+  <mat-card class="section-card earn-section" *ngIf="!isLoading && developerEarnings.length > 0">
+    <mat-card-header>
+      <mat-icon mat-card-avatar class="section-avatar earn-avatar">bar_chart</mat-icon>
+      <mat-card-title>Earnings Breakdown by Developer</mat-card-title>
+      <mat-card-subtitle>WRT Dev, actual price, deduction, and conversion rates per project</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="dev-earn-list">
+        <div class="dev-earn-item" *ngFor="let dev of developerEarnings">
+          <div class="dev-earn-header" (click)="toggleEarningDev(dev.developerId)">
+            <div class="dev-earn-avatar">{{ dev.developerName.charAt(0).toUpperCase() }}</div>
+            <div class="dev-earn-info">
+              <div class="dev-earn-name">{{ dev.developerName }}</div>
+              <div class="dev-earn-sub">{{ dev.projects?.length || 0 }} projects</div>
+            </div>
+            <div class="dev-earn-totals">
+              <div class="earn-total-item">
+                <span class="earn-total-label">Dev Total</span>
+                <span class="earn-total-val dev-col">${{ dev.totalEarnings | number:'1.2-2' }}</span>
+              </div>
+              <div class="earn-total-item">
+                <span class="earn-total-label">Our Share</span>
+                <span class="earn-total-val our-col">${{ getTotalOurEarnings() / (developerEarnings.length || 1) | number:'1.2-2' }}</span>
+              </div>
+            </div>
+            <mat-icon class="expand-icon">{{ expandedEarningDev === dev.developerId ? 'expand_less' : 'expand_more' }}</mat-icon>
+          </div>
+
+          <!-- Project breakdown table -->
+          <div class="earn-table-wrap" *ngIf="expandedEarningDev === dev.developerId && dev.projects?.length">
+            <table mat-table [dataSource]="dev.projects" class="earn-table">
+              <ng-container matColumnDef="project">
+                <th mat-header-cell *matHeaderCellDef>Project</th>
+                <td mat-cell *matCellDef="let p"><strong>{{ p.projectTitle }}</strong></td>
+              </ng-container>
+              <ng-container matColumnDef="actualPrice">
+                <th mat-header-cell *matHeaderCellDef>Actual ($)</th>
+                <td mat-cell *matCellDef="let p">${{ p.actualPrice | number:'1.2-2' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="afterDeduction">
+                <th mat-header-cell *matHeaderCellDef>After 20% Deduction</th>
+                <td mat-cell *matCellDef="let p">${{ p.paymentInDollarAfterDeduction | number:'1.2-2' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="wrtDev">
+                <th mat-header-cell *matHeaderCellDef>WRT Dev ($)</th>
+                <td mat-cell *matCellDef="let p" class="wrt-col">${{ p.paymentWrtDev | number:'1.2-2' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="devPayment">
+                <th mat-header-cell *matHeaderCellDef>Dev 50% ($)</th>
+                <td mat-cell *matCellDef="let p" class="dev-pay-col">${{ p.devPayment | number:'1.2-2' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="devPkr">
+                <th mat-header-cell *matHeaderCellDef>Dev PKR</th>
+                <td mat-cell *matCellDef="let p" class="pkr-col">{{ getProjectDevPkr(p) | number:'1.0-0' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="ourShare">
+                <th mat-header-cell *matHeaderCellDef>Our Share ($)</th>
+                <td mat-cell *matCellDef="let p" class="our-share-col">${{ getProjectOurShare(p) | number:'1.2-2' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="ourPkr">
+                <th mat-header-cell *matHeaderCellDef>Our PKR</th>
+                <td mat-cell *matCellDef="let p" class="our-pkr-col">{{ getProjectOurPkr(p) | number:'1.0-0' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="rates">
+                <th mat-header-cell *matHeaderCellDef>Rates</th>
+                <td mat-cell *matCellDef="let p" class="rate-col">
+                  <span class="rate-pill">Dev: {{ (p.dollarRateWrtDev || globalDollarRateWrtDev) | number:'1.0-0' }}</span>
+                  <span class="rate-pill our">Admin: {{ (p.dollarRate || globalDollarRate) | number:'1.0-0' }}</span>
+                </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="['project','actualPrice','afterDeduction','wrtDev','devPayment','devPkr','ourShare','ourPkr','rates']"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['project','actualPrice','afterDeduction','wrtDev','devPayment','devPkr','ourShare','ourPkr','rates'];"></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Developer Balance Cards -->
+  <div class="dev-balance-section" *ngIf="!isLoading">
+    <h2 class="section-heading">Developer Balance Tracking</h2>
+    <div class="dev-grid">
+      <mat-card class="dev-bal-card" *ngFor="let d of devBalances">
+        <mat-card-content>
+          <div class="dev-bal-header">
+            <div class="dev-avatar">{{ d.developerName.charAt(0).toUpperCase() }}</div>
+            <div class="dev-bal-info">
+              <div class="dev-bal-name">{{ d.developerName }}</div>
+              <div class="dev-bal-email">{{ d.developerEmail }}</div>
+            </div>
+          </div>
+          <div class="bal-nums">
+            <div class="bal-num">
+              <div class="bal-label">Net Owed</div>
+              <div class="bal-val owed-v">${{ d.totalOwed | number:'1.2-2' }}</div>
+            </div>
+            <div class="bal-num">
+              <div class="bal-label">Paid</div>
+              <div class="bal-val paid-v">${{ d.totalPaid | number:'1.2-2' }}</div>
+            </div>
+            <div class="bal-num">
+              <div class="bal-label">Remaining</div>
+              <div class="bal-val" [class.rem-v]="d.balance > 0" [class.zero-v]="d.balance <= 0">
+                ${{ d.balance | number:'1.2-2' }}
+              </div>
+            </div>
+          </div>
+          <div class="expense-deduction-row" *ngIf="d.totalExpenseDeduction > 0">
+            <mat-icon class="ded-icon">receipt_long</mat-icon>
+            <span>Expense deduction (50%): <strong>-${{ d.totalExpenseDeduction | number:'1.2-2' }}</strong></span>
+          </div>
+          <mat-progress-bar mode="determinate"
+            [value]="d.totalOwed > 0 ? (d.totalPaid / d.totalOwed) * 100 : 0"
+            [color]="d.balance <= 0 ? 'accent' : 'primary'">
+          </mat-progress-bar>
+          <div class="prog-label">
+            {{ d.totalOwed > 0 ? ((d.totalPaid / d.totalOwed) * 100 | number:'1.0-0') : 0 }}% paid
+          </div>
+
+          <button mat-button class="hist-btn" (click)="toggleDev(d.developerId)" *ngIf="d.transfers?.length">
+            <mat-icon>{{ expandedDev === d.developerId ? 'expand_less' : 'history' }}</mat-icon>
+            {{ expandedDev === d.developerId ? 'Hide' : 'View' }} Transfer History ({{ d.transfers.length }})
+          </button>
+
+          <div class="transfer-list" *ngIf="expandedDev === d.developerId && d.transfers?.length">
+            <div class="transfer-row" *ngFor="let t of d.transfers">
+              <div class="tr-date">{{ t.transferDate | date:'mediumDate' }}</div>
+              <div class="tr-info">
+                <div class="tr-amounts">${{ t.amountUsd | number:'1.2-2' }} <span class="tr-pkr">/ {{ t.amountPkr | number:'1.0-0' }} PKR</span></div>
+                <div class="tr-method">{{ t.method }}</div>
+                <div class="tr-project" *ngIf="t.projectTitle">{{ t.projectTitle }}</div>
+              </div>
+              <button mat-icon-button color="warn" (click)="deleteTransfer(t.id)" matTooltip="Delete">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Fiverr Deposits Section -->
+  <mat-card class="section-card" *ngIf="deposits.length > 0">
+    <mat-card-header>
+      <mat-card-title>Fiverr Deposits (Manual Balance Additions)</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <table mat-table [dataSource]="deposits">
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef>Date</th>
+          <td mat-cell *matCellDef="let d">{{ d.depositDate | date:'mediumDate' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="amount">
+          <th mat-header-cell *matHeaderCellDef>Amount</th>
+          <td mat-cell *matCellDef="let d" class="dep-amt">+${{ d.amount | number:'1.2-2' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="source">
+          <th mat-header-cell *matHeaderCellDef>Source</th>
+          <td mat-cell *matCellDef="let d">{{ d.source || '—' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="notes">
+          <th mat-header-cell *matHeaderCellDef>Notes</th>
+          <td mat-cell *matCellDef="let d" class="muted">{{ d.notes || '—' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let d">
+            <button mat-icon-button color="warn" (click)="deleteDeposit(d.id)"><mat-icon>delete_outline</mat-icon></button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="['date','amount','source','notes','actions']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['date','amount','source','notes','actions'];"></tr>
+      </table>
+      <div class="table-footer-total">Total Deposits: <strong>+${{ getTotalDeposits() | number:'1.2-2' }}</strong></div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Admin Personal Withdrawals -->
+  <mat-card class="section-card" *ngIf="adminWithdrawals.length > 0">
+    <mat-card-header>
+      <mat-card-title>My Personal Withdrawals (After Receiving from Fiverr)</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <table mat-table [dataSource]="adminWithdrawals">
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef>Date</th>
+          <td mat-cell *matCellDef="let a">{{ a.withdrawalDate | date:'mediumDate' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="amount">
+          <th mat-header-cell *matHeaderCellDef>Amount (USD)</th>
+          <td mat-cell *matCellDef="let a">${{ a.amount | number:'1.2-2' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="pkr">
+          <th mat-header-cell *matHeaderCellDef>Amount (PKR)</th>
+          <td mat-cell *matCellDef="let a">{{ a.amountPkr | number:'1.0-0' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="rate">
+          <th mat-header-cell *matHeaderCellDef>Rate</th>
+          <td mat-cell *matCellDef="let a">{{ a.dollarRateUsed | number:'1.0-0' }} PKR/$</td>
+        </ng-container>
+        <ng-container matColumnDef="method">
+          <th mat-header-cell *matHeaderCellDef>Method</th>
+          <td mat-cell *matCellDef="let a">{{ a.method }}</td>
+        </ng-container>
+        <ng-container matColumnDef="notes">
+          <th mat-header-cell *matHeaderCellDef>Notes</th>
+          <td mat-cell *matCellDef="let a" class="muted">{{ a.notes || '—' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let a">
+            <button mat-icon-button color="warn" (click)="deleteAdminWithdrawal(a.id)"><mat-icon>delete_outline</mat-icon></button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="['date','amount','pkr','rate','method','notes','actions']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['date','amount','pkr','rate','method','notes','actions'];"></tr>
+      </table>
+      <div class="table-footer-total">Total Withdrawn: <strong>${{ getTotalAdminWithdrawn() | number:'1.2-2' }}</strong></div>
+    </mat-card-content>
+  </mat-card>
+</div>

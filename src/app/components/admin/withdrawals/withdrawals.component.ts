@@ -4,7 +4,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { WithdrawalService } from '../../../services/withdrawal.service';
 import { ProjectService } from '../../../services/project.service';
+import { ExpenseService } from '../../../services/expense.service';
 import { Withdrawal, WithdrawalCreate } from '../../../models/withdrawal.model';
+import { Expense } from '../../../models/expense.model';
 import { Project } from '../../../models/project.model';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 
@@ -17,19 +19,24 @@ export class WithdrawalsComponent implements OnInit {
   withdrawals: Withdrawal[] = [];
   filteredWithdrawals: Withdrawal[] = [];
   projects: Project[] = [];
+  expenses: Expense[] = [];
   fiverrBalance = 0;
+  totalExpenses = 0;
   isLoading = false;
   showForm = false;
+  showExpenseDialog = false;
   expandedWithdrawal: number | null = null;
 
   withdrawalForm!: FormGroup;
   filterForm!: FormGroup;
+  expenseForm!: FormGroup;
 
   displayedColumns = ['date', 'amount', 'fiverrFee', 'netAmount', 'projectCount', 'notes', 'actions'];
 
   constructor(
     private withdrawalService: WithdrawalService,
     private projectService: ProjectService,
+    private expenseService: ExpenseService,
     private formBuilder: FormBuilder,
     private snackBar: MatSnackBar,
     private dialog: MatDialog
@@ -42,7 +49,14 @@ export class WithdrawalsComponent implements OnInit {
       fiverrFee: [3, [Validators.required, Validators.min(0)]],
       withdrawalDate: [new Date(), Validators.required],
       notes: [''],
-      projectIds: [[]]
+      projectIds: [[], Validators.required]
+    });
+    this.expenseForm = this.formBuilder.group({
+      description: ['', Validators.required],
+      amount: [0, [Validators.required, Validators.min(0.01)]],
+      expenseDate: [new Date(), Validators.required],
+      projectId: [null],
+      notes: ['']
     });
     this.loadData();
   }
@@ -51,19 +65,35 @@ export class WithdrawalsComponent implements OnInit {
     this.isLoading = true;
     const { startDate, endDate } = this.filterForm.value;
     this.withdrawalService.getWithdrawals(startDate || undefined, endDate || undefined).subscribe({
-      next: (data) => {
-        this.withdrawals = data;
-        this.filteredWithdrawals = data;
-        this.isLoading = false;
-      },
+      next: (data) => { this.withdrawals = data; this.filteredWithdrawals = data; this.isLoading = false; },
       error: () => { this.snackBar.open('Failed to load withdrawals', 'Close', { duration: 4000 }); this.isLoading = false; }
     });
-    this.withdrawalService.getFiverrBalance().subscribe({
-      next: (balance) => { this.fiverrBalance = balance; }
+    this.withdrawalService.getFiverrBalance().subscribe({ next: b => { this.fiverrBalance = b; } });
+    this.projectService.getProjects(0, 200).subscribe({ next: r => { this.projects = r.items; } });
+    this.expenseService.getExpenses().subscribe({
+      next: (data) => { this.expenses = data; this.totalExpenses = data.reduce((s, e) => s + e.amount, 0); }
     });
-    this.projectService.getProjects(0, 200).subscribe({
-      next: (resp) => { this.projects = resp.items; }
+  }
+
+  submitExpense() {
+    if (this.expenseForm.invalid) return;
+    const v = this.expenseForm.value;
+    this.expenseService.createExpense({
+      description: v.description, amount: v.amount,
+      expenseDate: v.expenseDate, projectId: v.projectId || undefined, notes: v.notes
+    }).subscribe({
+      next: () => {
+        this.snackBar.open('Expense added', 'Close', { duration: 3000 });
+        this.showExpenseDialog = false;
+        this.expenseForm.reset({ expenseDate: new Date() });
+        this.loadData();
+      },
+      error: () => this.snackBar.open('Failed to save expense', 'Close', { duration: 4000 })
     });
+  }
+
+  deleteExpense(id: number) {
+    this.expenseService.deleteExpense(id).subscribe({ next: () => this.loadData() });
   }
 
   applyFilter() { this.loadData(); }

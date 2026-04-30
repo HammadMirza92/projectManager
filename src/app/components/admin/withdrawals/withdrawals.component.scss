@@ -3,73 +3,182 @@
 .page-header {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
-  h1 { margin: 0; font-size: 22px; font-weight: 600; }
+  h1 { margin: 0; font-size: 22px; font-weight: 600; color: #202124; }
   .subtitle { font-size: 13px; color: #9aa0a6; }
 }
 
 .header-left { display: flex; align-items: center; gap: 12px; }
 .page-icon { font-size: 36px; width: 36px; height: 36px; color: #1967d2; }
 
+// ── Summary Cards ───────────────────────────────────────────────────────────
 .summary-row {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 14px;
   margin-bottom: 20px;
-  @media (max-width: 1200px) { grid-template-columns: repeat(3, 1fr); }
-  @media (max-width: 768px) { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 1400px) { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 768px)  { grid-template-columns: 1fr 1fr; }
 }
 
 .summary-card mat-card-content {
   display: flex; align-items: center; gap: 12px; padding: 16px !important;
 }
 
-.s-icon { font-size: 28px; width: 28px; height: 28px; border-radius: 8px; padding: 4px; }
-.balance-card  .s-icon { background: #e8f0fe; color: #1967d2; }
-.withdrawn-card .s-icon{ background: #fce8e6; color: #c5221f; }
-.fee-card      .s-icon { background: #fef3e2; color: #b06000; }
-.net-card      .s-icon { background: #e6f4ea; color: #137333; }
-.count-card    .s-icon { background: #f1f3f4; color: #5f6368; }
+.s-icon-wrap {
+  width: 44px; height: 44px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  mat-icon { font-size: 22px; width: 22px; height: 22px; }
+}
 
-.s-label { font-size: 11px; color: #9aa0a6; }
-.s-value { font-size: 20px; font-weight: 700; color: #202124; &.negative { color: #c5221f; } }
+.balance-icon  { background: #e8f0fe; color: #1967d2; }
+.withdrawn-icon{ background: #fce8e6; color: #c5221f; }
+.fee-icon      { background: #fef3e2; color: #b06000; }
+.net-icon      { background: #e6f4ea; color: #137333; }
+.expense-icon  { background: #f3e8ff; color: #7b1fa2; }
+.count-icon    { background: #f1f3f4; color: #5f6368; }
+
+.s-info { flex: 1; min-width: 0; }
+.s-label { font-size: 11px; color: #9aa0a6; font-weight: 500; text-transform: uppercase; letter-spacing: .4px; }
+.s-value { font-size: 18px; font-weight: 700; color: #202124; margin-top: 2px; &.negative { color: #c5221f; } &.expense-val { color: #7b1fa2; } }
 .s-hint  { font-size: 10px; color: #bdc1c6; margin-top: 2px; }
 
-// Pending projects alert
-.pending-projects-card {
+.s-hint-action {
+  display: flex; align-items: center; gap: 3px;
+  font-size: 10px; color: #7b1fa2; margin-top: 2px;
+  .hint-icon { font-size: 12px; width: 12px; height: 12px; }
+}
+
+.clickable {
+  cursor: pointer;
+  transition: box-shadow .18s ease, transform .18s ease;
+  &:hover {
+    box-shadow: 0 4px 16px rgba(123,31,162,.18) !important;
+    transform: translateY(-1px);
+  }
+}
+
+// ── Expense Dialog Overlay ──────────────────────────────────────────────────
+.dialog-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,.45);
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+
+.expense-dialog {
+  width: 100%; max-width: 620px; max-height: 90vh;
+  border-radius: 16px !important;
+  overflow: hidden; display: flex; flex-direction: column;
+}
+
+.dialog-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #7b1fa2, #9c27b0);
+  flex-shrink: 0;
+}
+
+.dialog-title-row {
+  display: flex; align-items: center; gap: 10px;
+  .dialog-icon { color: #fff; font-size: 22px; }
+}
+
+.dialog-title    { font-size: 16px; font-weight: 700; color: #fff; }
+.dialog-subtitle { font-size: 12px; color: rgba(255,255,255,.8); }
+
+// Expense Add Form
+.expense-form { padding: 16px 20px; border-bottom: 1px solid #f1f3f4; }
+
+.exp-form-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
+
+  .span-2 { grid-column: span 2; }
+  mat-form-field { width: 100%; }
+}
+
+.exp-form-actions {
+  display: flex; justify-content: flex-end; margin-top: 8px;
+}
+
+// Expense List
+.exp-list {
+  overflow-y: auto; flex: 1; padding: 0 20px 16px;
+}
+
+.exp-list-header {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .8px; color: #9aa0a6; padding: 12px 0 6px;
+}
+
+.exp-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid #f1f3f4;
+  &:last-child { border-bottom: none; }
+}
+
+.exp-item-left { flex: 1; min-width: 0; }
+.exp-desc  { font-size: 14px; font-weight: 500; color: #202124; }
+.exp-meta  { font-size: 11px; color: #9aa0a6; margin-top: 2px; display: flex; align-items: center; gap: 6px; }
+.exp-proj-tag {
+  background: #f3e8ff; color: #7b1fa2;
+  padding: 1px 8px; border-radius: 10px; font-size: 10px; font-weight: 600;
+}
+.exp-amount { font-size: 15px; font-weight: 700; color: #7b1fa2; flex-shrink: 0; }
+
+.exp-empty {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 24px; color: #bdc1c6;
+  mat-icon { font-size: 32px; width: 32px; height: 32px; margin-bottom: 6px; }
+  p { margin: 0; font-size: 13px; }
+}
+
+// ── Alert Card ──────────────────────────────────────────────────────────────
+.alert-card {
   border-radius: 12px !important;
   margin-bottom: 20px;
   border-left: 4px solid #f29900 !important;
   background: #fffbf2 !important;
+}
 
-  .new-icon { color: #f29900; background: transparent; }
+.alert-inner {
+  display: flex; align-items: center; gap: 10px; padding: 2px 0;
+  .alert-icon { color: #f29900; font-size: 22px; flex-shrink: 0; }
+  .alert-text { font-size: 14px; color: #7d5900; }
 }
 
 .pending-chips {
-  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
 }
 
 .pending-chip {
   display: flex; align-items: center; gap: 4px;
   background: #fef3e2; color: #b06000;
-  padding: 4px 10px; border-radius: 12px; font-size: 12px;
+  padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;
   mat-icon { font-size: 14px; width: 14px; height: 14px; }
 }
 
-// Filter
+// ── Filter Card ─────────────────────────────────────────────────────────────
 .filter-card {
-  border-radius: 12px !important; margin-bottom: 20px;
-  .filter-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-  .filter-actions { display: flex; gap: 8px; }
+  border-radius: 12px !important;
+  margin-bottom: 20px;
+  border-top: 3px solid #1967d2 !important;
 }
 
-// Form
-.form-card { border-radius: 12px !important; margin-bottom: 20px; }
+.filter-row {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  mat-form-field { min-width: 180px; }
+}
+
+.filter-actions { display: flex; gap: 8px; }
+
+// ── Form Card ───────────────────────────────────────────────────────────────
+.form-card { border-radius: 12px !important; margin-bottom: 20px; border-left: 4px solid #1967d2 !important; }
 
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 120px;
-  gap: 16px;
-  align-items: start;
+  gap: 16px; align-items: start;
   @media (max-width: 768px) { grid-template-columns: 1fr; }
 
   .span-2 { grid-column: span 2; }
@@ -84,15 +193,16 @@
 
 .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 16px; }
 
-// History table
+// ── History Table ───────────────────────────────────────────────────────────
 .table-card { border-radius: 12px !important; margin-bottom: 20px; }
 
-table { width: 100%; }
+.history-table { width: 100%; }
+
 th.mat-header-cell { font-weight: 600; color: #5f6368; font-size: 12px; text-transform: uppercase; }
-.main-row { cursor: default; }
 
 .amount-col { font-weight: 600; color: #202124; }
 .fee-val    { color: #c5221f; }
+.net-col    strong { color: #137333; }
 
 .proj-expand-btn {
   font-size: 12px; color: #1967d2; padding: 0 4px;
@@ -101,7 +211,7 @@ th.mat-header-cell { font-weight: 600; color: #5f6368; font-size: 12px; text-tra
 
 .muted { color: #9aa0a6; font-size: 13px; }
 
-// Expanded project panel — rendered below the main table rows
+// ── Expanded Project Panel ──────────────────────────────────────────────────
 .project-expand-panel {
   margin: 0 0 4px 0;
   background: #f8faff;
@@ -111,9 +221,11 @@ th.mat-header-cell { font-weight: 600; color: #5f6368; font-size: 12px; text-tra
 }
 
 .expand-header {
+  display: flex; align-items: center; gap: 6px;
   padding: 8px 16px;
   font-size: 12px; font-weight: 600; color: #1967d2;
   background: #e8f0fe;
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
 }
 
 .inner-table {

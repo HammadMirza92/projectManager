@@ -288,29 +288,69 @@
           </mat-card-content>
         </mat-card>
 
-        <!-- Financial Summary Card -->
+        <!-- Financial Overview Card -->
         <mat-card class="section-card">
           <mat-card-header>
             <mat-icon mat-card-avatar class="card-icon budget-icon">pie_chart</mat-icon>
             <mat-card-title>Financial Overview</mat-card-title>
           </mat-card-header>
           <mat-card-content>
+
+            <!-- Admin XLS-aligned net breakdown -->
+            <div class="finance-section" *ngIf="isAdmin() && project.paymentInDollarTotal > 0">
+              <div class="finance-section-title">Revenue Breakdown</div>
+              <div class="finance-row highlight-row">
+                <span>Fiverr Order Total</span>
+                <span class="finance-val">${{ project.paymentInDollarTotal | number:'1.2-2' }}</span>
+              </div>
+              <div class="finance-row">
+                <span>After 20% Fiverr Deduction</span>
+                <span class="finance-val">${{ project.paymentInDollarAfterDeduction | number:'1.2-2' }}</span>
+              </div>
+              <div class="finance-row tip-row" *ngIf="project.tipAmount > 0">
+                <span>+ Tip</span>
+                <span class="finance-val tip-val">+${{ project.tipAmount | number:'1.2-2' }}</span>
+              </div>
+              <div class="finance-row dev-share-row">
+                <span>Developer Share (50%)</span>
+                <span class="finance-val dev-share-val">-${{ project.devPayment | number:'1.2-2' }}</span>
+              </div>
+              <div class="finance-row our-share-row">
+                <span><strong>Our Net Share (USD)</strong></span>
+                <span class="finance-val our-share-val">
+                  <strong>${{ (project.paymentInDollarAfterDeduction - project.devPayment + project.tipAmount) | number:'1.2-2' }}</strong>
+                </span>
+              </div>
+            </div>
+
+            <mat-divider *ngIf="isAdmin() && project.dollarRate > 0"></mat-divider>
+
+            <!-- PKR split (admin only) -->
+            <div class="finance-section" *ngIf="isAdmin() && project.dollarRate > 0">
+              <div class="finance-section-title">PKR Split</div>
+              <div class="finance-row">
+                <span>Dev gets</span>
+                <span class="finance-val dev-share-val">{{ (project.wtrToDevInPkr / 2) | number:'1.0-0' }} PKR</span>
+              </div>
+              <div class="finance-row our-share-row">
+                <span><strong>Our Share (PKR)</strong></span>
+                <span class="finance-val our-share-val">
+                  <strong>{{ ((project.paymentInDollarAfterDeduction - project.devPayment + project.tipAmount) * project.dollarRate - (project.wtrToDevInPkr / 2)) | number:'1.0-0' }} PKR</strong>
+                </span>
+              </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
             <div class="finance-section">
               <div class="finance-row">
                 <span>Total Budget</span>
                 <span class="finance-val">{{ project.totalBudget | currency }}</span>
               </div>
               <div class="finance-row">
-                <span>After Platform Deduction</span>
-                <span class="finance-val">{{ project.totalAfterDeduction | currency }}</span>
-              </div>
-              <div class="finance-row">
                 <span>Developer Amount</span>
                 <span class="finance-val">{{ project.developerAmount | currency }}</span>
               </div>
-            </div>
-            <mat-divider></mat-divider>
-            <div class="finance-section">
               <div class="finance-row">
                 <span>Paid to Developer</span>
                 <span class="finance-val paid-val">{{ getTotalPaidAmount() | currency }}</span>
@@ -321,10 +361,9 @@
               </div>
             </div>
 
-            <!-- Payment progress bar -->
             <div class="pay-progress" *ngIf="project.developerAmount > 0">
               <div class="pay-progress-label">
-                <span>Payment Progress</span>
+                <span>Dev Payment Progress</span>
                 <span>{{ getPaymentPercentage() }}%</span>
               </div>
               <mat-progress-bar mode="determinate" [value]="getPaymentPercentage()" [color]="getPaymentPercentage() >= 100 ? 'accent' : 'primary'"></mat-progress-bar>
