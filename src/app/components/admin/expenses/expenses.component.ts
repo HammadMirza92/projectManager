@@ -39,6 +39,7 @@ export class ExpensesComponent implements OnInit {
       description: ['', Validators.required],
       amount: [0, [Validators.required, Validators.min(0.01)]],
       expenseDate: [new Date(), Validators.required],
+      expenseType: [0, Validators.required],
       projectId: [null],
       notes: ['']
     });
@@ -64,6 +65,7 @@ export class ExpensesComponent implements OnInit {
       description: v.description,
       amount: v.amount,
       expenseDate: v.expenseDate,
+      expenseType: v.expenseType,
       projectId: v.projectId || undefined,
       notes: v.notes
     };
@@ -71,7 +73,7 @@ export class ExpensesComponent implements OnInit {
       next: () => {
         this.snackBar.open('Expense added', 'Close', { duration: 3000 });
         this.showForm = false;
-        this.expenseForm.reset({ expenseDate: new Date() });
+        this.expenseForm.reset({ expenseDate: new Date(), expenseType: 0 });
         this.loadData();
       },
       error: () => this.snackBar.open('Failed to save expense', 'Close', { duration: 4000 })

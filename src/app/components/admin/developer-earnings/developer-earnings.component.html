@@ -225,9 +225,16 @@
             <ng-container matColumnDef="devPaymentStatus">
               <th mat-header-cell *matHeaderCellDef>Paid?</th>
               <td mat-cell *matCellDef="let p">
-                <mat-icon [class]="p.devPaymentStatus ? 'paid-icon' : 'unpaid-icon'">
-                  {{ p.devPaymentStatus ? 'check_circle' : 'radio_button_unchecked' }}
-                </mat-icon>
+                <div class="paid-status-cell">
+                  <mat-icon [class]="p.devPaymentStatus ? 'paid-icon' : 'unpaid-icon'">
+                    {{ p.devPaymentStatus ? 'check_circle' : 'radio_button_unchecked' }}
+                  </mat-icon>
+                  <span *ngIf="p.transferPaid" class="transfer-badge"
+                    [matTooltip]="'Transferred: $' + (p.transferAmountUsd | number:'1.2-2') + ' / ' + (p.transferAmountPkr | number:'1.0-0') + ' PKR'">
+                    <mat-icon class="transfer-icon">send</mat-icon>
+                    {{ p.transferAmountPkr | number:'1.0-0' }} PKR
+                  </span>
+                </div>
               </td>
             </ng-container>
             <tr mat-header-row *matHeaderRowDef="projectColumns"></tr>

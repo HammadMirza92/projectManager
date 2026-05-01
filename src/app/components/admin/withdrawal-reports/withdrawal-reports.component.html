@@ -185,7 +185,7 @@
         </div>
 
         <!-- Expenses breakdown (if any) -->
-        <div class="expenses-section" *ngIf="r.expenses?.length > 0">
+        <div class="expenses-section" *ngIf="(r.expenses?.length ?? 0) > 0">
           <div class="exp-section-header">
             <mat-icon>receipt_long</mat-icon>
             Period Expenses — Split 50/50 between admin and developer

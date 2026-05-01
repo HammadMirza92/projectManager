@@ -21,6 +21,7 @@ export interface ReportExpense {
   expenseId: number;
   description: string;
   amount: number;
+  expenseType: string; // "Fiverr" or "Ours"
   devShare: number;
   adminShare: number;
   expenseDate: Date;

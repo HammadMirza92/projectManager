@@ -100,36 +100,34 @@ export class DeveloperEarningsComponent implements OnInit {
     return this.rateForm.value.dollarRateWrtDev || 0;
   }
 
-  // Dev's PKR earnings: use per-project rates when available, else fall back to global
   getDevPkr(earning: DeveloperEarning): number {
     if (earning.projects?.length) {
-      const sumFromProjects = earning.projects.reduce((s, p) => {
-        const rate = p.dollarRateWrtDev > 0 ? p.dollarRateWrtDev : this.getEffectiveDollarRateWrtDev();
-        return s + p.devPayment * rate;
-      }, 0);
-      return sumFromProjects;
+      return earning.projects.reduce((s, p) => s + this.getProjectDevPkr(p), 0);
     }
     return earning.totalEarnings * this.getEffectiveDollarRateWrtDev();
   }
 
-  // Our PKR share: PaymentWrtDevAfterDeduction × DollarRate (per project or global)
+  // Our PKR share: (ourNetShareUSD × dollarRate) - devPkr
+  // ourNetShareUSD = paymentInDollarAfterDeduction - devPayment + tipAmount
   getOurPkr(earning: DeveloperEarning): number {
     if (earning.projects?.length) {
-      return earning.projects.reduce((s, p) => {
-        const rate = p.dollarRate > 0 ? p.dollarRate : this.getEffectiveDollarRate();
-        return s + p.paymentWrtDevAfterDeduction * rate;
-      }, 0);
+      return earning.projects.reduce((s, p) => s + this.getProjectOurPkr(p), 0);
     }
     return 0;
   }
 
+  // Dev PKR = devPayment × dollarRateWrtDev
+  // e.g. $128 × 264.25 = 33,825 PKR
   getProjectDevPkr(p: any): number {
     const rate = p.dollarRateWrtDev > 0 ? p.dollarRateWrtDev : this.getEffectiveDollarRateWrtDev();
     return p.devPayment * rate;
   }
 
+  // Our PKR = (paymentInDollarAfterDeduction × dollarRate) - devPKR
+  // e.g. 640 × 280 - 33,825 = 145,375 PKR
   getProjectOurPkr(p: any): number {
-    const rate = p.dollarRate > 0 ? p.dollarRate : this.getEffectiveDollarRate();
-    return p.paymentWrtDevAfterDeduction * rate;
+    const adminRate = p.dollarRate > 0 ? p.dollarRate : this.getEffectiveDollarRate();
+    const devPkr = this.getProjectDevPkr(p);
+    return (p.paymentInDollarAfterDeduction + (p.tipAmount || 0)) * adminRate - devPkr;
   }
 }

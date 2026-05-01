@@ -285,6 +285,26 @@
               </div>
             </div>
 
+            <mat-divider *ngIf="devTransfers.length > 0"></mat-divider>
+
+            <!-- Dev Payment Transfers for this project -->
+            <div class="finance-section" *ngIf="devTransfers.length > 0">
+              <div class="finance-section-title">Transfers Paid to Developer</div>
+              <div class="finance-row" *ngFor="let t of devTransfers">
+                <span>{{ t.transferDate | date:'mediumDate' }} · {{ t.method }}</span>
+                <span class="finance-val paid-val">
+                  ${{ t.amountUsd | number:'1.2-2' }}
+                  <span *ngIf="t.amountPkr > 0"> / {{ t.amountPkr | number:'1.0-0' }} PKR</span>
+                </span>
+              </div>
+              <div class="finance-row">
+                <span><strong>Total Transferred</strong></span>
+                <span class="finance-val paid-val">
+                  <strong>${{ getTransferPaidUsd() | number:'1.2-2' }} / {{ getTransferPaidPkr() | number:'1.0-0' }} PKR</strong>
+                </span>
+              </div>
+            </div>
+
           </mat-card-content>
         </mat-card>
 
@@ -296,7 +316,7 @@
           </mat-card-header>
           <mat-card-content>
 
-            <!-- Admin XLS-aligned net breakdown -->
+            <!-- Admin revenue breakdown -->
             <div class="finance-section" *ngIf="isAdmin() && project.paymentInDollarTotal > 0">
               <div class="finance-section-title">Revenue Breakdown</div>
               <div class="finance-row highlight-row">
@@ -304,7 +324,7 @@
                 <span class="finance-val">${{ project.paymentInDollarTotal | number:'1.2-2' }}</span>
               </div>
               <div class="finance-row">
-                <span>After 20% Fiverr Deduction</span>
+                <span>After Fiverr Deduction (80%)</span>
                 <span class="finance-val">${{ project.paymentInDollarAfterDeduction | number:'1.2-2' }}</span>
               </div>
               <div class="finance-row tip-row" *ngIf="project.tipAmount > 0">
@@ -312,13 +332,13 @@
                 <span class="finance-val tip-val">+${{ project.tipAmount | number:'1.2-2' }}</span>
               </div>
               <div class="finance-row dev-share-row">
-                <span>Developer Share (50%)</span>
+                <span>Dev Payment</span>
                 <span class="finance-val dev-share-val">-${{ project.devPayment | number:'1.2-2' }}</span>
               </div>
               <div class="finance-row our-share-row">
-                <span><strong>Our Net Share (USD)</strong></span>
+                <span><strong>Our Share (USD)</strong></span>
                 <span class="finance-val our-share-val">
-                  <strong>${{ (project.paymentInDollarAfterDeduction - project.devPayment + project.tipAmount) | number:'1.2-2' }}</strong>
+                  <strong>${{ (project.paymentInDollarAfterDeduction + project.tipAmount - project.devPayment) | number:'1.2-2' }}</strong>
                 </span>
               </div>
             </div>
@@ -329,14 +349,26 @@
             <div class="finance-section" *ngIf="isAdmin() && project.dollarRate > 0">
               <div class="finance-section-title">PKR Split</div>
               <div class="finance-row">
-                <span>Dev gets</span>
-                <span class="finance-val dev-share-val">{{ (project.wtrToDevInPkr / 2) | number:'1.0-0' }} PKR</span>
+                <span>After Deduction × Rate (${{ project.paymentInDollarAfterDeduction | number:'1.0-0' }} × {{ project.dollarRate | number:'1.0-0' }})</span>
+                <span class="finance-val">{{ (project.paymentInDollarAfterDeduction + project.tipAmount) * project.dollarRate | number:'1.0-0' }} PKR</span>
+              </div>
+              <div class="finance-row dev-share-row">
+                <span>Dev Payment (${{ project.devPayment | number:'1.2-2' }} × {{ project.dollarRateWrtDev | number:'1.0-0' }})</span>
+                <span class="finance-val dev-share-val">-{{ getDevPkr() | number:'1.0-0' }} PKR</span>
               </div>
               <div class="finance-row our-share-row">
                 <span><strong>Our Share (PKR)</strong></span>
                 <span class="finance-val our-share-val">
-                  <strong>{{ ((project.paymentInDollarAfterDeduction - project.devPayment + project.tipAmount) * project.dollarRate - (project.wtrToDevInPkr / 2)) | number:'1.0-0' }} PKR</strong>
+                  <strong>{{ getOurSharePkr() | number:'1.0-0' }} PKR</strong>
                 </span>
+              </div>
+              <div class="finance-row dev-share-row">
+                <span>Dev gets (PKR)</span>
+                <span class="finance-val dev-share-val">{{ getDevPkr() | number:'1.0-0' }} PKR</span>
+              </div>
+              <div class="finance-row" *ngIf="getTransferPaidPkr() > 0">
+                <span>Transferred to Dev</span>
+                <span class="finance-val paid-val">{{ getTransferPaidPkr() | number:'1.0-0' }} PKR</span>
               </div>
             </div>
 

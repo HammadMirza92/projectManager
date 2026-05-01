@@ -55,6 +55,7 @@ export class WithdrawalsComponent implements OnInit {
       description: ['', Validators.required],
       amount: [0, [Validators.required, Validators.min(0.01)]],
       expenseDate: [new Date(), Validators.required],
+      expenseType: [0, Validators.required],
       projectId: [null],
       notes: ['']
     });
@@ -80,12 +81,13 @@ export class WithdrawalsComponent implements OnInit {
     const v = this.expenseForm.value;
     this.expenseService.createExpense({
       description: v.description, amount: v.amount,
-      expenseDate: v.expenseDate, projectId: v.projectId || undefined, notes: v.notes
+      expenseDate: v.expenseDate, expenseType: v.expenseType,
+      projectId: v.projectId || undefined, notes: v.notes
     }).subscribe({
       next: () => {
         this.snackBar.open('Expense added', 'Close', { duration: 3000 });
         this.showExpenseDialog = false;
-        this.expenseForm.reset({ expenseDate: new Date() });
+        this.expenseForm.reset({ expenseDate: new Date(), expenseType: 0 });
         this.loadData();
       },
       error: () => this.snackBar.open('Failed to save expense', 'Close', { duration: 4000 })

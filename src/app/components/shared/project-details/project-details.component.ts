@@ -6,9 +6,11 @@ import { ProjectService } from '../../../services/project.service';
 import { TaskService } from '../../../services/task.service';
 import { PaymentService } from '../../../services/payment.service';
 import { AuthService } from '../../../services/auth.service';
+import { WithdrawalService } from '../../../services/withdrawal.service';
 import { Project, ProjectStatus } from '../../../models/project.model';
 import { Task, TaskStatus } from '../../../models/task.model';
 import { Payment, PaymentStatus } from '../../../models/payment.model';
+import { DevPaymentTransfer } from '../../../models/withdrawal-report.model';
 import { User, UserRole } from '../../../models/user.model';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
@@ -22,6 +24,7 @@ export class ProjectDetailsComponent implements OnInit {
   project: Project | null = null;
   tasks: Task[] = [];
   payments: Payment[] = [];
+  devTransfers: DevPaymentTransfer[] = [];
   currentUser: User | null = null;
   isLoading = false;
 
@@ -31,6 +34,7 @@ export class ProjectDetailsComponent implements OnInit {
     private projectService: ProjectService,
     private taskService: TaskService,
     private paymentService: PaymentService,
+    private withdrawalService: WithdrawalService,
     private authService: AuthService,
     private snackBar: MatSnackBar,
     private dialog: MatDialog
@@ -44,6 +48,7 @@ export class ProjectDetailsComponent implements OnInit {
         this.loadProject();
         this.loadTasks();
         this.loadPayments();
+        this.loadDevTransfers();
       }
     });
   }
@@ -72,6 +77,39 @@ export class ProjectDetailsComponent implements OnInit {
       next: (payments) => { this.payments = payments; },
       error: () => this.snackBar.open('Failed to load payments', 'Close', { duration: 5000 })
     });
+  }
+
+  loadDevTransfers() {
+    this.withdrawalService.getDevPayments().subscribe({
+      next: (transfers) => {
+        this.devTransfers = transfers.filter(t => t.projectId === this.projectId);
+      },
+      error: () => {}
+    });
+  }
+
+  // Dev PKR = devPayment × dollarRateWrtDev
+  // e.g. $128 × 264.25 = 33,825 PKR
+  getDevPkr(): number {
+    if (!this.project) return 0;
+    return this.project.devPayment * this.project.dollarRateWrtDev;
+  }
+
+  // Our PKR = (paymentInDollarAfterDeduction × dollarRate) - devPKR
+  // e.g. 640 × 280 - 33,825 = 145,375 PKR
+  getOurSharePkr(): number {
+    if (!this.project) return 0;
+    const devPkr = this.getDevPkr();
+    return (this.project.paymentInDollarAfterDeduction + (this.project.tipAmount || 0)) * this.project.dollarRate - devPkr;
+  }
+
+  // Total PKR transferred to dev for this project
+  getTransferPaidPkr(): number {
+    return this.devTransfers.reduce((s, t) => s + t.amountPkr, 0);
+  }
+
+  getTransferPaidUsd(): number {
+    return this.devTransfers.reduce((s, t) => s + t.amountUsd, 0);
   }
 
   getStatusBadgeClass(status: ProjectStatus): string {

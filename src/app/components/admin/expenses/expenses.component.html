@@ -61,6 +61,15 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
+            <mat-label>Expense Type</mat-label>
+            <mat-select formControlName="expenseType">
+              <mat-option [value]="0">Fiverr — Split 50/50 (Dev & Admin)</mat-option>
+              <mat-option [value]="1">Ours — Admin only (100%)</mat-option>
+            </mat-select>
+            <mat-hint>Fiverr: both pay half. Ours: deducted from admin only.</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
             <mat-label>Linked Project (optional)</mat-label>
             <mat-select formControlName="projectId">
               <mat-option [value]="null">No specific project</mat-option>

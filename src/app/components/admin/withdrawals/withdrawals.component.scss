@@ -118,7 +118,13 @@
 }
 
 .exp-item-left { flex: 1; min-width: 0; }
-.exp-desc  { font-size: 14px; font-weight: 500; color: #202124; }
+.exp-desc  { font-size: 14px; font-weight: 500; color: #202124; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+.exp-type-badge {
+  font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 10px; line-height: 16px;
+}
+.fiverr-badge { background: #e8f0fe; color: #1a73e8; }
+.ours-badge   { background: #fce8e6; color: #c5221f; }
 .exp-meta  { font-size: 11px; color: #9aa0a6; margin-top: 2px; display: flex; align-items: center; gap: 6px; }
 .exp-proj-tag {
   background: #f3e8ff; color: #7b1fa2;

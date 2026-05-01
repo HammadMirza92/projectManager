@@ -46,11 +46,15 @@ export interface DevProjectEarning {
   paymentWrtDevAfterDeduction: number;
   devPayment: number;
   tipAmount: number;
-  devPaymentInPkr: number;
+  wtrToDevInPkr: number;      // PaymentWrtDevAfterDeduction × DollarRateWrtDev
+  devPaymentInPkr: number;    // same as wtrToDevInPkr
   ourShareInPkr: number;
   dollarRate: number;
   dollarRateWrtDev: number;
   devPaymentStatus: boolean;
+  transferPaid: boolean;       // true if a DevPaymentTransfer exists for this project
+  transferAmountUsd: number;
+  transferAmountPkr: number;
   endDate: Date;
 }
 

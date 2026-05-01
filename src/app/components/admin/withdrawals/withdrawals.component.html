@@ -118,6 +118,14 @@
             <mat-datepicker #expPicker></mat-datepicker>
           </mat-form-field>
           <mat-form-field appearance="outline">
+            <mat-label>Expense Type</mat-label>
+            <mat-select formControlName="expenseType">
+              <mat-option [value]="0">Fiverr — Split 50/50 (Dev & Admin)</mat-option>
+              <mat-option [value]="1">Ours — Admin only (100%)</mat-option>
+            </mat-select>
+            <mat-hint>Fiverr: both pay half. Ours: deducted from admin only.</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
             <mat-label>Linked Project</mat-label>
             <mat-select formControlName="projectId">
               <mat-option [value]="null">No project</mat-option>
@@ -141,7 +149,12 @@
         <div class="exp-list-header">Recent Expenses</div>
         <div class="exp-item" *ngFor="let e of expenses">
           <div class="exp-item-left">
-            <div class="exp-desc">{{ e.description }}</div>
+            <div class="exp-desc">
+              {{ e.description }}
+              <span class="exp-type-badge" [class.fiverr-badge]="e.expenseType === 0" [class.ours-badge]="e.expenseType === 1">
+                {{ e.expenseType === 0 ? 'Fiverr 50/50' : 'Ours' }}
+              </span>
+            </div>
             <div class="exp-meta">{{ e.expenseDate | date:'mediumDate' }}
               <span *ngIf="e.projectTitle" class="exp-proj-tag">{{ e.projectTitle }}</span>
             </div>

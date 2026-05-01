@@ -109,7 +109,7 @@ export class DevPaymentsComponent implements OnInit {
     this.withdrawalService.getAdminWithdrawals().subscribe({ next: a => { this.adminWithdrawals = a; } });
     this.projectService.getProjects(0, 200).subscribe({ next: r => { this.projects = r.items; } });
     this.userService.getDevelopers().subscribe({ next: d => { this.developers = d; } });
-    this.dashboardService.getDeveloperEarnings(null, null).subscribe({
+    this.dashboardService.getDeveloperEarnings(undefined, undefined).subscribe({
       next: earnings => { this.developerEarnings = earnings; }
     });
   }
@@ -239,24 +239,24 @@ export class DevPaymentsComponent implements OnInit {
 
   getTotalOurEarningsPkr(): number {
     return this.developerEarnings.reduce((sum, dev) => {
-      return sum + (dev.projects || []).reduce((s, p) => {
-        const rate = p.dollarRate > 0 ? p.dollarRate : this.globalDollarRate;
-        return s + (p.paymentWrtDevAfterDeduction + (p.tipAmount || 0)) * rate;
-      }, 0);
+      return sum + (dev.projects || []).reduce((s, p) => s + this.getProjectOurPkr(p), 0);
     }, 0);
   }
 
   getProjectOurShare(p: DevProjectEarning): number {
-    return p.paymentWrtDevAfterDeduction + (p.tipAmount || 0);
+    return p.paymentInDollarAfterDeduction - p.devPayment + (p.tipAmount || 0);
   }
 
+  // Dev PKR = devPayment × dollarRateWrtDev
   getProjectDevPkr(p: DevProjectEarning): number {
     const rate = p.dollarRateWrtDev > 0 ? p.dollarRateWrtDev : this.globalDollarRateWrtDev;
     return p.devPayment * rate;
   }
 
+  // Our PKR = (paymentInDollarAfterDeduction × dollarRate) - devPKR
   getProjectOurPkr(p: DevProjectEarning): number {
-    const rate = p.dollarRate > 0 ? p.dollarRate : this.globalDollarRate;
-    return this.getProjectOurShare(p) * rate;
+    const adminRate = p.dollarRate > 0 ? p.dollarRate : this.globalDollarRate;
+    const devPkr = this.getProjectDevPkr(p);
+    return (p.paymentInDollarAfterDeduction + (p.tipAmount || 0)) * adminRate - devPkr;
   }
 }
