@@ -1,0 +1,235 @@
+.page-wrapper { padding: 24px; background: #f5f7fa; min-height: 100vh; }
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  h1 { margin: 0; font-size: 22px; font-weight: 600; }
+  .subtitle { font-size: 13px; color: #9aa0a6; }
+}
+
+.header-left { display: flex; align-items: center; gap: 12px; }
+.page-icon { font-size: 36px; width: 36px; height: 36px; color: #1a73e8; }
+
+// Summary cards
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+  max-width: 640px;
+
+  @media (max-width: 600px) { grid-template-columns: 1fr; max-width: 100%; }
+}
+
+.summary-card mat-card-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px !important;
+}
+
+.s-icon {
+  font-size: 28px; width: 28px; height: 28px;
+  border-radius: 8px; padding: 6px;
+
+  &.proj   { background: #e8f0fe; color: #1a73e8; }
+  &.manual { background: #fef7e0; color: #f9ab00; }
+  &.active { background: #e6f4ea; color: #137333; }
+}
+
+.s-label { font-size: 12px; color: #9aa0a6; }
+.s-value { font-size: 22px; font-weight: 700; color: #202124; }
+
+.loading-row { display: flex; justify-content: center; padding: 60px; }
+
+// Tabs
+.main-tabs {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+.tab-icon { font-size: 18px; width: 18px; height: 18px; margin-right: 6px; vertical-align: middle; }
+
+.tab-badge {
+  display: inline-block;
+  background: #e8f0fe;
+  color: #1a73e8;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 10px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+// Toolbar inside each tab
+.tab-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 16px 16px 0;
+}
+
+.search-field { flex: 1; min-width: 200px; }
+
+.result-count { font-size: 13px; color: #9aa0a6; white-space: nowrap; }
+
+.add-btn { margin-left: auto; }
+
+// Form card
+.form-card {
+  margin: 16px;
+  border-radius: 10px !important;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+
+.full-width { grid-column: 1 / -1; }
+
+.status-toggle-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+// Tables
+.table-responsive { overflow-x: auto; padding: 0 16px 16px; }
+
+table { width: 100%; }
+
+th.mat-header-cell {
+  font-weight: 600;
+  color: #5f6368;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.proj-title { font-size: 13px; color: #202124; }
+
+.url-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #1a73e8;
+  text-decoration: none;
+  font-size: 13px;
+  &:hover { text-decoration: underline; }
+}
+
+.link-icon { font-size: 14px; width: 14px; height: 14px; }
+
+// Login cells
+.login-cell {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.login-cell-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.login-user { font-size: 13px; color: #202124; font-weight: 500; }
+
+.password-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.login-pass {
+  font-size: 13px;
+  color: #5f6368;
+  font-family: monospace;
+  letter-spacing: 1px;
+}
+
+.eye-btn {
+  width: 24px !important;
+  height: 24px !important;
+  line-height: 24px !important;
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+// Reference
+.ref-badge {
+  display: inline-block;
+  background: #e8f0fe;
+  color: #1967d2;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ref-detail {
+  display: block;
+  font-size: 11px;
+  color: #9aa0a6;
+  margin-top: 2px;
+}
+
+.muted { color: #9aa0a6; font-size: 13px; }
+
+// Project status chips
+.status-chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+
+  &.status-completed  { background: #e6f4ea; color: #137333; }
+  &.status-started    { background: #e8f0fe; color: #1967d2; }
+  &.status-pending    { background: #fef7e0; color: #b06000; }
+  &.status-hold       { background: #f1f3f4; color: #5f6368; }
+  &.status-revision   { background: #fce8e6; color: #c5221f; }
+  &.status-cancelled  { background: #fce8e6; color: #c5221f; }
+}
+
+// Manual link status
+.status-label {
+  font-size: 12px;
+  margin-left: 6px;
+  vertical-align: middle;
+  &.status-active   { color: #137333; }
+  &.status-inactive { color: #c5221f; }
+}
+
+.inactive-row { opacity: 0.55; }
+
+// Empty state
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px;
+  color: #9aa0a6;
+
+  mat-icon { font-size: 48px; width: 48px; height: 48px; margin-bottom: 12px; }
+  p { margin-bottom: 16px; }
+}

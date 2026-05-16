@@ -18,6 +18,7 @@ import { WithdrawalReportsComponent } from './components/admin/withdrawal-report
 import { DevPaymentsComponent } from './components/admin/dev-payments/dev-payments.component';
 import { AdminTaskListComponent } from './components/admin/task-list/admin-task-list.component';
 import { AdminTaskFormComponent } from './components/admin/task-form/admin-task-form.component';
+import { WebsiteLinksComponent } from './components/admin/website-links/website-links.component';
 
 // Developer Components
 import { DeveloperDashboardComponent } from './components/developer/developer-dashboard/developer-dashboard.component';
@@ -72,7 +73,8 @@ const routes: Routes = [
       { path: 'tasks/edit/:id', component: AdminTaskFormComponent },
       { path: 'tasks/:id', component: TaskDetailComponent },
       { path: 'projects/:projectId/tasks', component: AdminTaskListComponent },
-      { path: 'projects/:projectId/tasks/add', component: AdminTaskFormComponent }
+      { path: 'projects/:projectId/tasks/add', component: AdminTaskFormComponent },
+      { path: 'website-links', component: WebsiteLinksComponent }
     ]
   },
 

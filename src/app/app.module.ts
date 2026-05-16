@@ -80,6 +80,7 @@ import { AdminTaskFormComponent } from './components/admin/task-form/admin-task-
 import { AdminTaskListComponent } from './components/admin/task-list/admin-task-list.component';
 import { DeveloperTaskListComponent } from './components/developer/task-list/developer-task-list.component';
 import { TaskDetailComponent } from './components/shared/task-detail/task-detail.component';
+import { WebsiteLinksComponent } from './components/admin/website-links/website-links.component';
 
 @NgModule({
   declarations: [
@@ -116,7 +117,8 @@ import { TaskDetailComponent } from './components/shared/task-detail/task-detail
     AdminTaskFormComponent,
     AdminTaskListComponent,
     DeveloperTaskListComponent,
-    TaskDetailComponent
+    TaskDetailComponent,
+    WebsiteLinksComponent
   ],
   imports: [
     BrowserModule,
