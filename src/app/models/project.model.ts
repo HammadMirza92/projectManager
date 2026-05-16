@@ -28,6 +28,9 @@ export interface Project {
   statusName: string;
   platform: string;
   daysRemaining: number;
+  daysRemainingWrtDev: number;
+  originalEndDate?: Date | null;
+  extendedDays: number;
   paidAmount: number;
   remainingAmount: number;
   // Admin-only payment tracking fields
@@ -55,6 +58,8 @@ export interface ProjectCreate {
   websiteLogin: string;
   startDate: Date;
   endDate: Date;
+  originalEndDate?: Date | null;
+  extendedDays?: number;
   sourceOfProject: string;
   totalBudget: number;
   totalAfterDeduction: number;
@@ -82,6 +87,8 @@ export interface ProjectUpdate {
   websiteLogin?: string;
   startDate?: Date;
   endDate?: Date;
+  originalEndDate?: Date | null;
+  extendedDays?: number;
   sourceOfProject?: string;
   totalBudget?: number;
   totalAfterDeduction?: number;

@@ -1,32 +1,42 @@
-<!-- components/admin/task-list/admin-task-list.component.html -->
 <div class="admin-task-list-container">
+
+  <!-- Page header -->
   <div class="header-section">
     <div class="header-title">
-      <h1 *ngIf="!projectId">Task Management</h1>
+      <div *ngIf="!projectId" class="page-heading">
+        <mat-icon class="heading-icon">assignment</mat-icon>
+        <div>
+          <h1>Task Management</h1>
+          <span class="heading-sub">View, create and manage all tasks</span>
+        </div>
+      </div>
       <div *ngIf="projectId" class="project-header">
         <button mat-icon-button (click)="backToProjects()" matTooltip="Back to Projects">
           <mat-icon>arrow_back</mat-icon>
         </button>
-        <h1>Tasks for Project: {{ project?.title || 'Loading...' }}</h1>
+        <div>
+          <h1>{{ project?.title || 'Loading…' }}</h1>
+          <span class="heading-sub">Task list for this project</span>
+        </div>
       </div>
     </div>
     <div class="header-actions">
       <button mat-raised-button color="primary" (click)="openTaskForm()">
-        <mat-icon>add</mat-icon> Add New Task
+        <mat-icon>add</mat-icon> Add Task
       </button>
     </div>
   </div>
 
+  <!-- Loading/error states for project details -->
+  <div class="loading-row" *ngIf="loading">
+    <mat-spinner diameter="36"></mat-spinner>
+  </div>
+  <div class="error-banner" *ngIf="error">
+    <mat-icon>error_outline</mat-icon> {{ error }}
+  </div>
+
+  <!-- Task list card -->
   <mat-card class="content-card">
-    <div class="loading-container" *ngIf="loading">
-      <app-loading-spinner></app-loading-spinner>
-    </div>
-
-    <div class="error-container" *ngIf="error">
-      <mat-chip color="warn" selected>{{ error }}</mat-chip>
-    </div>
-
-    <!-- Task List Component -->
     <app-task-list
       [projectId]="projectId"
       [showActions]="true"
@@ -35,4 +45,5 @@
       (taskUpdated)="onTaskUpdated()">
     </app-task-list>
   </mat-card>
+
 </div>

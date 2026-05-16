@@ -51,6 +51,7 @@ export class ProjectFormComponent implements OnInit {
   }
 
   initForm() {
+    const now = new Date();
     this.projectForm = this.formBuilder.group({
       title: ['', [Validators.required]],
       description: [''],
@@ -59,8 +60,12 @@ export class ProjectFormComponent implements OnInit {
       clientId: [null, [Validators.required]],
       websiteUrl: [''],
       websiteLogin: [''],
-      startDate: [new Date(), [Validators.required]],
+      startDate: [now, [Validators.required]],
+      startTime: [this.formatTime(now)],
       endDate: [null, [Validators.required]],
+      endTime: [''],
+      daysRemainingWrtDev: [{ value: null, disabled: true }],
+      extendedDays: [0],
       sourceOfProject: [''],
       totalBudget: [0, [Validators.required, Validators.min(0)]],
       totalAfterDeduction: [0, [Validators.required, Validators.min(0)]],
@@ -81,6 +86,22 @@ export class ProjectFormComponent implements OnInit {
     });
   }
 
+  private formatTime(date: Date): string {
+    const h = date.getHours().toString().padStart(2, '0');
+    const m = date.getMinutes().toString().padStart(2, '0');
+    return `${h}:${m}`;
+  }
+
+  private combineDateAndTime(date: Date | null, time: string): Date | null {
+    if (!date) return null;
+    const d = new Date(date);
+    if (time) {
+      const [hours, minutes] = time.split(':').map(Number);
+      d.setHours(hours || 0, minutes || 0, 0, 0);
+    }
+    return d;
+  }
+
   loadProjectData() {
     if (!this.projectId) return;
 
@@ -97,7 +118,11 @@ export class ProjectFormComponent implements OnInit {
             websiteUrl: project.websiteUrl,
             websiteLogin: project.websiteLogin,
             startDate: new Date(project.startDate),
+            startTime: this.formatTime(new Date(project.startDate)),
             endDate: new Date(project.endDate),
+            endTime: this.formatTime(new Date(project.endDate)),
+            daysRemainingWrtDev: project.daysRemainingWrtDev ?? null,
+            extendedDays: project.extendedDays ?? 0,
             sourceOfProject: project.sourceOfProject,
             totalBudget: project.totalBudget,
             totalAfterDeduction: project.totalAfterDeduction,
@@ -149,8 +174,9 @@ export class ProjectFormComponent implements OnInit {
       clientId: v.clientId,
       websiteUrl: v.websiteUrl,
       websiteLogin: v.websiteLogin,
-      startDate: v.startDate,
-      endDate: v.endDate,
+      startDate: this.combineDateAndTime(v.startDate, v.startTime) ?? v.startDate,
+      endDate: this.combineDateAndTime(v.endDate, v.endTime) ?? v.endDate,
+      extendedDays: v.extendedDays || 0,
       sourceOfProject: v.sourceOfProject,
       totalBudget: v.totalBudget,
       totalAfterDeduction: v.totalAfterDeduction,
@@ -193,8 +219,9 @@ export class ProjectFormComponent implements OnInit {
       developerId: v.developerId,
       websiteUrl: v.websiteUrl,
       websiteLogin: v.websiteLogin,
-      startDate: v.startDate,
-      endDate: v.endDate,
+      startDate: this.combineDateAndTime(v.startDate, v.startTime) ?? v.startDate,
+      endDate: this.combineDateAndTime(v.endDate, v.endTime) ?? v.endDate,
+      extendedDays: v.extendedDays || 0,
       sourceOfProject: v.sourceOfProject,
       totalBudget: v.totalBudget,
       totalAfterDeduction: v.totalAfterDeduction,
@@ -245,6 +272,19 @@ export class ProjectFormComponent implements OnInit {
       paymentWrtDevAfterDeduction: wrtDevAfterDeduction,
       devPayment
     }, { emitEvent: false });
+  }
+
+  onExtendedDaysChange() {
+    // Preview only — actual extension applied server-side on save
+  }
+
+  getExtendedDeadline(): Date | null {
+    const endDate = this.projectForm.get('endDate')?.value;
+    const extDays = this.projectForm.get('extendedDays')?.value || 0;
+    if (!endDate || extDays <= 0) return null;
+    const d = new Date(endDate);
+    d.setDate(d.getDate() + extDays);
+    return d;
   }
 
   onWrtDevChange() {

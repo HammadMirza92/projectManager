@@ -1,81 +1,156 @@
-/* components/admin/task-form/admin-task-form.component.scss */
+$radius: 14px;
+$radius-sm: 8px;
+$shadow: 0 2px 12px rgba(15,23,42,0.08);
+
 .admin-task-form-container {
   padding: 24px;
-  max-width: 800px;
+  background: #f0f2f7;
+  min-height: 100vh;
+}
+
+.form-card {
+  max-width: 780px;
   margin: 0 auto;
+  border-radius: $radius !important;
+  box-shadow: $shadow !important;
+  overflow: hidden;
+  padding: 0 !important;
 
-  .form-card {
+  ::ng-deep mat-card-content { padding: 0 !important; }
+}
+
+// ── Card header band ─────────────────────────────────────────────
+.form-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  .back-btn ::ng-deep mat-icon { color: #93c5fd; }
+
+  .hero-text { flex: 1; }
+
+  .hero-title {
+    margin: 0 0 3px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .hero-sub {
+    margin: 0;
+    font-size: 12px;
+    color: #93c5fd;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: rgba(99,179,237,0.15);
+    border: 1px solid rgba(147,197,253,0.3);
+    color: #93c5fd;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+}
+
+// ── Loading overlay ──────────────────────────────────────────────
+.loading-shade {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: #f8fafc;
+}
+
+.error-banner {
+  margin: 16px 24px 0;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: $radius-sm;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #be123c;
+  font-size: 13px;
+  font-weight: 500;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; color: #f43f5e; }
+}
+
+// ── Form body ────────────────────────────────────────────────────
+.form-body {
+  padding: 24px;
+}
+
+.form-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: #94a3b8;
+  margin: 0 0 12px;
+}
+
+.form-row {
+  margin-bottom: 4px;
+
+  &.row-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+
+    @media (max-width: 580px) { grid-template-columns: 1fr; }
+  }
+}
+
+.full-width { width: 100%; }
+
+// style all outline fields uniformly
+::ng-deep {
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__trailing,
+  .mdc-notched-outline__notch { border-color: #e2e8f0 !important; border-radius: $radius-sm; }
+
+  .mat-mdc-form-field:focus-within {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__trailing,
+    .mdc-notched-outline__notch { border-color: #2563eb !important; border-width: 2px !important; }
+  }
+}
+
+// ── Actions footer ────────────────────────────────────────────────
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+
+  .btn-cancel {
+    border-radius: $radius-sm !important;
+    color: #64748b !important;
+    font-weight: 600 !important;
+  }
+
+  .btn-submit {
+    border-radius: $radius-sm !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.2px;
+    min-width: 130px;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.3) !important;
     position: relative;
-    padding: 16px;
 
-    .loading-shade {
+    .btn-spinner {
       position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      right: 0;
-      background: rgba(255, 255, 255, 0.7);
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-    }
-
-    .header-actions {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-    }
-
-    mat-card-title {
-      margin-top: 16px;
-      margin-left: 40px;
-    }
-
-    mat-card-subtitle {
-      margin-left: 40px;
-    }
-
-    .error-message {
-      margin: 16px 0;
-    }
-
-    .form-row {
-      margin-bottom: 16px;
-
-      &.form-row-split {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-
-        @media (max-width: 600px) {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      .full-width {
-        width: 100%;
-      }
-    }
-
-    .form-actions {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 24px;
-
-      button {
-        margin-left: 8px;
-        min-width: 120px;
-        position: relative;
-
-        .button-spinner {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-        }
-      }
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
   }
 }

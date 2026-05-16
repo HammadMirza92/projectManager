@@ -81,25 +81,89 @@
           <h2 class="section-title">Project Timeline</h2>
 
           <div class="form-row two-column">
-            <mat-form-field appearance="outline">
-              <mat-label>Start Date</mat-label>
-              <input matInput [matDatepicker]="startPicker" formControlName="startDate" required>
-              <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
-              <mat-datepicker #startPicker></mat-datepicker>
-              <mat-error *ngIf="projectForm.get('startDate')?.hasError('required')">
-                Start date is required
-              </mat-error>
-            </mat-form-field>
+            <div class="datetime-field">
+              <mat-form-field appearance="outline" class="date-part">
+                <mat-label>Start Date</mat-label>
+                <input matInput [matDatepicker]="startPicker" formControlName="startDate" required>
+                <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+                <mat-datepicker #startPicker></mat-datepicker>
+                <mat-error *ngIf="projectForm.get('startDate')?.hasError('required')">
+                  Start date is required
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="time-part">
+                <mat-label>Start Time</mat-label>
+                <input matInput type="time" formControlName="startTime">
+              </mat-form-field>
+            </div>
 
-            <mat-form-field appearance="outline">
-              <mat-label>End Date</mat-label>
-              <input matInput [matDatepicker]="endPicker" formControlName="endDate" required>
-              <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-              <mat-datepicker #endPicker></mat-datepicker>
-              <mat-error *ngIf="projectForm.get('endDate')?.hasError('required')">
-                End date is required
-              </mat-error>
-            </mat-form-field>
+            <div class="datetime-field">
+              <mat-form-field appearance="outline" class="date-part">
+                <mat-label>End Date</mat-label>
+                <input matInput [matDatepicker]="endPicker" formControlName="endDate" required>
+                <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+                <mat-datepicker #endPicker></mat-datepicker>
+                <mat-error *ngIf="projectForm.get('endDate')?.hasError('required')">
+                  End date is required
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="time-part">
+                <mat-label>End Time</mat-label>
+                <input matInput type="time" formControlName="endTime">
+              </mat-form-field>
+            </div>
+          </div>
+
+          <!-- Days Remaining WRT Dev (read-only calculated) -->
+          <div class="form-row" *ngIf="isEditMode">
+            <div class="info-chip-row">
+              <span class="info-chip">
+                <mat-icon>schedule</mat-icon>
+                Days Remaining (WRT Dev): <strong>{{ projectForm.get('daysRemainingWrtDev')?.value ?? '—' }}</strong>
+              </span>
+            </div>
+          </div>
+
+          <!-- Delivery Extension -->
+          <div class="form-row extension-row">
+            <div class="extension-box">
+              <div class="extension-header">
+                <mat-icon class="ext-icon">update</mat-icon>
+                <span class="ext-title">Fiverr Delivery Extension</span>
+                <span class="ext-hint">Enter total extra days granted on Fiverr (e.g. 4)</span>
+              </div>
+              <div class="ext-controls">
+                <mat-form-field appearance="outline" class="ext-field">
+                  <mat-label>Extended Days</mat-label>
+                  <input matInput type="number" formControlName="extendedDays" min="0"
+                         placeholder="0" (input)="onExtendedDaysChange()">
+                  <mat-hint>0 = no extension</mat-hint>
+                </mat-form-field>
+
+                <div class="ext-preview" *ngIf="projectForm.get('extendedDays')?.value > 0 && projectForm.get('endDate')?.value">
+                  <div class="ext-preview-row" *ngIf="projectForm.get('extendedDays')?.value > 0">
+                    <span class="ext-lbl">Original Deadline</span>
+                    <span class="ext-val original">{{ projectForm.get('endDate')?.value | date:'mediumDate' }}</span>
+                  </div>
+                  <div class="ext-preview-row">
+                    <span class="ext-lbl">New Deadline</span>
+                    <span class="ext-val new">{{ getExtendedDeadline() | date:'mediumDate' }}</span>
+                  </div>
+                  <div class="ext-arrow">+{{ projectForm.get('extendedDays')?.value }} days →</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Extension summary (edit mode — already extended) -->
+          <div class="form-row" *ngIf="isEditMode && projectForm.get('extendedDays')?.value > 0">
+            <div class="extension-summary">
+              <mat-icon>info_outline</mat-icon>
+              <span>
+                Delivery extended by <strong>{{ projectForm.get('extendedDays')?.value }} days</strong> on Fiverr.
+                Current deadline: <strong>{{ projectForm.get('endDate')?.value | date:'mediumDate' }}</strong>
+              </span>
+            </div>
           </div>
         </div>
 

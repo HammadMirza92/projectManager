@@ -111,4 +111,9 @@ export class NotificationsComponent implements OnInit {
         return 'notification-icon general';
     }
   }
+
+  cleanTitle(title: string): string {
+    // Strip dedup prefix like "[overdue:20260520] " or "[deadline-1day:20260520] "
+    return title.replace(/^\[[^\]]+\]\s*/, '');
+  }
 }

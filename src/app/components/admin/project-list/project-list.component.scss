@@ -119,6 +119,35 @@ table {
   font-weight: 500;
 }
 
+.deadline-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.deadline-current {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.deadline-extended-badge {
+  display: inline-block;
+  background: #fef9c3;
+  border: 1px solid #fde047;
+  color: #92400e;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 10px;
+}
+
+.deadline-original {
+  font-size: 11px;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
 .no-data {
   display: flex;
   align-items: center;

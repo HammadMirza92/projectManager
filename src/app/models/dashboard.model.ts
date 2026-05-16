@@ -11,6 +11,7 @@ export interface AdminDashboard {
   allProjectsRevenue: number;         // all projects earnings (explicit alias)
   completedProjectsRevenue: number;   // completed projects earnings (explicit alias)
   totalPaidToDevelopers: number;
+  netRevenue: number;
   pendingPayments: number;
   fiverrBalance: number;
   totalWithdrawn: number;

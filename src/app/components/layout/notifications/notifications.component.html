@@ -26,7 +26,7 @@
       </div>
 
       <div class="notif-body">
-        <div class="notif-item-title">{{ n.title }}</div>
+        <div class="notif-item-title">{{ cleanTitle(n.title) }}</div>
         <div class="notif-message">{{ n.message }}</div>
         <div class="notif-time">{{ n.createdAt | date:'MMM d, h:mm a' }}</div>
       </div>

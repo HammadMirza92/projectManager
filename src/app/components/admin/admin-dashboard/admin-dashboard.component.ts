@@ -72,7 +72,7 @@ export class AdminDashboardComponent implements OnInit {
 
   calculateNetRevenue(): number {
     if (!this.dashboardData) return 0;
-    return this.dashboardData.totalRevenue - this.dashboardData.totalPaidToDevelopers;
+    return this.dashboardData.netRevenue ?? 0;
   }
 
   computeCharts() {

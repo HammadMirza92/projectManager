@@ -134,11 +134,20 @@ export class TaskListComponent implements OnInit {
   }
 
   openTaskForm(task?: Task): void {
+    const resolvedProjectId = this.projectId || (task ? task.projectId : null);
+
+    // No project context and no task to edit — navigate to the add form instead of opening a dialog with null projectId
+    if (!resolvedProjectId && !task) {
+      const role = this.currentUserRole?.toLowerCase() || 'admin';
+      this.router.navigate([`/${role}/tasks/add`]);
+      return;
+    }
+
     const dialogRef = this.dialog.open(TaskFormComponent, {
       width: '600px',
       data: {
         task: task || null,
-        projectId: this.projectId || (task ? task.projectId : null)
+        projectId: resolvedProjectId
       }
     });
 
@@ -216,7 +225,8 @@ export class TaskListComponent implements OnInit {
   }
 
   viewTaskDetails(task: Task): void {
-    this.router.navigate(['/tasks', task.id]);
+    const role = this.currentUserRole?.toLowerCase() || 'admin';
+    this.router.navigate([`/${role}/tasks`, task.id]);
   }
 
   isAdmin(): boolean {
