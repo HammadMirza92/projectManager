@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors  } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '../../../services/auth.service';
@@ -25,22 +25,28 @@ export class RegisterComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.registerForm = this.formBuilder.group({
-      name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', Validators.required],
-      role: [UserRole.Client, Validators.required]
-    }, {
-      validator: this.mustMatch('password', 'confirmPassword')
-    });
+    this.initForm();
 
     // Redirect if already logged in
     if (this.authService.isAuthenticated()) {
       this.router.navigate(['/']);
     }
   }
-
+  initForm(): void {
+    this.registerForm = this.formBuilder.group({
+      name: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
+      ]],
+      confirmPassword: ['', [Validators.required]],
+      role: [null, [Validators.required]],
+    }, {
+      validators: this.mustMatch('password', 'confirmPassword')
+    });
+  }
   onSubmit() {
     if (this.registerForm.invalid) {
       return;
@@ -70,21 +76,24 @@ export class RegisterComponent implements OnInit {
 
   // Custom validator to check if passwords match
   mustMatch(controlName: string, matchingControlName: string) {
-    return (formGroup: FormGroup) => {
+    return (formGroup: FormGroup): ValidationErrors | null => {
       const control = formGroup.controls[controlName];
       const matchingControl = formGroup.controls[matchingControlName];
 
       if (matchingControl.errors && !matchingControl.errors['mustMatch']) {
-        // return if another validator has already found an error on the matching control
-        return;
+        // Return if another validator has already found an error
+        return null;
       }
 
-      // set error on matching control if validation fails
+      // Set error if validation fails
       if (control.value !== matchingControl.value) {
         matchingControl.setErrors({ mustMatch: true });
+        return { mustMatch: true };
       } else {
         matchingControl.setErrors(null);
+        return null;
       }
     };
   }
+
 }

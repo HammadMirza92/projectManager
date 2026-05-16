@@ -16,12 +16,15 @@ import { WithdrawalsComponent } from './components/admin/withdrawals/withdrawals
 import { ExpensesComponent } from './components/admin/expenses/expenses.component';
 import { WithdrawalReportsComponent } from './components/admin/withdrawal-reports/withdrawal-reports.component';
 import { DevPaymentsComponent } from './components/admin/dev-payments/dev-payments.component';
+import { AdminTaskListComponent } from './components/admin/task-list/admin-task-list.component';
+import { AdminTaskFormComponent } from './components/admin/task-form/admin-task-form.component';
 
 // Developer Components
 import { DeveloperDashboardComponent } from './components/developer/developer-dashboard/developer-dashboard.component';
 import { DeveloperProjectsComponent } from './components/developer/developer-projects/developer-projects.component';
 import { DeveloperProjectDetailsComponent } from './components/developer/developer-project-details/developer-project-details.component';
 import { DeveloperPaymentsComponent } from './components/developer/developer-payments/developer-payments.component';
+import { DeveloperTaskListComponent } from './components/developer/task-list/developer-task-list.component';
 
 // Client Components
 import { ClientDashboardComponent } from './components/client/client-dashboard/client-dashboard.component';
@@ -31,6 +34,7 @@ import { ClientTasksComponent } from './components/client/client-tasks/client-ta
 
 // Shared Components
 import { ProjectDetailsComponent } from './components/shared/project-details/project-details.component';
+import { TaskDetailComponent } from './components/shared/task-detail/task-detail.component';
 import { PageNotFoundComponent } from './components/layout/page-not-found/page-not-found.component';
 
 // Guards
@@ -62,7 +66,13 @@ const routes: Routes = [
       { path: 'withdrawals', component: WithdrawalsComponent },
       { path: 'withdrawal-reports', component: WithdrawalReportsComponent },
       { path: 'dev-payments', component: DevPaymentsComponent },
-      { path: 'expenses', component: ExpensesComponent }
+      { path: 'expenses', component: ExpensesComponent },
+      { path: 'tasks', component: AdminTaskListComponent },
+      { path: 'tasks/add', component: AdminTaskFormComponent },
+      { path: 'tasks/edit/:id', component: AdminTaskFormComponent },
+      { path: 'tasks/:id', component: TaskDetailComponent },
+      { path: 'projects/:projectId/tasks', component: AdminTaskListComponent },
+      { path: 'projects/:projectId/tasks/add', component: AdminTaskFormComponent }
     ]
   },
 
@@ -76,7 +86,11 @@ const routes: Routes = [
       { path: 'dashboard', component: DeveloperDashboardComponent },
       { path: 'projects', component: DeveloperProjectsComponent },
       { path: 'projects/:id', component: DeveloperProjectDetailsComponent },
-      { path: 'payments', component: DeveloperPaymentsComponent }
+      { path: 'payments', component: DeveloperPaymentsComponent },
+      // Task routes for developer
+      { path: 'tasks', component: DeveloperTaskListComponent },
+      { path: 'tasks/:id', component: TaskDetailComponent },
+      { path: 'projects/:projectId/tasks', component: DeveloperTaskListComponent }
     ]
   },
 
@@ -90,7 +104,10 @@ const routes: Routes = [
       { path: 'dashboard', component: ClientDashboardComponent },
       { path: 'projects', component: ClientProjectsComponent },
       { path: 'projects/:id', component: ClientProjectDetailsComponent },
-      { path: 'tasks', component: ClientTasksComponent }
+      // Task routes for client
+      { path: 'tasks', component: ClientTasksComponent },
+      { path: 'tasks/:id', component: TaskDetailComponent },
+      { path: 'projects/:projectId/tasks', component: ClientTasksComponent }
     ]
   },
 

@@ -1,0 +1,45 @@
+<!-- components/developer/task-list/developer-task-list.component.html -->
+<div class="developer-task-list-container">
+  <div class="header-section">
+    <div class="header-title">
+      <div *ngIf="projectId" class="project-header">
+        <button mat-icon-button (click)="backToProjects()" matTooltip="Back to Projects">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h1>{{ project?.title || 'Loading...' }}</h1>
+      </div>
+      <h1 *ngIf="!projectId">My Tasks</h1>
+    </div>
+    <div class="header-actions">
+      <div class="filter-actions" *ngIf="!projectId">
+        <mat-button-toggle-group [(value)]="tasksToDisplay">
+          <mat-button-toggle value="all">All Tasks</mat-button-toggle>
+          <mat-button-toggle value="assigned">Assigned to Me</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+    </div>
+  </div>
+
+  <mat-card class="content-card">
+    <div class="loading-container" *ngIf="loading">
+      <app-loading-spinner></app-loading-spinner>
+    </div>
+
+    <div class="error-container" *ngIf="error">
+      <mat-chip color="warn" selected>{{ error }}</mat-chip>
+    </div>
+
+    <div class="filter-info">
+      <h2>{{ filterText }}</h2>
+    </div>
+
+    <!-- Task List Component -->
+    <app-task-list
+      [projectId]="projectId"
+      [showActions]="true"
+      [showProject]="!projectId"
+      [showFilters]="true"
+      (taskUpdated)="onTaskUpdated()">
+    </app-task-list>
+  </mat-card>
+</div>

@@ -6,6 +6,8 @@ export interface ConfirmDialogData {
   message: string;
   confirmText: string;
   cancelText: string;
+  confirmButtonText?: string;
+  cancelButtonText?: string;
   itemName?: string;
   isDanger?: boolean;
 }
@@ -23,11 +25,11 @@ export class ConfirmDialogComponent {
     if (data.isDanger === undefined) data.isDanger = true;
   }
 
-  onConfirm(): void {
-    this.dialogRef.close(true);
-  }
-
   onCancel(): void {
     this.dialogRef.close(false);
+  }
+
+  onConfirm(): void {
+    this.dialogRef.close(true);
   }
 }

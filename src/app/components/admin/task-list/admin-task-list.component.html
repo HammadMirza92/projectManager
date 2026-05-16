@@ -1,0 +1,38 @@
+<!-- components/admin/task-list/admin-task-list.component.html -->
+<div class="admin-task-list-container">
+  <div class="header-section">
+    <div class="header-title">
+      <h1 *ngIf="!projectId">Task Management</h1>
+      <div *ngIf="projectId" class="project-header">
+        <button mat-icon-button (click)="backToProjects()" matTooltip="Back to Projects">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h1>Tasks for Project: {{ project?.title || 'Loading...' }}</h1>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button mat-raised-button color="primary" (click)="openTaskForm()">
+        <mat-icon>add</mat-icon> Add New Task
+      </button>
+    </div>
+  </div>
+
+  <mat-card class="content-card">
+    <div class="loading-container" *ngIf="loading">
+      <app-loading-spinner></app-loading-spinner>
+    </div>
+
+    <div class="error-container" *ngIf="error">
+      <mat-chip color="warn" selected>{{ error }}</mat-chip>
+    </div>
+
+    <!-- Task List Component -->
+    <app-task-list
+      [projectId]="projectId"
+      [showActions]="true"
+      [showProject]="!projectId"
+      [showFilters]="true"
+      (taskUpdated)="onTaskUpdated()">
+    </app-task-list>
+  </mat-card>
+</div>

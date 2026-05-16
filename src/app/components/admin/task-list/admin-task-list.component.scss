@@ -1,0 +1,39 @@
+/* components/admin/task-list/admin-task-list.component.scss */
+.admin-task-list-container {
+  padding: 24px;
+
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    .header-title {
+      h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.87);
+      }
+
+      .project-header {
+        display: flex;
+        align-items: center;
+
+        button {
+          margin-right: 16px;
+        }
+      }
+    }
+  }
+
+  .content-card {
+    position: relative;
+    padding: 16px;
+    min-height: 400px;
+
+    .loading-container, .error-container {
+      margin-bottom: 16px;
+    }
+  }
+}

@@ -34,6 +34,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
@@ -71,10 +72,14 @@ import { ClientTasksComponent } from './components/client/client-tasks/client-ta
 
 // Shared Components
 import { ProjectDetailsComponent } from './components/shared/project-details/project-details.component';
-// import { TaskListComponent } from './components/shared/task-list/task-list.component';
-// import { TaskFormComponent } from './components/shared/task-form/task-form.component';
+import { TaskListComponent } from './components/shared/task-list/task-list.component';
+import { TaskFormComponent } from './components/shared/task-form/task-form.component';
 import { ConfirmDialogComponent } from './components/shared/confirm-dialog/confirm-dialog.component';
-// import { LoadingSpinnerComponent } from './components/shared/loading-spinner/loading-spinner.component';
+import { LoadingSpinnerComponent } from './components/shared/loading-spinner/loading-spinner.component';
+import { AdminTaskFormComponent } from './components/admin/task-form/admin-task-form.component';
+import { AdminTaskListComponent } from './components/admin/task-list/admin-task-list.component';
+import { DeveloperTaskListComponent } from './components/developer/task-list/developer-task-list.component';
+import { TaskDetailComponent } from './components/shared/task-detail/task-detail.component';
 
 @NgModule({
   declarations: [
@@ -104,10 +109,14 @@ import { ConfirmDialogComponent } from './components/shared/confirm-dialog/confi
     ClientProjectDetailsComponent,
     ClientTasksComponent,
     ProjectDetailsComponent,
-    // TaskListComponent,
-    // TaskFormComponent,
+    TaskListComponent,
+    TaskFormComponent,
     ConfirmDialogComponent,
-    // LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    AdminTaskFormComponent,
+    AdminTaskListComponent,
+    DeveloperTaskListComponent,
+    TaskDetailComponent
   ],
   imports: [
     BrowserModule,
@@ -140,6 +149,7 @@ import { ConfirmDialogComponent } from './components/shared/confirm-dialog/confi
     MatTabsModule,
     MatProgressBarModule,
     MatTooltipModule,
+    MatButtonToggleModule,
     MatDividerModule,
     MatSlideToggleModule
   ],

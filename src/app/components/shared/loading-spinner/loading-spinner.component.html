@@ -1,0 +1,5 @@
+<!-- components/shared/loading-spinner/loading-spinner.component.html -->
+<div class="spinner-container" [ngClass]="{'overlay': overlay}">
+  <mat-spinner [diameter]="diameter"></mat-spinner>
+  <p *ngIf="message" class="spinner-message">{{ message }}</p>
+</div>

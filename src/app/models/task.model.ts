@@ -2,7 +2,8 @@ export enum TaskStatus {
   ToDo = 'ToDo',
   InProgress = 'InProgress',
   Done = 'Done',
-  Blocked = 'Blocked'
+  Blocked = 'Blocked',
+  OnHold = 'OnHold',
 }
 
 export interface Task {

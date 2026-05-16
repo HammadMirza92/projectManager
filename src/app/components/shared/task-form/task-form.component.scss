@@ -1,0 +1,46 @@
+/* components/shared/task-form/task-form.component.scss */
+.task-form-container {
+  position: relative;
+  min-width: 350px;
+  max-width: 600px;
+
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+  }
+
+  .error-message {
+    color: #f44336;
+    margin-bottom: 16px;
+    padding: 8px;
+    background-color: #ffebee;
+    border-radius: 4px;
+  }
+
+  .full-width {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  .project-display {
+    margin-bottom: 16px;
+    padding: 8px 0;
+
+    mat-label {
+      font-weight: 500;
+      margin-right: 8px;
+    }
+  }
+
+  .mat-dialog-actions {
+    padding-top: 16px;
+  }
+}

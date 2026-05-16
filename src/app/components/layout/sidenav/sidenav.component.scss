@@ -1,3 +1,4 @@
+/* sidebar.component.scss */
 .sidenav-content {
   width: 260px;
   height: 100%;
@@ -174,3 +175,16 @@ mat-nav-list {
 ::ng-deep .sidenav-content .sidenav-footer mat-nav-list a.mdc-list-item:hover {
   background: rgba(248,113,113,0.1) !important;
 }
+
+.mat-divider {
+  margin: 0;
+}
+
+.spacer-divider {
+  margin-top: auto;
+}
+
+.bottom-nav {
+  margin-top: auto;
+}
+

@@ -15,7 +15,6 @@ import { DeveloperEarning } from '../../../models/dashboard.model';
 export class DeveloperEarningsComponent implements OnInit {
   displayedColumns: string[] = ['developerName', 'totalEarnings', 'totalEarningsInPkr', 'ourShareInPkr', 'paidAmount', 'pendingAmount', 'completedProjects'];
   projectColumns: string[] = ['projectTitle', 'status', 'devPayment', 'devPaymentInPkr', 'ourShareInPkr', 'dollarRateWrtDev', 'dollarRate', 'devPaymentStatus'];
-
   dataSource = new MatTableDataSource<DeveloperEarning>([]);
   isLoading = false;
   totalEarnings = 0;          // completed projects only (USD)
@@ -145,4 +144,40 @@ export class DeveloperEarningsComponent implements OnInit {
     const devPkr = this.getProjectDevPkr(p);
     return (p.paymentInDollarAfterDeduction + (p.tipAmount || 0)) * adminRate - devPkr;
   }
+  applySearch(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    // Update totals based on filtered data
+    this.updateTotalsFromFilteredData();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
+  /**
+   * Updates the summary totals based on currently filtered data
+   * This ensures totals reflect what's currently visible in the table
+   */
+  updateTotalsFromFilteredData(): void {
+    // Create a MatTableDataSource instance to leverage its filtering capability
+    const tempDataSource = new MatTableDataSource<DeveloperEarning>(this.dataSource.data);
+    tempDataSource.filter = this.dataSource.filter;
+
+    // Get the filtered data
+    const filteredData = tempDataSource.filteredData;
+
+    // Recalculate totals based on filtered data
+    this.totalEarnings = filteredData.reduce((sum, item) => sum + item.totalEarnings, 0);
+    this.totalPaid = filteredData.reduce((sum, item) => sum + item.paidAmount, 0);
+    this.totalPending = filteredData.reduce((sum, item) => sum + item.pendingAmount, 0);
+
+  }
+  generateReport(){}
+  viewDetails(earning:any){
+    console.log("asdddddddddasdddddddddddd")
+  }
+  downloadStatement(data:any){}
+  processPayment(data:any){}
 }
