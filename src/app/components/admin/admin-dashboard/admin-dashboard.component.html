@@ -63,12 +63,22 @@
       </mat-card-content>
     </mat-card>
 
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon-wrap sky"><mat-icon>pending_actions</mat-icon></div>
+        <div class="stat-info">
+          <div class="stat-value">{{ dashboardData?.activeRevenue | currency:'USD':'symbol':'1.0-0' }}</div>
+          <div class="stat-label">All Projects Revenue</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
     <mat-card class="stat-card revenue">
       <mat-card-content>
         <div class="stat-icon-wrap emerald"><mat-icon>account_balance_wallet</mat-icon></div>
         <div class="stat-info">
           <div class="stat-value">{{ dashboardData?.totalRevenue | currency:'USD':'symbol':'1.0-0' }}</div>
-          <div class="stat-label">Total Revenue</div>
+          <div class="stat-label">Completed Revenue</div>
         </div>
       </mat-card-content>
     </mat-card>
@@ -147,7 +157,11 @@
     <mat-card-content>
       <div class="fin-grid">
         <div class="fin-item">
-          <div class="fin-item-label">Total Revenue</div>
+          <div class="fin-item-label">All Projects Revenue</div>
+          <div class="fin-item-value sky-val">{{ dashboardData?.activeRevenue | currency }}</div>
+        </div>
+        <div class="fin-item">
+          <div class="fin-item-label">Completed Revenue</div>
           <div class="fin-item-value green-val">{{ dashboardData?.totalRevenue | currency }}</div>
         </div>
         <div class="fin-item">

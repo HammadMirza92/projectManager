@@ -162,10 +162,18 @@ export class WithdrawalsComponent implements OnInit {
     return this.filteredWithdrawals.reduce((s, w) => s + w.netAmount, 0);
   }
 
-  // Projects that are completed but not yet linked to any withdrawal
+  // Completed projects with Fiverr earnings not yet linked to any withdrawal
   getUnwithdrawProjects(): Project[] {
     const linkedIds = new Set<number>();
     this.withdrawals.forEach(w => w.projects?.forEach(p => linkedIds.add(p.projectId)));
-    return this.projects.filter(p => !linkedIds.has(p.id) && (p as any).paymentInDollarAfterDeduction > 0);
+    return this.projects.filter(p =>
+      p.status === 'Completed' &&
+      !linkedIds.has(p.id) &&
+      (p as any).paymentInDollarAfterDeduction > 0
+    );
+  }
+
+  getPendingWithdrawalTotal(): number {
+    return this.getUnwithdrawProjects().reduce((s, p) => s + ((p as any).paymentInDollarAfterDeduction + ((p as any).tipAmount || 0)), 0);
   }
 }

@@ -171,19 +171,70 @@
     </mat-card>
   </div>
 
-  <!-- Pending projects without withdrawal -->
-  <mat-card class="alert-card" *ngIf="getUnwithdrawProjects().length > 0">
-    <div class="alert-inner">
-      <mat-icon class="alert-icon">new_releases</mat-icon>
-      <div class="alert-text">
-        <strong>{{ getUnwithdrawProjects().length }} project(s)</strong> have Fiverr earnings not linked to any withdrawal
+  <!-- Completed projects pending withdrawal -->
+  <mat-card class="pending-card" *ngIf="getUnwithdrawProjects().length > 0">
+    <mat-card-header>
+      <div class="pending-header">
+        <div class="pending-title-row">
+          <mat-icon class="pending-icon">new_releases</mat-icon>
+          <div>
+            <div class="pending-title">{{ getUnwithdrawProjects().length }} Completed Project(s) Awaiting Withdrawal</div>
+            <div class="pending-subtitle">These projects are marked Completed but have not been included in any withdrawal yet</div>
+          </div>
+        </div>
+        <div class="pending-total">
+          <span class="pending-total-label">Total Pending</span>
+          <span class="pending-total-val">${{ getPendingWithdrawalTotal() | number:'1.2-2' }}</span>
+        </div>
       </div>
-    </div>
-    <div class="pending-chips">
-      <span class="pending-chip" *ngFor="let p of getUnwithdrawProjects()">
-        <mat-icon>work</mat-icon> {{ p.title }}
-      </span>
-    </div>
+    </mat-card-header>
+    <mat-card-content>
+      <table mat-table [dataSource]="getUnwithdrawProjects()" class="pending-table">
+
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef>Project</th>
+          <td mat-cell *matCellDef="let p"><strong>{{ p.title }}</strong></td>
+        </ng-container>
+
+        <ng-container matColumnDef="developer">
+          <th mat-header-cell *matHeaderCellDef>Developer</th>
+          <td mat-cell *matCellDef="let p">{{ p.developerName }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="gross">
+          <th mat-header-cell *matHeaderCellDef>Fiverr Total ($)</th>
+          <td mat-cell *matCellDef="let p" class="amt-col">${{ p.paymentInDollarTotal | number:'1.2-2' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="afterDeduction">
+          <th mat-header-cell *matHeaderCellDef>After Deduction ($)</th>
+          <td mat-cell *matCellDef="let p" class="amt-col after-col">${{ p.paymentInDollarAfterDeduction | number:'1.2-2' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="tip">
+          <th mat-header-cell *matHeaderCellDef>Tip ($)</th>
+          <td mat-cell *matCellDef="let p" class="amt-col tip-col">
+            <span *ngIf="p.tipAmount > 0">+${{ p.tipAmount | number:'1.2-2' }}</span>
+            <span *ngIf="!p.tipAmount" class="muted">—</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="devPayment">
+          <th mat-header-cell *matHeaderCellDef>Dev Payment ($)</th>
+          <td mat-cell *matCellDef="let p" class="amt-col dev-col">${{ p.devPayment | number:'1.2-2' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="ourShare">
+          <th mat-header-cell *matHeaderCellDef>Our Share ($)</th>
+          <td mat-cell *matCellDef="let p" class="amt-col our-col">
+            ${{ (p.paymentInDollarAfterDeduction + (p.tipAmount || 0) - p.devPayment) | number:'1.2-2' }}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['title','developer','gross','afterDeduction','tip','devPayment','ourShare']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['title','developer','gross','afterDeduction','tip','devPayment','ourShare'];"></tr>
+      </table>
+    </mat-card-content>
   </mat-card>
 
   <!-- Date Filter -->

@@ -112,12 +112,13 @@ export class AdminDashboardComponent implements OnInit {
 
   private computeFinancialBars() {
     const d = this.dashboardData!;
-    const max = Math.max(d.totalRevenue, 1);
+    const max = Math.max(d.activeRevenue, 1);
     this.financialBars = [
-      { label: 'Total Revenue',     value: d.totalRevenue,            percent: 100,                            color: '#16a34a' },
-      { label: 'Paid to Devs',      value: d.totalPaidToDevelopers,   percent: (d.totalPaidToDevelopers / max) * 100,  color: '#2563eb' },
-      { label: 'Pending Payments',  value: d.pendingPayments,         percent: (d.pendingPayments / max) * 100,        color: '#f59e0b' },
-      { label: 'Net Revenue',       value: this.calculateNetRevenue(), percent: (this.calculateNetRevenue() / max) * 100, color: '#8b5cf6' },
+      { label: 'All Projects Revenue', value: d.activeRevenue,           percent: 100,                                      color: '#0ea5e9' },
+      { label: 'Completed Revenue',     value: d.totalRevenue,            percent: (d.totalRevenue / max) * 100,             color: '#16a34a' },
+      { label: 'Paid to Devs',         value: d.totalPaidToDevelopers,   percent: (d.totalPaidToDevelopers / max) * 100,    color: '#2563eb' },
+      { label: 'Pending Payments',     value: d.pendingPayments,         percent: (d.pendingPayments / max) * 100,          color: '#f59e0b' },
+      { label: 'Net Revenue',          value: this.calculateNetRevenue(), percent: (this.calculateNetRevenue() / max) * 100, color: '#8b5cf6' },
     ];
   }
 

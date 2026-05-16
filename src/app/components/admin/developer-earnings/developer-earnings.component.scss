@@ -52,11 +52,11 @@
 
 .totals-row {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   gap: 14px;
   margin-bottom: 24px;
-  @media (max-width: 1200px) { grid-template-columns: repeat(3, 1fr); }
-  @media (max-width: 768px) { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 1400px) { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 900px)  { grid-template-columns: repeat(2, 1fr); }
 }
 
 .total-card mat-card-content {
@@ -66,6 +66,8 @@
   padding: 16px !important;
   mat-icon { font-size: 28px; width: 28px; height: 28px; border-radius: 8px; padding: 4px; }
 }
+.sky-card     mat-icon { background: #e0f2fe; color: #0369a1; }
+.green-card   mat-icon { background: #dcfce7; color: #15803d; }
 .earn-card    mat-icon { background: #e8f0fe; color: #1967d2; }
 .pkr-dev-card mat-icon { background: #fce8e6; color: #c5221f; }
 .pkr-our-card mat-icon { background: #e6f4ea; color: #137333; }
@@ -74,6 +76,7 @@
 
 .total-label { font-size: 11px; color: #9aa0a6; }
 .total-val   { font-size: 18px; font-weight: 700; color: #202124; }
+.total-sub   { font-size: 10px; color: #b0b8c1; margin-top: 2px; }
 
 .loading-container { display: flex; justify-content: center; padding: 48px; }
 
@@ -124,9 +127,10 @@
   justify-content: space-between;
 }
 
-.fin-item  { text-align: center; flex: 1; }
-.fin-label { display: block; font-size: 11px; color: #9aa0a6; margin-bottom: 4px; }
-.fin-val   { font-size: 16px; font-weight: 700; }
+.fin-item      { text-align: center; flex: 1; }
+.fin-label     { display: block; font-size: 11px; color: #9aa0a6; margin-bottom: 4px; }
+.fin-sublabel  { display: block; font-size: 10px; color: #b0b8c1; margin-top: 2px; }
+.fin-val       { font-size: 16px; font-weight: 700; }
 .earn-val    { color: #202124; }
 .paid-val    { color: #137333; }
 .pending-val { color: #b06000; }
@@ -150,6 +154,7 @@
   .pkr-label { font-size: 11px; color: #c5221f; }
   .pkr-val   { font-size: 20px; font-weight: 700; color: #c5221f; }
   .pkr-rate  { font-size: 10px; color: #9aa0a6; margin-top: 2px; }
+  .pkr-sub   { font-size: 10px; color: #c5221f; opacity: 0.6; margin-top: 2px; }
 }
 
 .our-pkr-box {
@@ -157,6 +162,7 @@
   .pkr-label { font-size: 11px; color: #137333; }
   .pkr-val   { font-size: 20px; font-weight: 700; color: #137333; }
   .pkr-rate  { font-size: 10px; color: #9aa0a6; margin-top: 2px; }
+  .pkr-sub   { font-size: 10px; color: #137333; opacity: 0.6; margin-top: 2px; }
 }
 
 .pay-progress { margin-top: 12px; }
@@ -227,6 +233,7 @@
 .table-container { overflow-x: auto; }
 table { width: 100%; }
 th.mat-header-cell { font-weight: 600; color: #5f6368; font-size: 12px; text-transform: uppercase; }
+.col-sub { font-size: 9px; color: #9aa0a6; text-transform: lowercase; font-weight: 400; margin-left: 2px; }
 .pkr-dev-text  { color: #c5221f; font-weight: 600; }
 .pkr-our-text  { color: #137333; font-weight: 600; }
 .paid-text     { color: #137333; font-weight: 600; }

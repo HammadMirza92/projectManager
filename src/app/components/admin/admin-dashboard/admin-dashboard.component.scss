@@ -79,6 +79,7 @@
   &.indigo  { background: linear-gradient(135deg, #4f46e5, #4338ca); }
   &.amber   { background: linear-gradient(135deg, #f59e0b, #d97706); }
   &.emerald { background: linear-gradient(135deg, #059669, #047857); }
+  &.sky     { background: linear-gradient(135deg, #0ea5e9, #0284c7); }
   &.red     { background: linear-gradient(135deg, #ef4444, #dc2626); }
 }
 
@@ -321,6 +322,7 @@
 
 /* ── Color Utilities ─────────────────────────── */
 .green-val  { color: #16a34a !important; }
+.sky-val    { color: #0284c7 !important; }
 .blue-val   { color: #2563eb !important; }
 .amber-val  { color: #d97706 !important; }
 .purple-val { color: #7c3aed !important; }

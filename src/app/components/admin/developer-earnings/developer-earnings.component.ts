@@ -18,11 +18,14 @@ export class DeveloperEarningsComponent implements OnInit {
 
   dataSource = new MatTableDataSource<DeveloperEarning>([]);
   isLoading = false;
-  totalEarnings = 0;
+  totalEarnings = 0;          // completed projects only (USD)
+  totalAllProjectsEarnings = 0; // all projects (USD)
   totalPaid = 0;
   totalPending = 0;
-  totalEarningsPkr = 0;
-  totalOurSharePkr = 0;
+  totalEarningsPkr = 0;       // completed projects only (PKR)
+  totalOurSharePkr = 0;       // completed projects only (PKR)
+  allProjectsRevenue = 0;
+  completedProjectsRevenue = 0;
 
   // Global rate override (admin can set a single rate for quick calculation)
   globalDollarRate = 0;
@@ -70,7 +73,9 @@ export class DeveloperEarningsComponent implements OnInit {
   }
 
   calculateTotals(earnings: DeveloperEarning[]) {
+    // Completed projects only for the top cards
     this.totalEarnings = earnings.reduce((s, d) => s + d.totalEarnings, 0);
+    this.totalAllProjectsEarnings = earnings.reduce((s, d) => s + (d.allProjectsEarnings || 0), 0);
     this.totalPaid = earnings.reduce((s, d) => s + d.paidAmount, 0);
     this.totalPending = earnings.reduce((s, d) => s + d.pendingAmount, 0);
     this.totalEarningsPkr = earnings.reduce((s, d) => s + this.getDevPkr(d), 0);
@@ -100,18 +105,28 @@ export class DeveloperEarningsComponent implements OnInit {
     return this.rateForm.value.dollarRateWrtDev || 0;
   }
 
+  // Dev PKR for top cards and summary table: completed projects only (use backend-calculated value)
   getDevPkr(earning: DeveloperEarning): number {
+    if (earning.totalEarningsInPkr > 0) {
+      return earning.totalEarningsInPkr;
+    }
     if (earning.projects?.length) {
-      return earning.projects.reduce((s, p) => s + this.getProjectDevPkr(p), 0);
+      return earning.projects
+        .filter(p => p.status === 'Completed')
+        .reduce((s, p) => s + this.getProjectDevPkr(p), 0);
     }
     return earning.totalEarnings * this.getEffectiveDollarRateWrtDev();
   }
 
-  // Our PKR share: (ourNetShareUSD × dollarRate) - devPkr
-  // ourNetShareUSD = paymentInDollarAfterDeduction - devPayment + tipAmount
+  // Our PKR share for top cards and summary table: completed projects only (use backend-calculated value)
   getOurPkr(earning: DeveloperEarning): number {
+    if (earning.ourShareInPkr > 0) {
+      return earning.ourShareInPkr;
+    }
     if (earning.projects?.length) {
-      return earning.projects.reduce((s, p) => s + this.getProjectOurPkr(p), 0);
+      return earning.projects
+        .filter(p => p.status === 'Completed')
+        .reduce((s, p) => s + this.getProjectOurPkr(p), 0);
     }
     return 0;
   }

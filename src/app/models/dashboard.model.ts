@@ -6,7 +6,10 @@ export interface AdminDashboard {
   activeProjects: number;
   completedProjects: number;
   delayedProjects: number;
-  totalRevenue: number;
+  totalRevenue: number;               // completed projects earnings
+  activeRevenue: number;              // all projects earnings
+  allProjectsRevenue: number;         // all projects earnings (explicit alias)
+  completedProjectsRevenue: number;   // completed projects earnings (explicit alias)
   totalPaidToDevelopers: number;
   pendingPayments: number;
   fiverrBalance: number;
@@ -62,15 +65,18 @@ export interface DeveloperEarning {
   developerId: number;
   developerName: string;
   developerEmail: string;
-  totalEarnings: number;
+  totalEarnings: number;          // completed projects only (USD)
+  allProjectsEarnings: number;    // all projects (USD)
   paidAmount: number;
   pendingAmount: number;
   completedProjects: number;
   totalProjects: number;
   activeProjects: number;
   manualPaymentAdjustment: number;
-  totalEarningsInPkr: number;
-  ourShareInPkr: number;
+  totalEarningsInPkr: number;         // completed projects only (PKR)
+  ourShareInPkr: number;              // completed projects only (PKR)
+  allProjectsEarningsInPkr: number;   // all projects (PKR)
+  allProjectsOurShareInPkr: number;   // all projects our share (PKR)
   avgDollarRate: number;
   avgDollarRateWrtDev: number;
   projects: DevProjectEarning[];

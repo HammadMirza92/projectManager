@@ -76,12 +76,33 @@
 
   <!-- Totals -->
   <div class="totals-row">
+    <mat-card class="total-card sky-card">
+      <mat-card-content>
+        <mat-icon>pending_actions</mat-icon>
+        <div>
+          <div class="total-label">All Projects Revenue</div>
+          <div class="total-val">{{ totalAllProjectsEarnings | currency }}</div>
+          <div class="total-sub">All active + completed</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="total-card green-card">
+      <mat-card-content>
+        <mat-icon>account_balance_wallet</mat-icon>
+        <div>
+          <div class="total-label">Completed Projects Revenue</div>
+          <div class="total-val">{{ totalEarnings | currency }}</div>
+          <div class="total-sub">Completed only</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
     <mat-card class="total-card earn-card">
       <mat-card-content>
         <mat-icon>trending_up</mat-icon>
         <div>
           <div class="total-label">Dev Earnings (USD)</div>
           <div class="total-val">{{ totalEarnings | currency }}</div>
+          <div class="total-sub">Completed projects only</div>
         </div>
       </mat-card-content>
     </mat-card>
@@ -91,6 +112,7 @@
         <div>
           <div class="total-label">Dev Earnings (PKR)</div>
           <div class="total-val">{{ totalEarningsPkr | number:'1.0-0' }}</div>
+          <div class="total-sub">Completed projects only</div>
         </div>
       </mat-card-content>
     </mat-card>
@@ -100,6 +122,7 @@
         <div>
           <div class="total-label">Our Share (PKR)</div>
           <div class="total-val">{{ totalOurSharePkr | number:'1.0-0' }}</div>
+          <div class="total-sub">Completed projects only</div>
         </div>
       </mat-card-content>
     </mat-card>
@@ -149,6 +172,7 @@
           <div class="fin-item">
             <span class="fin-label">Dev Earnings (USD)</span>
             <span class="fin-val earn-val">{{ earning.totalEarnings | currency }}</span>
+            <span class="fin-sublabel">completed only</span>
           </div>
           <div class="fin-item">
             <span class="fin-label">Paid</span>
@@ -166,11 +190,13 @@
             <div class="pkr-label">{{ earning.developerName }}'s Share (PKR)</div>
             <div class="pkr-val">{{ getDevPkr(earning) | number:'1.0-0' }}</div>
             <div class="pkr-rate" *ngIf="earning.avgDollarRateWrtDev > 0">@ {{ earning.avgDollarRateWrtDev | number:'1.0-0' }} PKR/$ avg</div>
+            <div class="pkr-sub">completed projects only</div>
           </div>
           <div class="pkr-box our-pkr-box">
             <div class="pkr-label">Our Share (PKR)</div>
             <div class="pkr-val">{{ getOurPkr(earning) | number:'1.0-0' }}</div>
             <div class="pkr-rate" *ngIf="earning.avgDollarRate > 0">@ {{ earning.avgDollarRate | number:'1.0-0' }} PKR/$ avg</div>
+            <div class="pkr-sub">completed projects only</div>
           </div>
         </div>
 
@@ -261,17 +287,17 @@
             <td mat-footer-cell *matFooterCellDef><strong>Total</strong></td>
           </ng-container>
           <ng-container matColumnDef="totalEarnings">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Dev Earnings (USD)</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Dev Earnings (USD) <small class="col-sub">completed</small></th>
             <td mat-cell *matCellDef="let e">{{ e.totalEarnings | currency }}</td>
             <td mat-footer-cell *matFooterCellDef><strong>{{ totalEarnings | currency }}</strong></td>
           </ng-container>
           <ng-container matColumnDef="totalEarningsInPkr">
-            <th mat-header-cell *matHeaderCellDef>Dev Earnings (PKR)</th>
+            <th mat-header-cell *matHeaderCellDef>Dev Earnings (PKR) <small class="col-sub">completed</small></th>
             <td mat-cell *matCellDef="let e" class="pkr-dev-text">{{ getDevPkr(e) | number:'1.0-0' }}</td>
             <td mat-footer-cell *matFooterCellDef><strong>{{ totalEarningsPkr | number:'1.0-0' }}</strong></td>
           </ng-container>
           <ng-container matColumnDef="ourShareInPkr">
-            <th mat-header-cell *matHeaderCellDef>Our Share (PKR)</th>
+            <th mat-header-cell *matHeaderCellDef>Our Share (PKR) <small class="col-sub">completed</small></th>
             <td mat-cell *matCellDef="let e" class="pkr-our-text">{{ getOurPkr(e) | number:'1.0-0' }}</td>
             <td mat-footer-cell *matFooterCellDef><strong>{{ totalOurSharePkr | number:'1.0-0' }}</strong></td>
           </ng-container>
