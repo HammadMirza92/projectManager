@@ -46,7 +46,7 @@ import { UserRole } from './models/user.model';
 const routes: Routes = [
   // Auth Routes
   { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
+  { path: 'register', redirectTo: '/login', pathMatch: 'full' },
 
   // Admin Routes
   {

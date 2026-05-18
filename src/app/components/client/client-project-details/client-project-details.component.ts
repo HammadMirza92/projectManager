@@ -161,10 +161,13 @@ export class ClientProjectDetailsComponent implements OnInit {
     return '';
   }
 
+  getCompletedTaskCount(): number {
+    return this.tasks.filter(t => t.status === TaskStatus.Done).length;
+  }
+
   getTaskCompletionPercentage(): number {
     if (!this.tasks.length) return 0;
-    const done = this.tasks.filter(t => t.status === TaskStatus.Done).length;
-    return Math.round((done / this.tasks.length) * 100);
+    return Math.round((this.getCompletedTaskCount() / this.tasks.length) * 100);
   }
 
   getTotalPaidAmount(): number {

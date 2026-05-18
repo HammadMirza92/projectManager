@@ -1,57 +1,121 @@
-.page-wrapper { padding: 24px; background: #f5f7fa; min-height: 100vh; }
+$radius: 14px;
+$radius-sm: 8px;
+$shadow: 0 2px 12px rgba(15,23,42,0.07);
+$blue: #2563eb;
 
+// ── Page shell ───────────────────────────────────────────────────
+.page-wrapper {
+  padding: 24px;
+  background: #f0f2f7;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+// ── Header ───────────────────────────────────────────────────────
 .page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
   flex-wrap: wrap;
   gap: 12px;
 
-  h1 { margin: 0; font-size: 22px; font-weight: 600; }
-  .subtitle { font-size: 13px; color: #9aa0a6; }
+  h1 { margin: 0 0 2px; font-size: 22px; font-weight: 700; color: #0f172a; letter-spacing: -0.3px; }
+  .subtitle { font-size: 13px; color: #94a3b8; }
 }
 
-.header-left { display: flex; align-items: center; gap: 12px; }
-.page-icon { font-size: 36px; width: 36px; height: 36px; color: #1a73e8; }
+.header-left { display: flex; align-items: center; gap: 14px; }
 
-// Summary cards
+.page-icon {
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+  color: $blue;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.action-header-btn {
+  border-radius: $radius-sm !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  height: 38px !important;
+  padding: 0 16px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+
+  ::ng-deep .mat-mdc-button-touch-target {
+    height: 38px !important;
+    width: 100% !important;
+  }
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}
+
+.download-btn {
+  border-color: $blue !important;
+  color: $blue !important;
+  &:hover { background: #dbeafe !important; }
+}
+
+.email-btn {
+  background: $blue !important;
+  color: #fff !important;
+  &:hover { background: #1d4ed8 !important; }
+  &:disabled { background: #94a3b8 !important; }
+}
+
+// ── Summary cards ─────────────────────────────────────────────────
 .summary-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
-  margin-bottom: 24px;
-  max-width: 640px;
+  max-width: 580px;
 
   @media (max-width: 600px) { grid-template-columns: 1fr; max-width: 100%; }
 }
 
-.summary-card mat-card-content {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px !important;
+.summary-card {
+  border-radius: $radius !important;
+  box-shadow: $shadow !important;
+
+  mat-card-content {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px !important;
+  }
 }
 
 .s-icon {
-  font-size: 28px; width: 28px; height: 28px;
-  border-radius: 8px; padding: 6px;
+  font-size: 26px;
+  width: 26px;
+  height: 26px;
+  border-radius: $radius-sm;
+  padding: 7px;
 
-  &.proj   { background: #e8f0fe; color: #1a73e8; }
-  &.manual { background: #fef7e0; color: #f9ab00; }
-  &.active { background: #e6f4ea; color: #137333; }
+  &.proj   { background: #dbeafe; color: $blue; }
+  &.manual { background: #fef9c3; color: #ca8a04; }
+  &.active { background: #dcfce7; color: #16a34a; }
 }
 
-.s-label { font-size: 12px; color: #9aa0a6; }
-.s-value { font-size: 22px; font-weight: 700; color: #202124; }
+.s-label { font-size: 12px; color: #94a3b8; }
+.s-value { font-size: 22px; font-weight: 700; color: #0f172a; }
 
 .loading-row { display: flex; justify-content: center; padding: 60px; }
 
-// Tabs
+// ── Tabs ─────────────────────────────────────────────────────────
 .main-tabs {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  background: #fff;
+  border-radius: $radius !important;
+  box-shadow: $shadow;
   overflow: hidden;
 }
 
@@ -59,8 +123,8 @@
 
 .tab-badge {
   display: inline-block;
-  background: #e8f0fe;
-  color: #1a73e8;
+  background: #dbeafe;
+  color: $blue;
   font-size: 11px;
   font-weight: 700;
   padding: 1px 7px;
@@ -69,7 +133,7 @@
   vertical-align: middle;
 }
 
-// Toolbar inside each tab
+// ── Tab toolbar ───────────────────────────────────────────────────
 .tab-toolbar {
   display: flex;
   align-items: center;
@@ -79,15 +143,15 @@
 }
 
 .search-field { flex: 1; min-width: 200px; }
+.result-count { font-size: 13px; color: #94a3b8; white-space: nowrap; }
+.add-btn { margin-left: auto; border-radius: $radius-sm !important; }
 
-.result-count { font-size: 13px; color: #9aa0a6; white-space: nowrap; }
-
-.add-btn { margin-left: auto; }
-
-// Form card
+// ── Form card ─────────────────────────────────────────────────────
 .form-card {
   margin: 16px;
-  border-radius: 10px !important;
+  border-radius: $radius !important;
+  box-shadow: $shadow !important;
+  border: 1px solid #e2e8f0;
 }
 
 .form-grid {
@@ -112,27 +176,58 @@
   gap: 12px;
   justify-content: flex-end;
   margin-top: 16px;
+
+  button { border-radius: $radius-sm !important; }
 }
 
-// Tables
+// ── Tables ────────────────────────────────────────────────────────
 .table-responsive { overflow-x: auto; padding: 0 16px 16px; }
 
 table { width: 100%; }
 
-th.mat-header-cell {
-  font-weight: 600;
-  color: #5f6368;
-  font-size: 12px;
-  text-transform: uppercase;
+::ng-deep {
+  .main-tabs .mat-mdc-header-row {
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .main-tabs .mat-mdc-header-cell {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #64748b !important;
+    padding: 0 14px !important;
+  }
+
+  .main-tabs .mat-mdc-row {
+    transition: background 0.15s;
+    &:hover { background: #f8fafc; }
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .main-tabs .mat-mdc-cell {
+    padding: 12px 14px !important;
+    font-size: 13px;
+    color: #1e293b;
+  }
 }
 
-.proj-title { font-size: 13px; color: #202124; }
+.proj-title { font-size: 13px; font-weight: 600; color: #0f172a; }
+
+.name-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+
+  strong { font-size: 13px; color: #0f172a; }
+}
 
 .url-link {
   display: flex;
   align-items: center;
   gap: 4px;
-  color: #1a73e8;
+  color: $blue;
   text-decoration: none;
   font-size: 13px;
   &:hover { text-decoration: underline; }
@@ -140,7 +235,7 @@ th.mat-header-cell {
 
 .link-icon { font-size: 14px; width: 14px; height: 14px; }
 
-// Login cells
+// ── Login cells ───────────────────────────────────────────────────
 .login-cell {
   display: flex;
   align-items: center;
@@ -153,7 +248,7 @@ th.mat-header-cell {
   gap: 2px;
 }
 
-.login-user { font-size: 13px; color: #202124; font-weight: 500; }
+.login-user { font-size: 13px; color: #0f172a; font-weight: 500; }
 
 .password-row {
   display: flex;
@@ -163,23 +258,29 @@ th.mat-header-cell {
 
 .login-pass {
   font-size: 13px;
-  color: #5f6368;
+  color: #64748b;
   font-family: monospace;
   letter-spacing: 1px;
 }
 
 .eye-btn {
-  width: 24px !important;
-  height: 24px !important;
-  line-height: 24px !important;
-  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+
+  ::ng-deep .mat-mdc-button-touch-target {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
 }
 
-// Reference
+// ── Reference badges ─────────────────────────────────────────────
 .ref-badge {
   display: inline-block;
-  background: #e8f0fe;
-  color: #1967d2;
+  background: #dbeafe;
+  color: #1d4ed8;
   padding: 2px 8px;
   border-radius: 12px;
   font-size: 11px;
@@ -189,47 +290,109 @@ th.mat-header-cell {
 .ref-detail {
   display: block;
   font-size: 11px;
-  color: #9aa0a6;
+  color: #94a3b8;
   margin-top: 2px;
 }
 
-.muted { color: #9aa0a6; font-size: 13px; }
+.muted { color: #94a3b8; font-size: 13px; }
 
-// Project status chips
+// ── Status chips ─────────────────────────────────────────────────
 .status-chip {
   display: inline-block;
   padding: 3px 10px;
-  border-radius: 12px;
+  border-radius: 20px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
 
-  &.status-completed  { background: #e6f4ea; color: #137333; }
-  &.status-started    { background: #e8f0fe; color: #1967d2; }
-  &.status-pending    { background: #fef7e0; color: #b06000; }
-  &.status-hold       { background: #f1f3f4; color: #5f6368; }
-  &.status-revision   { background: #fce8e6; color: #c5221f; }
-  &.status-cancelled  { background: #fce8e6; color: #c5221f; }
+  &.status-completed  { background: #dcfce7; color: #16a34a; }
+  &.status-started    { background: #dbeafe; color: $blue; }
+  &.status-pending    { background: #fef9c3; color: #ca8a04; }
+  &.status-hold       { background: #f1f5f9; color: #64748b; }
+  &.status-revision   { background: #ede9fe; color: #7c3aed; }
+  &.status-cancelled  { background: #fee2e2; color: #dc2626; }
 }
 
-// Manual link status
 .status-label {
   font-size: 12px;
   margin-left: 6px;
   vertical-align: middle;
-  &.status-active   { color: #137333; }
-  &.status-inactive { color: #c5221f; }
+  &.status-active   { color: #16a34a; }
+  &.status-inactive { color: #dc2626; }
 }
 
-.inactive-row { opacity: 0.55; }
+.inactive-row { opacity: 0.5; }
 
-// Empty state
+// ── Table action buttons ───────────────────────────────────────────
+.tbl-edit-btn,
+.tbl-del-btn {
+  width: 30px !important;
+  height: 30px !important;
+  padding: 0 !important;
+  border-radius: 7px !important;
+
+  ::ng-deep .mat-mdc-button-touch-target {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}
+
+.tbl-edit-btn { color: #7c3aed; &:hover { background: #ede9fe; } }
+.tbl-del-btn  { color: #dc2626; &:hover { background: #fee2e2; } }
+
+// ── All Data tab ───────────────────────────────────────────────────
+.all-badge { background: #f1f5f9; color: #64748b; }
+
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+
+  mat-icon { font-size: 13px; width: 13px; height: 13px; }
+
+  &.type-project { background: #dbeafe; color: #1d4ed8; }
+  &.type-manual  { background: #f0fdf4; color: #16a34a; }
+}
+
+.all-client-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  strong { font-size: 13px; color: #0f172a; }
+}
+
+.all-proj-title {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.active-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+
+  &.pill-active   { background: #dcfce7; color: #16a34a; }
+  &.pill-inactive { background: #fee2e2; color: #dc2626; }
+}
+
+// ── Empty state ───────────────────────────────────────────────────
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 48px;
-  color: #9aa0a6;
+  padding: 48px 24px;
+  color: #94a3b8;
 
-  mat-icon { font-size: 48px; width: 48px; height: 48px; margin-bottom: 12px; }
-  p { margin-bottom: 16px; }
+  mat-icon { font-size: 48px; width: 48px; height: 48px; margin-bottom: 12px; color: #cbd5e1; }
+  p { margin: 0 0 16px; font-size: 14px; font-weight: 500; }
+
+  button { border-radius: $radius-sm !important; }
 }

@@ -9,8 +9,8 @@
       #sidenav
       [mode]="mobileQuery.matches ? 'over' : 'side'"
       [fixedInViewport]="mobileQuery.matches"
-      [opened]="!mobileQuery.matches">
-      <app-sidenav [mobileQuery]="mobileQuery" (closeSidenav)="sidenav.close()"></app-sidenav>
+      [opened]="!!currentUser && !mobileQuery.matches">
+      <app-sidenav *ngIf="currentUser" [mobileQuery]="mobileQuery" (closeSidenav)="sidenav.close()"></app-sidenav>
     </mat-sidenav>
 
     <mat-sidenav-content>

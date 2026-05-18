@@ -14,6 +14,11 @@
   color: #64748b;
   margin-right: 4px;
   flex-shrink: 0;
+
+  ::ng-deep .mat-mdc-button-touch-target {
+    width: 40px !important;
+    height: 40px !important;
+  }
 }
 
 /* ── Logo ────────────────────────────────────── */
@@ -52,14 +57,27 @@
 
 .icon-btn {
   color: #64748b;
+
+  // Explicitly keep the icon centred — MDC's touch-target must stay
+  // at the same size as the host so the ripple doesn't push it off.
+  ::ng-deep .mat-mdc-button-touch-target {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
   &:hover { color: #2563eb; background: rgba(37,99,235,0.06); }
 }
 
 /* ── Avatar button in toolbar ────────────────── */
 .avatar-btn {
-  width: 38px;
-  height: 38px;
+  width: 38px !important;
+  height: 38px !important;
   padding: 0 !important;
+
+  ::ng-deep .mat-mdc-button-touch-target {
+    width: 38px !important;
+    height: 38px !important;
+  }
 }
 
 .user-avatar {

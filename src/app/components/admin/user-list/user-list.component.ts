@@ -70,14 +70,19 @@ export class UserListComponent implements OnInit {
 
   getRoleBadgeClass(role: UserRole): string {
     switch (role) {
-      case UserRole.Admin:
-        return 'admin-badge';
-      case UserRole.Developer:
-        return 'developer-badge';
-      case UserRole.Client:
-        return 'client-badge';
-      default:
-        return '';
+      case UserRole.Admin:     return 'role-admin';
+      case UserRole.Developer: return 'role-developer';
+      case UserRole.Client:    return 'role-client';
+      default: return '';
+    }
+  }
+
+  getAvatarClass(role: UserRole): string {
+    switch (role) {
+      case UserRole.Admin:     return 'av-admin';
+      case UserRole.Developer: return 'av-developer';
+      case UserRole.Client:    return 'av-client';
+      default: return 'av-developer';
     }
   }
 

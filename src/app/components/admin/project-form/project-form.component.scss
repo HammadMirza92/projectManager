@@ -1,20 +1,30 @@
 .container {
-  padding: 20px;
+  padding: 24px;
+  background: #f0f2f7;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .header {
-  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
 .title {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 500;
-  color: #3f51b5;
+  margin: 0 0 2px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.3px;
 }
 
 mat-card {
   position: relative;
+  border-radius: 14px !important;
+  box-shadow: 0 2px 12px rgba(15,23,42,0.07) !important;
 }
 
 .loading-shade {
@@ -37,10 +47,12 @@ mat-card {
 }
 
 .section-title {
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 700;
   margin: 0 0 16px 0;
-  color: #3f51b5;
+  color: #2563eb;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .form-row {

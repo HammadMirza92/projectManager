@@ -34,4 +34,8 @@ export class WebsiteLinkService {
   delete(id: number): Observable<boolean> {
     return this.http.delete<any>(`${this.apiUrl}/${id}`).pipe(map(r => r.data));
   }
+
+  sendActiveLinksEmail(): Observable<string> {
+    return this.http.post<any>(`${this.apiUrl}/send-active-links`, {}).pipe(map(r => r.data));
+  }
 }

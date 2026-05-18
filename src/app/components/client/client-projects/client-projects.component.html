@@ -1,80 +1,89 @@
-<div class="container">
-  <div class="header">
-    <h1 class="title">My Projects</h1>
+<div class="page-wrapper">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <mat-icon class="heading-icon">work_outline</mat-icon>
+      <div>
+        <h1 class="title">My Projects</h1>
+        <span class="subtitle">All your projects and their current status</span>
+      </div>
+    </div>
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search projects</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput (keyup)="applyFilter($event)" placeholder="Title, developer…">
+    </mat-form-field>
   </div>
 
-  <mat-card class="filter-card">
-    <mat-card-content>
-      <mat-form-field appearance="outline" class="filter-field">
-        <mat-label>Filter</mat-label>
-        <input matInput (keyup)="applyFilter($event)" placeholder="Search by title, developer...">
-        <mat-icon matSuffix>search</mat-icon>
-      </mat-form-field>
-    </mat-card-content>
-  </mat-card>
-
+  <!-- Table Card -->
   <mat-card class="data-card">
     <mat-card-content>
-      <div class="table-container">
+      <div class="table-responsive">
         <div class="loading-shade" *ngIf="isLoading">
-          <mat-spinner diameter="50"></mat-spinner>
+          <mat-spinner diameter="48"></mat-spinner>
         </div>
 
         <table mat-table [dataSource]="dataSource" matSort>
-          <!-- ID Column -->
+
           <ng-container matColumnDef="id">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
-            <td mat-cell *matCellDef="let project"> {{project.id}} </td>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>#</th>
+            <td mat-cell *matCellDef="let p">{{ p.id }}</td>
           </ng-container>
 
-          <!-- Title Column -->
           <ng-container matColumnDef="title">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Title </th>
-            <td mat-cell *matCellDef="let project"> {{project.title}} </td>
-          </ng-container>
-
-          <!-- Developer Column -->
-          <ng-container matColumnDef="developerName">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Developer </th>
-            <td mat-cell *matCellDef="let project"> {{project.developerName}} </td>
-          </ng-container>
-
-          <!-- End Date Column -->
-          <ng-container matColumnDef="endDate">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Deadline </th>
-            <td mat-cell *matCellDef="let project"> {{project.endDate | date}} </td>
-          </ng-container>
-
-          <!-- Days Remaining Column -->
-          <ng-container matColumnDef="daysRemaining">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Days Remaining </th>
-            <td mat-cell *matCellDef="let project" [ngClass]="getDaysRemainingColor(project.daysRemaining)">
-              {{project.daysRemaining}}
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Project</th>
+            <td mat-cell *matCellDef="let p">
+              <div class="title-cell">
+                <span class="proj-name">{{ p.title }}</span>
+                <span class="proj-platform" *ngIf="p.platform">{{ p.platform }}</span>
+              </div>
             </td>
           </ng-container>
 
-          <!-- Budget Column -->
-          <ng-container matColumnDef="totalBudget">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Budget </th>
-            <td mat-cell *matCellDef="let project"> {{project.totalBudget | currency}} </td>
+          <ng-container matColumnDef="developerName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Developer</th>
+            <td mat-cell *matCellDef="let p">
+              <div class="person-cell">
+                <div class="avatar dev-av">{{ p.developerName?.charAt(0)?.toUpperCase() }}</div>
+                <span>{{ p.developerName }}</span>
+              </div>
+            </td>
           </ng-container>
 
-          <!-- Status Column -->
-          <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
-            <td mat-cell *matCellDef="let project">
-              <span class="status-badge" [ngClass]="getStatusBadgeClass(project.status)">
-                {{project.statusName}}
+          <ng-container matColumnDef="endDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Deadline</th>
+            <td mat-cell *matCellDef="let p">{{ p.endDate | date:'mediumDate' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="daysRemaining">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Days Left</th>
+            <td mat-cell *matCellDef="let p">
+              <span class="days-badge" [ngClass]="getDaysRemainingColor(p.daysRemaining)">
+                {{ p.daysRemaining <= 0 ? 'Overdue' : p.daysRemaining + 'd' }}
               </span>
             </td>
           </ng-container>
 
-          <!-- Actions Column -->
+          <ng-container matColumnDef="totalBudget">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Budget</th>
+            <td mat-cell *matCellDef="let p">
+              <span class="budget-val">{{ p.totalBudget | currency:'USD':'symbol':'1.0-0' }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+            <td mat-cell *matCellDef="let p">
+              <span class="status-chip" [ngClass]="getStatusBadgeClass(p.status)">{{ p.statusName }}</span>
+            </td>
+          </ng-container>
+
           <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef> Actions </th>
-            <td mat-cell *matCellDef="let project">
-              <button mat-icon-button color="primary" (click)="viewProject(project.id)" matTooltip="View Details">
-                <mat-icon>visibility</mat-icon>
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let p">
+              <button mat-icon-button class="tbl-view-btn" (click)="viewProject(p.id)" matTooltip="View Details">
+                <mat-icon>arrow_forward</mat-icon>
               </button>
             </td>
           </ng-container>
@@ -82,12 +91,11 @@
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-          <!-- Row shown when no data matches the filter -->
           <tr class="mat-row" *matNoDataRow>
             <td class="mat-cell" colspan="8">
-              <div class="no-data">
-                <mat-icon>warning</mat-icon>
-                <span>No projects found</span>
+              <div class="empty-state">
+                <mat-icon>folder_off</mat-icon>
+                <p>No projects found</p>
               </div>
             </td>
           </tr>
@@ -97,4 +105,5 @@
       </div>
     </mat-card-content>
   </mat-card>
+
 </div>

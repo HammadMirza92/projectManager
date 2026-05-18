@@ -18,7 +18,7 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dial
   styleUrls: ['./project-list.component.scss']
 })
 export class ProjectListComponent implements OnInit {
-  displayedColumns: string[] = ['id', 'title', 'developerName', 'clientName', 'endDate', 'daysRemaining', 'totalBudget', 'status', 'actions'];
+  displayedColumns: string[] = ['id', 'title', 'developerName', 'clientName', 'startDate', 'endDate', 'daysRemaining', 'totalBudget', 'status', 'actions'];
   dataSource = new MatTableDataSource<Project>([]);
   isLoading = false;
   totalProjects = 0;

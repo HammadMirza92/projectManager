@@ -1,6 +1,6 @@
 <div class="page-wrapper">
 
-  <!-- Header -->
+  <!-- ── Header ────────────────────────────────────────────────── -->
   <div class="page-header">
     <div class="header-left">
       <mat-icon class="page-icon">language</mat-icon>
@@ -9,9 +9,19 @@
         <span class="subtitle">Client website credentials from projects and manual entries</span>
       </div>
     </div>
+    <div class="header-actions">
+      <button mat-stroked-button class="action-header-btn download-btn" (click)="downloadActiveLinks()" matTooltip="Download all active links as a .txt file">
+        <mat-icon>download</mat-icon>
+        Download Active Links
+      </button>
+      <button mat-flat-button class="action-header-btn email-btn" (click)="sendActiveLinksEmail()" [disabled]="isSendingEmail" matTooltip="Send active links report to admin email">
+        <mat-icon>{{ isSendingEmail ? 'hourglass_top' : 'send' }}</mat-icon>
+        {{ isSendingEmail ? 'Sending…' : 'Send to Admin Email' }}
+      </button>
+    </div>
   </div>
 
-  <!-- Summary Cards -->
+  <!-- ── Summary Cards ─────────────────────────────────────────── -->
   <div class="summary-row">
     <mat-card class="summary-card">
       <mat-card-content>
@@ -42,13 +52,13 @@
     </mat-card>
   </div>
 
-  <!-- Loading -->
+  <!-- ── Loading ───────────────────────────────────────────────── -->
   <div *ngIf="isLoading" class="loading-row">
     <mat-spinner diameter="44"></mat-spinner>
   </div>
 
-  <!-- Tabs -->
-  <mat-tab-group *ngIf="!isLoading" animationDuration="200ms" class="main-tabs">
+  <!-- ── Tabs — default to index 2 (All Data) ──────────────────── -->
+  <mat-tab-group *ngIf="!isLoading" animationDuration="200ms" class="main-tabs" [selectedIndex]="2">
 
     <!-- ─── TAB 1: FROM PROJECTS ─────────────────────────────── -->
     <mat-tab>
@@ -58,7 +68,6 @@
         <span class="tab-badge">{{ projects.length }}</span>
       </ng-template>
 
-      <!-- Search -->
       <div class="tab-toolbar">
         <mat-form-field appearance="outline" class="search-field">
           <mat-label>Search</mat-label>
@@ -69,29 +78,28 @@
         <span class="result-count">{{ filteredProjects.length }} result{{ filteredProjects.length !== 1 ? 's' : '' }}</span>
       </div>
 
-      <!-- Projects Table -->
       <div class="table-responsive">
         <table mat-table [dataSource]="filteredProjects" *ngIf="filteredProjects.length > 0">
 
           <ng-container matColumnDef="clientName">
             <th mat-header-cell *matHeaderCellDef>Client</th>
             <td mat-cell *matCellDef="let p">
-              <strong>{{ p.clientName || '—' }}</strong>
+              <div class="name-cell">
+                <strong>{{ p.clientName || '—' }}</strong>
+              </div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="title">
             <th mat-header-cell *matHeaderCellDef>Project</th>
-            <td mat-cell *matCellDef="let p">
-              <span class="proj-title">{{ p.title }}</span>
-            </td>
+            <td mat-cell *matCellDef="let p"><span class="proj-title">{{ p.title }}</span></td>
           </ng-container>
 
           <ng-container matColumnDef="websiteUrl">
             <th mat-header-cell *matHeaderCellDef>Website URL</th>
             <td mat-cell *matCellDef="let p">
-              <a *ngIf="p.websiteUrl" [href]="p.websiteUrl.startsWith('http') ? p.websiteUrl : 'https://' + p.websiteUrl" target="_blank" rel="noopener noreferrer" class="url-link"
-                 [matTooltip]="p.websiteUrl">
+              <a *ngIf="p.websiteUrl" [href]="p.websiteUrl.startsWith('http') ? p.websiteUrl : 'https://' + p.websiteUrl"
+                 target="_blank" rel="noopener noreferrer" class="url-link" [matTooltip]="p.websiteUrl">
                 <mat-icon class="link-icon">open_in_new</mat-icon>
                 {{ p.websiteUrl | slice:0:38 }}{{ p.websiteUrl.length > 38 ? '…' : '' }}
               </a>
@@ -104,8 +112,7 @@
             <td mat-cell *matCellDef="let p">
               <div *ngIf="p.websiteLogin" class="login-cell">
                 <span class="login-pass">{{ projectPasswordMap[p.id] ? p.websiteLogin : '••••••••' }}</span>
-                <button mat-icon-button class="eye-btn"
-                        (click)="toggleProjectPassword(p.id)"
+                <button mat-icon-button class="eye-btn" (click)="toggleProjectPassword(p.id)"
                         [matTooltip]="projectPasswordMap[p.id] ? 'Hide' : 'Show'">
                   <mat-icon>{{ projectPasswordMap[p.id] ? 'visibility_off' : 'visibility' }}</mat-icon>
                 </button>
@@ -124,9 +131,7 @@
 
           <ng-container matColumnDef="platform">
             <th mat-header-cell *matHeaderCellDef>Platform</th>
-            <td mat-cell *matCellDef="let p">
-              <span class="muted">{{ p.platform || '—' }}</span>
-            </td>
+            <td mat-cell *matCellDef="let p"><span class="muted">{{ p.platform || '—' }}</span></td>
           </ng-container>
 
           <ng-container matColumnDef="status">
@@ -155,7 +160,6 @@
         <span class="tab-badge">{{ links.length }}</span>
       </ng-template>
 
-      <!-- Toolbar -->
       <div class="tab-toolbar">
         <mat-form-field appearance="outline" class="search-field">
           <mat-label>Search</mat-label>
@@ -171,8 +175,7 @@
         </mat-button-toggle-group>
 
         <button mat-raised-button color="primary" (click)="openAddForm()" class="add-btn">
-          <mat-icon>add</mat-icon>
-          Add Website
+          <mat-icon>add</mat-icon> Add Website
         </button>
       </div>
 
@@ -184,7 +187,6 @@
         <mat-card-content>
           <form [formGroup]="linkForm" (ngSubmit)="submitForm()">
             <div class="form-grid">
-
               <mat-form-field appearance="outline">
                 <mat-label>Client Name</mat-label>
                 <input matInput formControlName="clientName" placeholder="e.g. John Smith">
@@ -232,7 +234,6 @@
               <div class="status-toggle-row">
                 <mat-slide-toggle formControlName="isActive" color="primary">Active</mat-slide-toggle>
               </div>
-
             </div>
 
             <div class="form-actions">
@@ -245,19 +246,23 @@
         </mat-card-content>
       </mat-card>
 
-      <!-- Manual Links Table -->
       <div class="table-responsive">
         <table mat-table [dataSource]="filteredLinks" *ngIf="filteredLinks.length > 0">
 
           <ng-container matColumnDef="clientName">
             <th mat-header-cell *matHeaderCellDef>Client</th>
-            <td mat-cell *matCellDef="let l"><strong>{{ l.clientName }}</strong></td>
+            <td mat-cell *matCellDef="let l">
+              <div class="name-cell">
+                <strong>{{ l.clientName }}</strong>
+              </div>
+            </td>
           </ng-container>
 
           <ng-container matColumnDef="websiteUrl">
             <th mat-header-cell *matHeaderCellDef>Website URL</th>
             <td mat-cell *matCellDef="let l">
-              <a [href]="l.websiteUrl.startsWith('http') ? l.websiteUrl : 'https://' + l.websiteUrl" target="_blank" rel="noopener noreferrer" class="url-link" [matTooltip]="l.websiteUrl">
+              <a [href]="l.websiteUrl.startsWith('http') ? l.websiteUrl : 'https://' + l.websiteUrl"
+                 target="_blank" rel="noopener noreferrer" class="url-link" [matTooltip]="l.websiteUrl">
                 <mat-icon class="link-icon">open_in_new</mat-icon>
                 {{ l.websiteUrl | slice:0:38 }}{{ l.websiteUrl.length > 38 ? '…' : '' }}
               </a>
@@ -265,24 +270,27 @@
           </ng-container>
 
           <ng-container matColumnDef="login">
-            <th mat-header-cell *matHeaderCellDef>Login</th>
+            <th mat-header-cell *matHeaderCellDef>Username</th>
             <td mat-cell *matCellDef="let l">
-              <div class="login-cell-col">
-                <span class="login-user">{{ l.loginUsername }}</span>
-                <div class="password-row">
-                  <span class="login-pass">{{ linkPasswordMap[l.id] ? l.loginPassword : '••••••••' }}</span>
-                  <button mat-icon-button class="eye-btn"
-                          (click)="toggleLinkPassword(l.id)"
-                          [matTooltip]="linkPasswordMap[l.id] ? 'Hide' : 'Show'">
-                    <mat-icon>{{ linkPasswordMap[l.id] ? 'visibility_off' : 'visibility' }}</mat-icon>
-                  </button>
-                </div>
+              <span class="login-user">{{ l.loginUsername }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="password">
+            <th mat-header-cell *matHeaderCellDef>Password</th>
+            <td mat-cell *matCellDef="let l">
+              <div class="login-cell">
+                <span class="login-pass">{{ linkPasswordMap[l.id] ? l.loginPassword : '••••••••' }}</span>
+                <button mat-icon-button class="eye-btn" (click)="toggleLinkPassword(l.id)"
+                        [matTooltip]="linkPasswordMap[l.id] ? 'Hide' : 'Show'">
+                  <mat-icon>{{ linkPasswordMap[l.id] ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
               </div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="reference">
-            <th mat-header-cell *matHeaderCellDef>Reference</th>
+            <th mat-header-cell *matHeaderCellDef>Source</th>
             <td mat-cell *matCellDef="let l">
               <span class="ref-badge">{{ l.referenceSource }}</span>
               <span *ngIf="l.referenceDetail" class="ref-detail">{{ l.referenceDetail }}</span>
@@ -297,10 +305,9 @@
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef>Status</th>
             <td mat-cell *matCellDef="let l">
-              <mat-slide-toggle [checked]="l.isActive" (change)="toggleActive(l)" color="primary"
-                                [matTooltip]="l.isActive ? 'Deactivate' : 'Activate'">
-              </mat-slide-toggle>
-              <span class="status-label" [class.status-active]="l.isActive" [class.status-inactive]="!l.isActive">
+              <span class="active-pill" [class.pill-active]="l.isActive" [class.pill-inactive]="!l.isActive"
+                    style="cursor:pointer" (click)="toggleActive(l)"
+                    [matTooltip]="l.isActive ? 'Click to deactivate' : 'Click to activate'">
                 {{ l.isActive ? 'Active' : 'Inactive' }}
               </span>
             </td>
@@ -309,10 +316,10 @@
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef></th>
             <td mat-cell *matCellDef="let l">
-              <button mat-icon-button color="primary" (click)="openEditForm(l)" matTooltip="Edit">
+              <button mat-icon-button class="tbl-edit-btn" (click)="openEditForm(l)" matTooltip="Edit">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="deleteLink(l)" matTooltip="Delete">
+              <button mat-icon-button class="tbl-del-btn" (click)="deleteLink(l)" matTooltip="Delete">
                 <mat-icon>delete_outline</mat-icon>
               </button>
             </td>
@@ -326,6 +333,113 @@
           <mat-icon>add_link</mat-icon>
           <p>No manual website links yet</p>
           <button mat-stroked-button color="primary" (click)="openAddForm()">Add first entry</button>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- ─── TAB 3: ALL DATA ───────────────────────────────────── -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">dataset</mat-icon>
+        All Data
+        <span class="tab-badge all-badge">{{ projects.length + links.length }}</span>
+      </ng-template>
+
+      <div class="tab-toolbar">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search all entries</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput [(ngModel)]="allDataSearch" placeholder="Client, project, URL, source…">
+        </mat-form-field>
+        <span class="result-count">{{ allDataRows.length }} result{{ allDataRows.length !== 1 ? 's' : '' }}</span>
+      </div>
+
+      <div class="table-responsive">
+        <table mat-table [dataSource]="allDataRows" *ngIf="allDataRows.length > 0">
+
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let row">
+              <span class="type-badge" [class.type-project]="row.type === 'project'" [class.type-manual]="row.type === 'manual'">
+                <mat-icon>{{ row.type === 'project' ? 'work_outline' : 'add_link' }}</mat-icon>
+                {{ row.type === 'project' ? 'Project' : 'Manual' }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="clientName">
+            <th mat-header-cell *matHeaderCellDef>Client</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="name-cell">
+                <strong>{{ row.clientName }}</strong>
+                <span class="all-proj-title" *ngIf="row.projectTitle">{{ row.projectTitle }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="websiteUrl">
+            <th mat-header-cell *matHeaderCellDef>Website URL</th>
+            <td mat-cell *matCellDef="let row">
+              <a *ngIf="row.websiteUrl" [href]="row.websiteUrl.startsWith('http') ? row.websiteUrl : 'https://' + row.websiteUrl"
+                 target="_blank" rel="noopener noreferrer" class="url-link" [matTooltip]="row.websiteUrl">
+                <mat-icon class="link-icon">open_in_new</mat-icon>
+                {{ row.websiteUrl | slice:0:36 }}{{ row.websiteUrl.length > 36 ? '…' : '' }}
+              </a>
+              <span *ngIf="!row.websiteUrl" class="muted">—</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="login">
+            <th mat-header-cell *matHeaderCellDef>Login</th>
+            <td mat-cell *matCellDef="let row">
+              <!-- Project rows: single credential field masked -->
+              <div *ngIf="row.type === 'project' && row.login" class="login-cell">
+                <span class="login-pass">{{ allDataPasswordMap[row.id] ? row.login : '••••••••' }}</span>
+                <button mat-icon-button class="eye-btn" (click)="toggleAllDataPassword(row.id)"
+                        [matTooltip]="allDataPasswordMap[row.id] ? 'Hide' : 'Show'">
+                  <mat-icon>{{ allDataPasswordMap[row.id] ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+              </div>
+              <!-- Manual rows: username plain, password masked -->
+              <div *ngIf="row.type === 'manual' && row.login" class="login-cell-col">
+                <span class="login-user">{{ row.login }}</span>
+                <div class="login-cell" *ngIf="row.password">
+                  <span class="login-pass">{{ allDataPasswordMap[row.id] ? row.password : '••••••••' }}</span>
+                  <button mat-icon-button class="eye-btn" (click)="toggleAllDataPassword(row.id)"
+                          [matTooltip]="allDataPasswordMap[row.id] ? 'Hide' : 'Show'">
+                    <mat-icon>{{ allDataPasswordMap[row.id] ? 'visibility_off' : 'visibility' }}</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <span *ngIf="!row.login" class="muted">—</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="source">
+            <th mat-header-cell *matHeaderCellDef>Source</th>
+            <td mat-cell *matCellDef="let row">
+              <span *ngIf="row.source" class="ref-badge">{{ row.source }}</span>
+              <span *ngIf="!row.source" class="muted">—</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let row">
+              <span *ngIf="row.type === 'project'" class="status-chip" [ngClass]="getStatusClass(row.status)">{{ row.status }}</span>
+              <span *ngIf="row.type === 'manual'" class="active-pill" [class.pill-active]="row.isActive" [class.pill-inactive]="!row.isActive">
+                {{ row.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="allDataColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: allDataColumns;" [class.inactive-row]="!row.isActive && row.type === 'manual'"></tr>
+        </table>
+
+        <div class="empty-state" *ngIf="allDataRows.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <p>No entries found</p>
         </div>
       </div>
     </mat-tab>

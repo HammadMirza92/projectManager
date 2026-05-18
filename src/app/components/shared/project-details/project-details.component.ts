@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
@@ -19,7 +19,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
   templateUrl: './project-details.component.html',
   styleUrls: ['./project-details.component.scss']
 })
-export class ProjectDetailsComponent implements OnInit {
+export class ProjectDetailsComponent implements OnInit, OnDestroy {
   projectId: number = 0;
   project: Project | null = null;
   tasks: Task[] = [];
@@ -27,6 +27,10 @@ export class ProjectDetailsComponent implements OnInit {
   devTransfers: DevPaymentTransfer[] = [];
   currentUser: User | null = null;
   isLoading = false;
+
+  // Countdown timer for Started projects
+  elapsedTime = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+  private timerInterval: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -56,7 +60,13 @@ export class ProjectDetailsComponent implements OnInit {
   loadProject() {
     this.isLoading = true;
     this.projectService.getProjectById(this.projectId).subscribe({
-      next: (project) => { this.project = project; this.isLoading = false; },
+      next: (project) => {
+        this.project = project;
+        this.isLoading = false;
+        if (project.status === ProjectStatus.Started && project.endDate) {
+          this.startTimer(new Date(project.endDate));
+        }
+      },
       error: () => {
         this.snackBar.open('Failed to load project', 'Close', { duration: 5000 });
         this.isLoading = false;
@@ -221,6 +231,27 @@ export class ProjectDetailsComponent implements OnInit {
     if (this.isAdmin() && this.project) {
       this.router.navigate(['/admin/payments/add'], { queryParams: { projectId: this.project.id } });
     }
+  }
+
+  startTimer(endDate: Date): void {
+    this.updateCountdown(endDate);
+    this.timerInterval = setInterval(() => this.updateCountdown(endDate), 1000);
+  }
+
+  private updateCountdown(endDate: Date): void {
+    const diffMs = endDate.getTime() - Date.now();
+    if (diffMs <= 0) { this.elapsedTime = { days: 0, hours: 0, minutes: 0, seconds: 0 }; return; }
+    const totalSec = Math.floor(diffMs / 1000);
+    this.elapsedTime = {
+      days: Math.floor(totalSec / 86400),
+      hours: Math.floor((totalSec % 86400) / 3600),
+      minutes: Math.floor((totalSec % 3600) / 60),
+      seconds: totalSec % 60
+    };
+  }
+
+  ngOnDestroy(): void {
+    if (this.timerInterval) clearInterval(this.timerInterval);
   }
 
   navigateBack() {

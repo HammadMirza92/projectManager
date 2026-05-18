@@ -62,8 +62,7 @@ export class ProjectFormComponent implements OnInit {
       websiteLogin: [''],
       startDate: [now, [Validators.required]],
       startTime: [this.formatTime(now)],
-      endDate: [null, [Validators.required]],
-      endTime: [''],
+      durationDays: [null, [Validators.required, Validators.min(1)]],
       daysRemainingWrtDev: [{ value: null, disabled: true }],
       extendedDays: [0],
       sourceOfProject: [''],
@@ -92,12 +91,22 @@ export class ProjectFormComponent implements OnInit {
     return `${h}:${m}`;
   }
 
+  // Normalize to noon local time so JSON serialization to UTC never shifts the date
+  private toNoonLocal(date: Date | null): Date | null {
+    if (!date) return null;
+    const d = new Date(date);
+    d.setHours(12, 0, 0, 0);
+    return d;
+  }
+
   private combineDateAndTime(date: Date | null, time: string): Date | null {
     if (!date) return null;
     const d = new Date(date);
     if (time) {
       const [hours, minutes] = time.split(':').map(Number);
       d.setHours(hours || 0, minutes || 0, 0, 0);
+    } else {
+      d.setHours(12, 0, 0, 0);
     }
     return d;
   }
@@ -119,8 +128,7 @@ export class ProjectFormComponent implements OnInit {
             websiteLogin: project.websiteLogin,
             startDate: new Date(project.startDate),
             startTime: this.formatTime(new Date(project.startDate)),
-            endDate: new Date(project.endDate),
-            endTime: this.formatTime(new Date(project.endDate)),
+            durationDays: this.computeDurationDays(new Date(project.startDate), project.originalEndDate ? new Date(project.originalEndDate) : new Date(project.endDate)),
             daysRemainingWrtDev: project.daysRemainingWrtDev ?? null,
             extendedDays: project.extendedDays ?? 0,
             sourceOfProject: project.sourceOfProject,
@@ -166,6 +174,8 @@ export class ProjectFormComponent implements OnInit {
 
   createProject() {
     const v = this.projectForm.value;
+    const startDate = this.toNoonLocal(v.startDate) ?? v.startDate;
+    const endDate = this.addDays(startDate, v.durationDays);
     const projectData: ProjectCreate = {
       title: v.title,
       description: v.description,
@@ -174,8 +184,8 @@ export class ProjectFormComponent implements OnInit {
       clientId: v.clientId,
       websiteUrl: v.websiteUrl,
       websiteLogin: v.websiteLogin,
-      startDate: this.combineDateAndTime(v.startDate, v.startTime) ?? v.startDate,
-      endDate: this.combineDateAndTime(v.endDate, v.endTime) ?? v.endDate,
+      startDate,
+      endDate,
       extendedDays: v.extendedDays || 0,
       sourceOfProject: v.sourceOfProject,
       totalBudget: v.totalBudget,
@@ -212,6 +222,8 @@ export class ProjectFormComponent implements OnInit {
     if (!this.projectId) return;
 
     const v = this.projectForm.value;
+    const startDate = this.toNoonLocal(v.startDate) ?? v.startDate;
+    const endDate = this.addDays(startDate, v.durationDays);
     const projectData: ProjectUpdate = {
       title: v.title,
       description: v.description,
@@ -219,8 +231,8 @@ export class ProjectFormComponent implements OnInit {
       developerId: v.developerId,
       websiteUrl: v.websiteUrl,
       websiteLogin: v.websiteLogin,
-      startDate: this.combineDateAndTime(v.startDate, v.startTime) ?? v.startDate,
-      endDate: this.combineDateAndTime(v.endDate, v.endTime) ?? v.endDate,
+      startDate,
+      endDate,
       extendedDays: v.extendedDays || 0,
       sourceOfProject: v.sourceOfProject,
       totalBudget: v.totalBudget,
@@ -278,13 +290,29 @@ export class ProjectFormComponent implements OnInit {
     // Preview only — actual extension applied server-side on save
   }
 
+  private addDays(date: Date, days: number): Date {
+    const d = new Date(date);
+    d.setDate(d.getDate() + days);
+    return d;
+  }
+
+  private computeDurationDays(start: Date, end: Date): number {
+    const diffMs = end.setHours(12, 0, 0, 0) - new Date(start).setHours(12, 0, 0, 0);
+    return Math.round(diffMs / 86400000);
+  }
+
+  getComputedEndDate(): Date | null {
+    const startDate = this.projectForm.get('startDate')?.value;
+    const days = this.projectForm.get('durationDays')?.value;
+    if (!startDate || !days || days < 1) return null;
+    return this.addDays(new Date(startDate), days);
+  }
+
   getExtendedDeadline(): Date | null {
-    const endDate = this.projectForm.get('endDate')?.value;
+    const endDate = this.getComputedEndDate();
     const extDays = this.projectForm.get('extendedDays')?.value || 0;
     if (!endDate || extDays <= 0) return null;
-    const d = new Date(endDate);
-    d.setDate(d.getDate() + extDays);
-    return d;
+    return this.addDays(endDate, extDays);
   }
 
   onWrtDevChange() {

@@ -1,6 +1,10 @@
 <div class="container">
   <div class="header">
-    <h1 class="title">{{ isEditMode ? 'Edit Project' : 'Create New Project' }}</h1>
+    <mat-icon style="font-size:36px;width:36px;height:36px;color:#2563eb">{{ isEditMode ? 'edit_note' : 'add_circle_outline' }}</mat-icon>
+    <div>
+      <h1 class="title">{{ isEditMode ? 'Edit Project' : 'Create New Project' }}</h1>
+      <span style="font-size:13px;color:#94a3b8">{{ isEditMode ? 'Update project information and settings' : 'Fill in the details to add a new project' }}</span>
+    </div>
   </div>
 
   <mat-card>
@@ -97,21 +101,15 @@
               </mat-form-field>
             </div>
 
-            <div class="datetime-field">
-              <mat-form-field appearance="outline" class="date-part">
-                <mat-label>End Date</mat-label>
-                <input matInput [matDatepicker]="endPicker" formControlName="endDate" required>
-                <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-                <mat-datepicker #endPicker></mat-datepicker>
-                <mat-error *ngIf="projectForm.get('endDate')?.hasError('required')">
-                  End date is required
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="outline" class="time-part">
-                <mat-label>End Time</mat-label>
-                <input matInput type="time" formControlName="endTime">
-              </mat-form-field>
-            </div>
+            <mat-form-field appearance="outline">
+              <mat-label>Duration (Days)</mat-label>
+              <input matInput type="number" formControlName="durationDays" min="1" placeholder="e.g. 7" required>
+              <mat-hint *ngIf="getComputedEndDate()">
+                Deadline: {{ getComputedEndDate() | date:'mediumDate' }}
+              </mat-hint>
+              <mat-error *ngIf="projectForm.get('durationDays')?.hasError('required')">Duration is required</mat-error>
+              <mat-error *ngIf="projectForm.get('durationDays')?.hasError('min')">Must be at least 1 day</mat-error>
+            </mat-form-field>
           </div>
 
           <!-- Days Remaining WRT Dev (read-only calculated) -->
@@ -140,10 +138,10 @@
                   <mat-hint>0 = no extension</mat-hint>
                 </mat-form-field>
 
-                <div class="ext-preview" *ngIf="projectForm.get('extendedDays')?.value > 0 && projectForm.get('endDate')?.value">
-                  <div class="ext-preview-row" *ngIf="projectForm.get('extendedDays')?.value > 0">
+                <div class="ext-preview" *ngIf="projectForm.get('extendedDays')?.value > 0 && getComputedEndDate()">
+                  <div class="ext-preview-row">
                     <span class="ext-lbl">Original Deadline</span>
-                    <span class="ext-val original">{{ projectForm.get('endDate')?.value | date:'mediumDate' }}</span>
+                    <span class="ext-val original">{{ getComputedEndDate() | date:'mediumDate' }}</span>
                   </div>
                   <div class="ext-preview-row">
                     <span class="ext-lbl">New Deadline</span>
@@ -161,7 +159,7 @@
               <mat-icon>info_outline</mat-icon>
               <span>
                 Delivery extended by <strong>{{ projectForm.get('extendedDays')?.value }} days</strong> on Fiverr.
-                Current deadline: <strong>{{ projectForm.get('endDate')?.value | date:'mediumDate' }}</strong>
+                Current deadline: <strong>{{ getExtendedDeadline() | date:'mediumDate' }}</strong>
               </span>
             </div>
           </div>

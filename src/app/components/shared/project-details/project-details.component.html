@@ -58,11 +58,48 @@
               <div class="deadline-info">
                 <span class="deadline-label">Deadline</span>
                 <span class="deadline-date">{{ project.endDate | date:'mediumDate' }}</span>
+                <span class="deadline-original-date" *ngIf="project.originalEndDate">
+                  <s>{{ project.originalEndDate | date:'mediumDate' }}</s>
+                  <span class="ext-badge">+{{ project.extendedDays }}d</span>
+                </span>
                 <span class="deadline-days">
                   {{ project.daysRemaining === 0 ? 'Due today' : project.daysRemaining + ' days left' }}
                 </span>
               </div>
             </div>
+
+            <!-- Started timer widget -->
+            <div class="started-widget" *ngIf="project.status === 'Started'">
+              <div class="started-header">
+                <mat-icon class="started-icon">hourglass_top</mat-icon>
+                <div class="started-meta">
+                  <span class="started-label">Time Remaining</span>
+                  <span class="started-date">Due {{ project.endDate | date:'mediumDate' }}</span>
+                </div>
+              </div>
+              <div class="timer-blocks">
+                <div class="timer-block">
+                  <span class="timer-num">{{ elapsedTime.days }}</span>
+                  <span class="timer-unit">days</span>
+                </div>
+                <span class="timer-sep">:</span>
+                <div class="timer-block">
+                  <span class="timer-num">{{ elapsedTime.hours | number:'2.0-0' }}</span>
+                  <span class="timer-unit">hrs</span>
+                </div>
+                <span class="timer-sep">:</span>
+                <div class="timer-block">
+                  <span class="timer-num">{{ elapsedTime.minutes | number:'2.0-0' }}</span>
+                  <span class="timer-unit">min</span>
+                </div>
+                <span class="timer-sep">:</span>
+                <div class="timer-block">
+                  <span class="timer-num">{{ elapsedTime.seconds | number:'2.0-0' }}</span>
+                  <span class="timer-unit">sec</span>
+                </div>
+              </div>
+            </div>
+
             <div class="progress-widget">
               <div class="progress-label">
                 <span>Task Progress</span>

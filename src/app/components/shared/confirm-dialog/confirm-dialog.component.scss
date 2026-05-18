@@ -1,19 +1,22 @@
+$radius: 14px;
+$radius-sm: 8px;
+
 .dialog-wrap {
-  padding: 8px 4px 4px;
+  padding: 10px 6px 6px;
   text-align: center;
   max-width: 380px;
 }
 
-/* ── Icon row ────────────────────────────────── */
+// ── Icon row ──────────────────────────────────────────────────────
 .dialog-icon-row {
   display: flex;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .dialog-icon {
-  width: 64px;
-  height: 64px;
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
   background: #fee2e2;
   display: flex;
@@ -21,48 +24,48 @@
   justify-content: center;
 
   mat-icon {
-    font-size: 32px;
-    width: 32px;
-    height: 32px;
+    font-size: 34px;
+    width: 34px;
+    height: 34px;
     color: #dc2626;
   }
 }
 
 .dialog-icon-row:not(.danger) .dialog-icon {
   background: #dbeafe;
-
   mat-icon { color: #2563eb; }
 }
 
-/* ── Title ───────────────────────────────────── */
+// ── Title ─────────────────────────────────────────────────────────
 .dialog-title {
   margin: 0 0 8px;
   font-size: 18px;
   font-weight: 700;
-  color: #1e293b;
+  color: #0f172a;
+  letter-spacing: -0.2px;
 }
 
-/* ── Message ─────────────────────────────────── */
+// ── Message ───────────────────────────────────────────────────────
 .dialog-message {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   font-size: 14px;
   color: #475569;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
-/* ── Item name ───────────────────────────────── */
+// ── Item name ─────────────────────────────────────────────────────
 .item-name {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   background: #f1f5f9;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 6px 14px;
+  border-radius: $radius-sm;
+  padding: 7px 14px;
   margin-bottom: 14px;
   font-size: 13px;
   font-weight: 600;
-  color: #1e293b;
+  color: #0f172a;
 
   mat-icon {
     font-size: 16px;
@@ -72,23 +75,28 @@
   }
 }
 
-/* ── Warning ─────────────────────────────────── */
+// ── Warning ───────────────────────────────────────────────────────
 .dialog-warning {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: $radius-sm;
+  padding: 6px 12px;
   font-size: 12px;
-  color: #b45309;
-  margin-bottom: 20px;
+  color: #92400e;
+  margin-bottom: 22px;
 
   mat-icon {
     font-size: 15px;
     width: 15px;
     height: 15px;
+    color: #f59e0b;
   }
 }
 
-/* ── Actions ─────────────────────────────────── */
+// ── Actions ───────────────────────────────────────────────────────
 .dialog-actions {
   display: flex;
   gap: 10px;
@@ -97,14 +105,16 @@
 
 .cancel-btn {
   border-color: #e2e8f0 !important;
-  color: #475569;
+  color: #475569 !important;
   min-width: 110px;
+  border-radius: $radius-sm !important;
 
   mat-icon { font-size: 16px; width: 16px; height: 16px; margin-right: 4px; }
 }
 
 .confirm-btn {
   min-width: 110px;
+  border-radius: $radius-sm !important;
 
   mat-icon { font-size: 16px; width: 16px; height: 16px; margin-right: 4px; }
 }
