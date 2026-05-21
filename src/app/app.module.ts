@@ -37,6 +37,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 // Core Components
 import { LoginComponent } from './components/auth/login/login.component';
@@ -81,6 +82,7 @@ import { AdminTaskListComponent } from './components/admin/task-list/admin-task-
 import { DeveloperTaskListComponent } from './components/developer/task-list/developer-task-list.component';
 import { TaskDetailComponent } from './components/shared/task-detail/task-detail.component';
 import { WebsiteLinksComponent } from './components/admin/website-links/website-links.component';
+import { KhataComponent } from './components/admin/khata/khata.component';
 
 @NgModule({
   declarations: [
@@ -118,7 +120,8 @@ import { WebsiteLinksComponent } from './components/admin/website-links/website-
     AdminTaskListComponent,
     DeveloperTaskListComponent,
     TaskDetailComponent,
-    WebsiteLinksComponent
+    WebsiteLinksComponent,
+    KhataComponent
   ],
   imports: [
     BrowserModule,
@@ -153,7 +156,8 @@ import { WebsiteLinksComponent } from './components/admin/website-links/website-
     MatTooltipModule,
     MatButtonToggleModule,
     MatDividerModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatCheckboxModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

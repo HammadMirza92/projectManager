@@ -19,6 +19,7 @@ import { DevPaymentsComponent } from './components/admin/dev-payments/dev-paymen
 import { AdminTaskListComponent } from './components/admin/task-list/admin-task-list.component';
 import { AdminTaskFormComponent } from './components/admin/task-form/admin-task-form.component';
 import { WebsiteLinksComponent } from './components/admin/website-links/website-links.component';
+import { KhataComponent } from './components/admin/khata/khata.component';
 
 // Developer Components
 import { DeveloperDashboardComponent } from './components/developer/developer-dashboard/developer-dashboard.component';
@@ -74,7 +75,8 @@ const routes: Routes = [
       { path: 'tasks/:id', component: TaskDetailComponent },
       { path: 'projects/:projectId/tasks', component: AdminTaskListComponent },
       { path: 'projects/:projectId/tasks/add', component: AdminTaskFormComponent },
-      { path: 'website-links', component: WebsiteLinksComponent }
+      { path: 'website-links', component: WebsiteLinksComponent },
+      { path: 'khata', component: KhataComponent }
     ]
   },
 

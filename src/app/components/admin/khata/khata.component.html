@@ -1,0 +1,1258 @@
+<div class="container">
+
+  <!-- ── Page Header ───────────────────────────────────────────── -->
+  <div class="header">
+    <div class="header-left">
+      <mat-icon class="heading-icon">account_balance_wallet</mat-icon>
+      <div>
+        <h1 class="title">Khata / Accounts</h1>
+        <span class="heading-sub">Manage receivables, payables, and monthly expenses</span>
+      </div>
+    </div>
+    <button mat-raised-button color="primary" (click)="loadDashboard(); loadEntries(); loadExpenses(); loadExpenseSummary()" style="border-radius:8px">
+      <mat-icon>refresh</mat-icon> Refresh
+    </button>
+  </div>
+
+  <!-- ── Dashboard Summary Cards ──────────────────────────────── -->
+  <div class="kpi-grid" *ngIf="!dashboardLoading && dashboard">
+    <div class="kpi-card kpi-receivable">
+      <div class="kpi-icon-wrap"><mat-icon>arrow_downward</mat-icon></div>
+      <div class="kpi-body">
+        <span class="kpi-label">Pending Receivables</span>
+        <span class="kpi-value">{{ dashboard.totalPendingReceivables | currency:'PKR ':'symbol':'1.0-0' }}</span>
+        <span class="kpi-sub overdue-text" *ngIf="dashboard.totalOverdueReceivables > 0">
+          {{ dashboard.totalOverdueReceivables | currency:'PKR ':'symbol':'1.0-0' }} overdue
+        </span>
+      </div>
+    </div>
+    <div class="kpi-card kpi-payable">
+      <div class="kpi-icon-wrap"><mat-icon>arrow_upward</mat-icon></div>
+      <div class="kpi-body">
+        <span class="kpi-label">Pending Payables</span>
+        <span class="kpi-value">{{ dashboard.totalPendingPayables | currency:'PKR ':'symbol':'1.0-0' }}</span>
+        <span class="kpi-sub overdue-text" *ngIf="dashboard.totalOverduePayables > 0">
+          {{ dashboard.totalOverduePayables | currency:'PKR ':'symbol':'1.0-0' }} overdue
+        </span>
+      </div>
+    </div>
+    <div class="kpi-card kpi-expense">
+      <div class="kpi-icon-wrap"><mat-icon>receipt_long</mat-icon></div>
+      <div class="kpi-body">
+        <span class="kpi-label">Monthly Expenses</span>
+        <span class="kpi-value">{{ dashboard.totalMonthlyExpenses | currency:'PKR ':'symbol':'1.0-0' }}</span>
+        <span class="kpi-sub">Current month</span>
+      </div>
+    </div>
+    <div class="kpi-card" [ngClass]="dashboard.monthlyNetCashFlow >= 0 ? 'kpi-positive' : 'kpi-negative'">
+      <div class="kpi-icon-wrap"><mat-icon>{{ dashboard.monthlyNetCashFlow >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon></div>
+      <div class="kpi-body">
+        <span class="kpi-label">Net Cash Flow</span>
+        <span class="kpi-value">{{ dashboard.monthlyNetCashFlow | currency:'PKR ':'symbol':'1.0-0' }}</span>
+        <span class="kpi-sub">This month</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-grid" *ngIf="dashboardLoading">
+    <div class="kpi-card skeleton" *ngFor="let i of [1,2,3,4]"></div>
+  </div>
+
+  <!-- ── Alerts Row ────────────────────────────────────────────── -->
+  <div class="alerts-row" *ngIf="dashboard && (dashboard.overdueCount > 0 || dashboard.upcomingCount > 0)">
+    <div class="alert-chip alert-overdue" *ngIf="dashboard.overdueCount > 0">
+      <mat-icon>warning</mat-icon>
+      {{ dashboard.overdueCount }} overdue payment{{ dashboard.overdueCount > 1 ? 's' : '' }}
+    </div>
+    <div class="alert-chip alert-upcoming" *ngIf="dashboard.upcomingCount > 0">
+      <mat-icon>schedule</mat-icon>
+      {{ dashboard.upcomingCount }} due in 7 days
+    </div>
+  </div>
+
+  <!-- ── Main Tabs ─────────────────────────────────────────────── -->
+  <mat-card class="tabs-card">
+    <mat-tab-group (selectedIndexChange)="onTabChange($event)" animationDuration="200ms">
+
+      <!-- ══ TAB 1: OVERVIEW ═══════════════════════════════════ -->
+      <mat-tab label="Overview">
+        <div class="tab-content" *ngIf="dashboard">
+
+          <!-- Upcoming + Overdue side by side -->
+          <div class="two-col">
+
+            <!-- Upcoming Receivables -->
+            <div class="mini-table-card">
+              <div class="mini-table-header">
+                <mat-icon class="mini-icon receivable-icon">arrow_downward</mat-icon>
+                <span>Upcoming Receivables</span>
+              </div>
+              <div class="mini-empty" *ngIf="dashboard.upcomingReceivables.length === 0">
+                <mat-icon>check_circle_outline</mat-icon> All clear
+              </div>
+              <div class="mini-row" *ngFor="let e of dashboard.upcomingReceivables">
+                <div class="mini-party">{{ e.partyName }}</div>
+                <div class="mini-amount receivable-color">{{ e.remainingAmount | currency:'PKR ':'symbol':'1.0-0' }}</div>
+                <div class="mini-due" [class.near-due]="getDaysUntilDue(e.dueDate) <= 2">
+                  {{ getDaysUntilDue(e.dueDate) === 0 ? 'Today' : getDaysUntilDue(e.dueDate) + 'd' }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Upcoming Payables -->
+            <div class="mini-table-card">
+              <div class="mini-table-header">
+                <mat-icon class="mini-icon payable-icon">arrow_upward</mat-icon>
+                <span>Upcoming Payables</span>
+              </div>
+              <div class="mini-empty" *ngIf="dashboard.upcomingPayables.length === 0">
+                <mat-icon>check_circle_outline</mat-icon> All clear
+              </div>
+              <div class="mini-row" *ngFor="let e of dashboard.upcomingPayables">
+                <div class="mini-party">{{ e.partyName }}</div>
+                <div class="mini-amount payable-color">{{ e.remainingAmount | currency:'PKR ':'symbol':'1.0-0' }}</div>
+                <div class="mini-due" [class.near-due]="getDaysUntilDue(e.dueDate) <= 2">
+                  {{ getDaysUntilDue(e.dueDate) === 0 ? 'Today' : getDaysUntilDue(e.dueDate) + 'd' }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Overdue Entries -->
+          <div class="overdue-section" *ngIf="dashboard.overdueEntries.length > 0">
+            <div class="section-header">
+              <mat-icon class="section-icon overdue-icon">warning</mat-icon>
+              <span>Overdue Entries</span>
+            </div>
+            <table mat-table [dataSource]="dashboard.overdueEntries" class="overdue-table">
+              <ng-container matColumnDef="party">
+                <th mat-header-cell *matHeaderCellDef>Party</th>
+                <td mat-cell *matCellDef="let e">{{ e.partyName }}</td>
+              </ng-container>
+              <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef>Type</th>
+                <td mat-cell *matCellDef="let e">
+                  <span class="type-badge" [ngClass]="getTypeClass(e.type)">{{ e.type }}</span>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="amount">
+                <th mat-header-cell *matHeaderCellDef>Remaining</th>
+                <td mat-cell *matCellDef="let e" class="amount-cell">{{ e.remainingAmount | currency:'PKR ':'symbol':'1.0-0' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="dueDate">
+                <th mat-header-cell *matHeaderCellDef>Was Due</th>
+                <td mat-cell *matCellDef="let e" class="overdue-date">{{ e.dueDate | date:'mediumDate' }}</td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="['party','type','amount','dueDate']"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['party','type','amount','dueDate'];"></tr>
+            </table>
+          </div>
+
+          <!-- Monthly Expense Trend -->
+          <div class="trend-section" *ngIf="dashboard.monthlyExpenseSummary.length > 0">
+            <div class="section-header">
+              <mat-icon class="section-icon">bar_chart</mat-icon>
+              <span>Monthly Expense Trend (Last 6 Months)</span>
+            </div>
+            <div class="trend-bars">
+              <div class="trend-bar-item" *ngFor="let m of dashboard.monthlyExpenseSummary">
+                <div class="trend-bar-wrap">
+                  <div class="trend-bar"
+                    [style.height.%]="dashboard.monthlyExpenseSummary.length > 0 ? (m.total / getMaxTrend()) * 100 : 0">
+                  </div>
+                </div>
+                <div class="trend-amount">{{ m.total | currency:'PKR ':'symbol':'1.0-0' }}</div>
+                <div class="trend-label">{{ m.monthName.slice(0,3) }}</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="tab-loading" *ngIf="dashboardLoading"><mat-spinner diameter="40"></mat-spinner></div>
+      </mat-tab>
+
+      <!-- ══ TAB 2: RECEIVABLES & PAYABLES ═════════════════════ -->
+      <mat-tab label="Receivables & Payables">
+        <div class="tab-content">
+
+          <!-- Filter Row -->
+          <form [formGroup]="entryFilterForm" (ngSubmit)="applyEntryFilter()">
+            <div class="filter-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Type</mat-label>
+                <mat-select formControlName="type">
+                  <mat-option [value]="null">All</mat-option>
+                  <mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Status</mat-label>
+                <mat-select formControlName="status">
+                  <mat-option [value]="null">All</mat-option>
+                  <mat-option *ngFor="let s of paymentStatuses" [value]="s">{{ s }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Month</mat-label>
+                <mat-select formControlName="month">
+                  <mat-option [value]="null">All</mat-option>
+                  <mat-option *ngFor="let m of months" [value]="m.value">{{ m.label }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Year</mat-label>
+                <mat-select formControlName="year">
+                  <mat-option [value]="null">All</mat-option>
+                  <mat-option *ngFor="let y of years" [value]="y">{{ y }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Search</mat-label>
+                <input matInput formControlName="search" placeholder="Party name…">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+              <div class="filter-actions">
+                <button mat-button type="button" (click)="resetEntryFilter()">Reset</button>
+                <button mat-raised-button color="primary" type="submit">Apply</button>
+                <button mat-raised-button color="accent" type="button" (click)="openEntryForm()">
+                  <mat-icon>add</mat-icon> New Entry
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <!-- Entries Table -->
+          <div class="table-wrap">
+            <div class="loading-shade" *ngIf="entriesLoading"><mat-spinner diameter="40"></mat-spinner></div>
+            <table mat-table [dataSource]="entries">
+
+              <ng-container matColumnDef="party">
+                <th mat-header-cell *matHeaderCellDef>Party</th>
+                <td mat-cell *matCellDef="let e">
+                  <div class="party-cell">
+                    <div class="party-avatar" [ngClass]="getTypeClass(e.type)">{{ e.partyName.charAt(0).toUpperCase() }}</div>
+                    <div>
+                      <div class="party-name">{{ e.partyName }}</div>
+                      <div class="party-sub" *ngIf="e.partyEmail">{{ e.partyEmail }}</div>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef>Type</th>
+                <td mat-cell *matCellDef="let e">
+                  <span class="type-badge" [ngClass]="getTypeClass(e.type)">{{ e.type }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="amount">
+                <th mat-header-cell *matHeaderCellDef>Total</th>
+                <td mat-cell *matCellDef="let e">
+                  <span class="amount-val">{{ e.amount | currency:'PKR ':'symbol':'1.0-0' }}</span>
+                  <div class="paid-sub" *ngIf="e.paidAmount > 0">Paid: {{ e.paidAmount | currency:'PKR ':'symbol':'1.0-0' }}</div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="remaining">
+                <th mat-header-cell *matHeaderCellDef>Remaining</th>
+                <td mat-cell *matCellDef="let e">
+                  <span class="remaining-val" [class.fully-paid]="e.remainingAmount <= 0">
+                    {{ e.remainingAmount <= 0 ? 'Paid' : (e.remainingAmount | currency:'PKR ':'symbol':'1.0-0') }}
+                  </span>
+                  <mat-progress-bar *ngIf="e.amount > 0" mode="determinate"
+                    [value]="(e.paidAmount / e.amount) * 100"
+                    [color]="e.remainingAmount <= 0 ? 'primary' : 'accent'"
+                    class="pay-progress">
+                  </mat-progress-bar>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="dueDate">
+                <th mat-header-cell *matHeaderCellDef>Due Date</th>
+                <td mat-cell *matCellDef="let e">
+                  <div class="due-date" [class.overdue-date]="e.status === 'Overdue'">
+                    {{ e.dueDate | date:'mediumDate' }}
+                  </div>
+                  <div class="days-badge" *ngIf="e.status === 'Pending'"
+                    [class.near-due]="getDaysUntilDue(e.dueDate) <= 3"
+                    [class.overdue-date]="getDaysUntilDue(e.dueDate) < 0">
+                    {{ getDaysUntilDue(e.dueDate) < 0 ? (-getDaysUntilDue(e.dueDate)) + 'd ago' : getDaysUntilDue(e.dueDate) + 'd left' }}
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="source">
+                <th mat-header-cell *matHeaderCellDef>Source</th>
+                <td mat-cell *matCellDef="let e">
+                  <span class="source-chip" *ngIf="e.paymentSource">{{ e.paymentSource }}</span>
+                  <span class="no-val" *ngIf="!e.paymentSource">—</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let e">
+                  <span class="status-badge" [ngClass]="getStatusClass(e.status)">{{ e.status }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let e">
+                  <button mat-icon-button class="action-btn pay-btn" (click)="openPayDialog(e)"
+                    matTooltip="Record Payment" [disabled]="e.status === 'Paid' || e.status === 'Cancelled'">
+                    <mat-icon>payments</mat-icon>
+                  </button>
+                  <button mat-icon-button class="action-btn remind-btn" (click)="sendReminder(e)"
+                    matTooltip="Send Reminder" [disabled]="!e.partyEmail || reminderSending[e.id]">
+                    <mat-icon>{{ reminderSending[e.id] ? 'hourglass_top' : 'mail_outline' }}</mat-icon>
+                  </button>
+                  <button mat-icon-button class="action-btn edit-btn" (click)="openEntryForm(e)" matTooltip="Edit">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button class="action-btn del-btn" (click)="deleteEntry(e)" matTooltip="Delete">
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="entryDisplayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: entryDisplayedColumns;"
+                [class.overdue-row]="row.status === 'Overdue'"></tr>
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" colspan="8">
+                  <div class="no-data"><mat-icon>receipt_long</mat-icon><p>No entries found</p></div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- ══ TAB 3: EXPENSES ════════════════════════════════════ -->
+      <mat-tab label="Monthly Expenses">
+        <div class="tab-content">
+
+          <!-- Summary Cards -->
+          <div class="expense-summary-row" *ngIf="khataExpenses.length > 0">
+            <div class="exp-summary-card">
+              <span class="exp-sum-label">Pending</span>
+              <span class="exp-sum-val">{{ getTotalExpenses() | currency:'PKR ':'symbol':'1.0-0' }}</span>
+            </div>
+            <div class="exp-summary-card" *ngIf="getTotalPaidExpenses() > 0">
+              <span class="exp-sum-label" style="color:#16a34a">Paid</span>
+              <span class="exp-sum-val" style="color:#16a34a">{{ getTotalPaidExpenses() | currency:'PKR ':'symbol':'1.0-0' }}</span>
+            </div>
+            <div class="exp-cat-row">
+              <div class="exp-cat-chip" *ngFor="let cat of getTopCategories()">
+                <mat-icon>{{ getCategoryIcon(cat.name) }}</mat-icon>
+                <span class="exp-cat-name">{{ cat.name }}</span>
+                <span class="exp-cat-amt">{{ cat.amount | currency:'PKR ':'symbol':'1.0-0' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Monthly Summary Table -->
+          <mat-expansion-panel class="summary-panel" *ngIf="expenseSummary.length > 0">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon style="margin-right:8px">bar_chart</mat-icon>
+                Monthly Summary (Last 12 Months)
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="summary-grid">
+              <div class="summary-month-card" *ngFor="let m of expenseSummary">
+                <div class="sum-month">{{ m.monthName }} {{ m.year }}</div>
+                <div class="sum-total">{{ m.total | currency:'PKR ':'symbol':'1.0-0' }}</div>
+                <div class="sum-cats">
+                  <span class="sum-cat-chip" *ngFor="let k of getCategoryKeys(m.byCategory)">
+                    {{ k }}: {{ m.byCategory[k] | currency:'PKR ':'symbol':'1.0-0' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </mat-expansion-panel>
+
+          <!-- Filter Row -->
+          <form [formGroup]="expenseFilterForm" (ngSubmit)="applyExpenseFilter()">
+            <div class="filter-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Month</mat-label>
+                <mat-select formControlName="month">
+                  <mat-option [value]="null">All</mat-option>
+                  <mat-option *ngFor="let m of months" [value]="m.value">{{ m.label }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Year</mat-label>
+                <mat-select formControlName="year">
+                  <mat-option [value]="null">All</mat-option>
+                  <mat-option *ngFor="let y of years" [value]="y">{{ y }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Category</mat-label>
+                <mat-select formControlName="category">
+                  <mat-option [value]="null">All</mat-option>
+                  <mat-option *ngFor="let c of expenseCategories" [value]="c">{{ c }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Search</mat-label>
+                <input matInput formControlName="search" placeholder="Expense title…">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+              <div class="filter-actions">
+                <button mat-button type="button" (click)="resetExpenseFilter()">Reset</button>
+                <button mat-raised-button color="primary" type="submit">Apply</button>
+                <button mat-stroked-button type="button" (click)="toggleCalendar()" matTooltip="Toggle calendar view">
+                  <mat-icon>{{ showCalendar ? 'view_list' : 'calendar_month' }}</mat-icon>
+                  {{ showCalendar ? 'List' : 'Calendar' }}
+                </button>
+                <button mat-raised-button color="accent" type="button" (click)="openExpenseForm()">
+                  <mat-icon>add</mat-icon> Add Expense
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <!-- Outstanding toggle -->
+          <div class="outstanding-toggle" *ngIf="expenseFilterForm.value.month && expenseFilterForm.value.year">
+            <mat-checkbox [(ngModel)]="showOutstanding" (change)="loadExpenses()">
+              Show outstanding from previous months
+            </mat-checkbox>
+          </div>
+
+          <!-- ── Calendar View ─────────────────────────────────── -->
+          <div class="expense-calendar" *ngIf="showCalendar">
+
+            <!-- Navigation Bar -->
+            <div class="cal-nav-bar">
+              <button mat-icon-button (click)="calendarPrevMonth()" matTooltip="Previous month">
+                <mat-icon>chevron_left</mat-icon>
+              </button>
+
+              <div class="cal-nav-center">
+                <select class="cal-month-select" [(ngModel)]="calendarMonth" (change)="loadCalendarExpenses()">
+                  <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+                </select>
+                <select class="cal-year-select" [(ngModel)]="calendarYear" (change)="loadCalendarExpenses()">
+                  <option *ngFor="let y of calendarYears" [value]="y">{{ y }}</option>
+                </select>
+              </div>
+
+              <button mat-icon-button (click)="calendarNextMonth()" matTooltip="Next month">
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+
+              <button mat-stroked-button
+                      (click)="calendarGoToMonth(currentMonth, currentYear)"
+                      style="margin-left:8px;height:32px;font-size:12px;padding:0 12px">
+                Today
+              </button>
+
+              <div class="cal-loading-indicator" *ngIf="calendarLoading">
+                <mat-spinner diameter="20"></mat-spinner>
+              </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="cal-legend">
+              <span class="cal-legend-item"><span class="cal-dot"></span> Pending</span>
+              <span class="cal-legend-item"><span class="cal-dot dot-paid"></span> Paid</span>
+              <span class="cal-legend-item"><span class="cal-dot dot-ignored"></span> Ignored</span>
+            </div>
+
+            <!-- Day-of-week headers -->
+            <div class="calendar-header">
+              <div class="cal-day-label" *ngFor="let d of ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']">{{ d }}</div>
+            </div>
+
+            <!-- Calendar grid -->
+            <div class="calendar-grid">
+              <div class="cal-cell"
+                   *ngFor="let day of calendarDays"
+                   [class.cal-empty]="!day.date"
+                   [class.cal-has-expenses]="day.expenses.length > 0"
+                   [class.cal-today]="day.date && isToday(day.date)"
+                   [class.cal-selected]="selectedCalendarDate && day.date && day.date.getTime() === selectedCalendarDate.getTime()"
+                   (click)="selectCalendarDay(day)">
+                <div class="cal-date" *ngIf="day.date">{{ day.date | date:'d' }}</div>
+                <div class="cal-expense-dots" *ngIf="day.expenses.length > 0">
+                  <span class="cal-dot"
+                        *ngFor="let e of day.expenses.slice(0, 3)"
+                        [class.dot-paid]="e.isPaid"
+                        [class.dot-ignored]="e.isIgnored"
+                        [matTooltip]="e.title + ': ' + (e.amount | currency:'PKR ':'symbol':'1.0-0')">
+                  </span>
+                  <span class="cal-more" *ngIf="day.expenses.length > 3">+{{ day.expenses.length - 3 }}</span>
+                </div>
+                <div class="cal-cell-amt" *ngIf="day.expenses.length > 0">
+                  {{ getDayTotal(day.expenses) | currency:'PKR ':'symbol':'1.0-0' }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Selected Day Detail -->
+            <div class="cal-day-detail" *ngIf="selectedCalendarDate && calendarExpenses.length > 0">
+              <h4 class="cal-detail-header">
+                <mat-icon>event</mat-icon>
+                {{ selectedCalendarDate | date:'MMMM d, yyyy' }} — {{ calendarExpenses.length }} expense(s)
+              </h4>
+              <div class="cal-detail-list">
+                <div class="cal-detail-item" *ngFor="let e of calendarExpenses" [ngClass]="getExpenseStatusClass(e)">
+                  <mat-icon class="cat-icon">{{ getCategoryIcon(e.category) }}</mat-icon>
+                  <div class="cal-detail-info">
+                    <div class="exp-title">{{ e.title }}</div>
+                    <div class="exp-desc">{{ e.category }}<span *ngIf="e.isRecurring"> · {{ e.frequency }}</span></div>
+                    <div class="amount-val expense-color">{{ e.amount | currency:'PKR ':'symbol':'1.0-0' }}</div>
+                  </div>
+                  <span class="exp-status-badge paid" *ngIf="e.isPaid"><mat-icon>check_circle</mat-icon> Paid</span>
+                  <span class="exp-status-badge ignored" *ngIf="e.isIgnored"><mat-icon>cancel</mat-icon> Ignored</span>
+                  <div class="cal-detail-actions" *ngIf="!e.isPaid && !e.isIgnored">
+                    <button mat-stroked-button color="primary" (click)="payOccurrence(e)">
+                      <mat-icon>check_circle</mat-icon> Pay
+                    </button>
+                    <button mat-stroked-button (click)="ignoreOccurrence(e)">
+                      <mat-icon>cancel</mat-icon> Ignore
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- No selection hint -->
+            <div class="cal-hint" *ngIf="!selectedCalendarDate && !calendarLoading">
+              <mat-icon>touch_app</mat-icon> Click a day to see its expenses
+            </div>
+          </div>
+
+          <!-- ── Expenses Table ───────────────────────────────── -->
+          <div class="table-wrap" *ngIf="!showCalendar">
+            <div class="loading-shade" *ngIf="expensesLoading"><mat-spinner diameter="40"></mat-spinner></div>
+            <table mat-table [dataSource]="khataExpenses">
+
+              <ng-container matColumnDef="title">
+                <th mat-header-cell *matHeaderCellDef>Expense</th>
+                <td mat-cell *matCellDef="let e" [ngClass]="getExpenseStatusClass(e)">
+                  <div class="expense-title-cell">
+                    <mat-icon class="cat-icon">{{ getCategoryIcon(e.category) }}</mat-icon>
+                    <div>
+                      <div class="exp-title">
+                        {{ e.title }}
+                        <span class="outstanding-badge" *ngIf="isOutstandingExpense(e)">Outstanding</span>
+                      </div>
+                      <div class="exp-desc" *ngIf="e.description">{{ e.description }}</div>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="category">
+                <th mat-header-cell *matHeaderCellDef>Category</th>
+                <td mat-cell *matCellDef="let e">
+                  <span class="cat-badge cat-{{ e.category.toLowerCase() }}">{{ e.category }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="amount">
+                <th mat-header-cell *matHeaderCellDef>Amount</th>
+                <td mat-cell *matCellDef="let e">
+                  <span class="amount-val expense-color">{{ e.amount | currency:'PKR ':'symbol':'1.0-0' }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef>Date</th>
+                <td mat-cell *matCellDef="let e">
+                  <div class="date-cell">{{ e.expenseDate | date:'mediumDate' }}</div>
+                  <div class="month-year">{{ e.monthYear }}</div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="recurring">
+                <th mat-header-cell *matHeaderCellDef>Status / Recurring</th>
+                <td mat-cell *matCellDef="let e">
+                  <span class="exp-status-badge paid" *ngIf="e.isPaid">
+                    <mat-icon>check_circle</mat-icon> Paid
+                  </span>
+                  <span class="exp-status-badge ignored" *ngIf="e.isIgnored">
+                    <mat-icon>cancel</mat-icon> Ignored
+                  </span>
+                  <span class="recurring-badge" *ngIf="!e.isPaid && !e.isIgnored && e.isRecurring">
+                    <mat-icon>repeat</mat-icon>{{ e.frequency }}
+                  </span>
+                  <span class="no-val" *ngIf="!e.isPaid && !e.isIgnored && !e.isRecurring">One-time</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let e">
+                  <button mat-icon-button color="primary" (click)="payOccurrence(e)" matTooltip="Mark as Paid"
+                          *ngIf="!e.isPaid && !e.isIgnored">
+                    <mat-icon>check_circle_outline</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="ignoreOccurrence(e)" matTooltip="Ignore this expense"
+                          *ngIf="!e.isPaid && !e.isIgnored">
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                  <button mat-icon-button class="action-btn edit-btn" (click)="openExpenseForm(e)" matTooltip="Edit">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button class="action-btn del-btn" (click)="deleteExpense(e)" matTooltip="Delete">
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="expenseDisplayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: expenseDisplayedColumns;"
+                  [ngClass]="getExpenseStatusClass(row)"></tr>
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" colspan="6">
+                  <div class="no-data"><mat-icon>receipt</mat-icon><p>No expenses found</p></div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- ══ TAB 4: INCOME ════════════════════════════════════ -->
+      <mat-tab label="Income Sources">
+        <div class="tab-content">
+
+          <!-- Income summary bar -->
+          <div class="income-summary-row" *ngIf="incomes.length > 0">
+            <div class="inc-card inc-card-total">
+              <mat-icon>trending_up</mat-icon>
+              <div>
+                <span class="inc-label">Total Monthly Income</span>
+                <span class="inc-value">{{ getTotalMonthlyIncome() | currency:'PKR ':'symbol':'1.0-0' }}</span>
+              </div>
+            </div>
+            <div class="inc-card" [ngClass]="getNetMonthly() >= 0 ? 'inc-card-positive' : 'inc-card-negative'">
+              <mat-icon>{{ getNetMonthly() >= 0 ? 'account_balance' : 'warning' }}</mat-icon>
+              <div>
+                <span class="inc-label">Net (Income − Expenses)</span>
+                <span class="inc-value">{{ getNetMonthly() | currency:'PKR ':'symbol':'1.0-0' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter row -->
+          <form [formGroup]="incomeFilterForm" (ngSubmit)="applyIncomeFilter()">
+            <div class="filter-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Month</mat-label>
+                <mat-select formControlName="month">
+                  <mat-option [value]="null">All</mat-option>
+                  <mat-option *ngFor="let m of months" [value]="m.value">{{ m.label }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Year</mat-label>
+                <mat-select formControlName="year">
+                  <mat-option [value]="null">All</mat-option>
+                  <mat-option *ngFor="let y of years" [value]="y">{{ y }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div class="filter-actions">
+                <button mat-button type="button" (click)="resetIncomeFilter()">Reset</button>
+                <button mat-raised-button color="primary" type="submit">Apply</button>
+                <button mat-raised-button color="accent" type="button" (click)="openIncomeForm()">
+                  <mat-icon>add</mat-icon> Add Income Source
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <!-- Income table -->
+          <div class="table-wrap">
+            <div class="loading-shade" *ngIf="incomesLoading"><mat-spinner diameter="40"></mat-spinner></div>
+            <table mat-table [dataSource]="incomes">
+
+              <ng-container matColumnDef="title">
+                <th mat-header-cell *matHeaderCellDef>Source</th>
+                <td mat-cell *matCellDef="let i">
+                  <div class="expense-title-cell">
+                    <mat-icon class="cat-icon income-icon">{{ getIncomeCategoryIcon(i.category) }}</mat-icon>
+                    <div>
+                      <div class="exp-title">{{ i.title }}</div>
+                      <div class="exp-desc" *ngIf="i.description">{{ i.description }}</div>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="category">
+                <th mat-header-cell *matHeaderCellDef>Category</th>
+                <td mat-cell *matCellDef="let i">
+                  <span class="cat-badge income-cat">{{ getIncomeCategoryLabel(i.category) }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="amount">
+                <th mat-header-cell *matHeaderCellDef>Amount</th>
+                <td mat-cell *matCellDef="let i">
+                  <span class="amount-val income-color">{{ i.amount | currency:'PKR ':'symbol':'1.0-0' }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="frequency">
+                <th mat-header-cell *matHeaderCellDef>Frequency</th>
+                <td mat-cell *matCellDef="let i">
+                  <span class="recurring-badge income-freq" *ngIf="i.isRecurring">
+                    <mat-icon>repeat</mat-icon>{{ i.frequency }}
+                  </span>
+                  <span class="no-val" *ngIf="!i.isRecurring">One-time</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="startDate">
+                <th mat-header-cell *matHeaderCellDef>Since</th>
+                <td mat-cell *matCellDef="let i">
+                  <div class="date-cell">{{ i.startDate | date:'mediumDate' }}</div>
+                  <div class="month-year" *ngIf="i.recurringEndDate">Until {{ i.recurringEndDate | date:'MMM yyyy' }}</div>
+                  <div class="month-year" *ngIf="!i.recurringEndDate && i.isRecurring" style="color:#16a34a">Ongoing</div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="monthly">
+                <th mat-header-cell *matHeaderCellDef>Monthly Equiv.</th>
+                <td mat-cell *matCellDef="let i">
+                  <span class="amount-val income-color" *ngIf="i.monthlyEquivalent > 0">
+                    {{ i.monthlyEquivalent | currency:'PKR ':'symbol':'1.0-0' }}
+                  </span>
+                  <span class="no-val" *ngIf="i.monthlyEquivalent === 0">—</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let i">
+                  <button mat-icon-button class="action-btn edit-btn" (click)="openIncomeForm(i)" matTooltip="Edit">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button class="action-btn del-btn" (click)="deleteIncome(i)" matTooltip="Delete">
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="incomeDisplayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: incomeDisplayedColumns;"></tr>
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" colspan="7">
+                  <div class="no-data">
+                    <mat-icon>attach_money</mat-icon>
+                    <p>No income sources yet — add your salary, freelance income, or other earnings</p>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- Income add/edit drawer -->
+          <div class="drawer-overlay" *ngIf="showIncomeForm" (click)="closeIncomeForm()"></div>
+          <div class="drawer" [class.open]="showIncomeForm">
+            <div class="drawer-header">
+              <mat-icon class="drawer-icon income-icon">attach_money</mat-icon>
+              <span>{{ editingIncome ? 'Edit Income Source' : 'Add Income Source' }}</span>
+              <button mat-icon-button (click)="closeIncomeForm()"><mat-icon>close</mat-icon></button>
+            </div>
+            <div class="drawer-body">
+              <form [formGroup]="incomeForm" (ngSubmit)="saveIncome()">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Title / Label</mat-label>
+                  <input matInput formControlName="title" placeholder="e.g. Monthly Salary">
+                  <mat-error *ngIf="incomeForm.get('title')?.hasError('required')">Required</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Amount (PKR)</mat-label>
+                  <input matInput type="number" formControlName="amount" min="0.01">
+                  <mat-error *ngIf="incomeForm.get('amount')?.hasError('required')">Required</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Category</mat-label>
+                  <mat-select formControlName="category">
+                    <mat-option *ngFor="let c of incomeCategories" [value]="c">
+                      {{ getIncomeCategoryLabel(c) }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Start Date</mat-label>
+                  <input matInput [matDatepicker]="incStartPicker" formControlName="startDate">
+                  <mat-datepicker-toggle matSuffix [for]="incStartPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #incStartPicker></mat-datepicker>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Frequency</mat-label>
+                  <mat-select formControlName="frequency">
+                    <mat-option *ngFor="let f of frequencies" [value]="f">{{ f }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <div class="never-ends-row">
+                  <mat-checkbox formControlName="neverEnds">Never ends (ongoing)</mat-checkbox>
+                </div>
+
+                <mat-form-field appearance="outline" class="full-width" *ngIf="!incomeForm.get('neverEnds')?.value">
+                  <mat-label>End Date</mat-label>
+                  <input matInput [matDatepicker]="incEndPicker" formControlName="recurringEndDate">
+                  <mat-datepicker-toggle matSuffix [for]="incEndPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #incEndPicker></mat-datepicker>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Description (optional)</mat-label>
+                  <input matInput formControlName="description">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Notes (optional)</mat-label>
+                  <textarea matInput formControlName="notes" rows="2"></textarea>
+                </mat-form-field>
+
+                <div class="drawer-actions">
+                  <button mat-button type="button" (click)="closeIncomeForm()">Cancel</button>
+                  <button mat-raised-button color="primary" type="submit" [disabled]="incomeForm.invalid">
+                    {{ editingIncome ? 'Save Changes' : 'Add Income' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </mat-tab>
+
+      <!-- ══ TAB 5: HISTORY ════════════════════════════════════ -->
+      <mat-tab label="History">
+        <div class="tab-content" (click)="$event.stopPropagation()">
+
+          <mat-tab-group (selectedIndexChange)="onHistoryTabChange($event)" animationDuration="150ms" class="history-inner-tabs">
+
+            <!-- History: Entries -->
+            <mat-tab label="Entries & Payments">
+              <div class="history-filter-row">
+                <mat-form-field appearance="outline" class="hist-field">
+                  <mat-label>Type</mat-label>
+                  <mat-select [(ngModel)]="historyEntryType">
+                    <mat-option value="">All Types</mat-option>
+                    <mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="hist-field-wide">
+                  <mat-label>Search party or description</mat-label>
+                  <input matInput [(ngModel)]="historySearch" placeholder="Search…">
+                  <mat-icon matSuffix>search</mat-icon>
+                </mat-form-field>
+                <div class="hist-actions">
+                  <button mat-raised-button color="primary" (click)="applyHistoryFilter()">
+                    <mat-icon>search</mat-icon> Search
+                  </button>
+                  <button mat-button (click)="resetHistoryFilter()">Reset</button>
+                </div>
+              </div>
+
+              <div class="table-wrap">
+                <div class="loading-shade" *ngIf="historyLoading"><mat-spinner diameter="40"></mat-spinner></div>
+                <table mat-table [dataSource]="historyEntries">
+
+                  <ng-container matColumnDef="party">
+                    <th mat-header-cell *matHeaderCellDef>Party</th>
+                    <td mat-cell *matCellDef="let e">
+                      <div class="party-cell">
+                        <div class="party-avatar" [ngClass]="getTypeClass(e.type)">{{ e.partyName.charAt(0).toUpperCase() }}</div>
+                        <div>
+                          <div class="party-name">{{ e.partyName }}</div>
+                          <div class="party-sub" *ngIf="e.description">{{ e.description }}</div>
+                        </div>
+                      </div>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="type">
+                    <th mat-header-cell *matHeaderCellDef>Type</th>
+                    <td mat-cell *matCellDef="let e">
+                      <span class="type-badge" [ngClass]="getTypeClass(e.type)">{{ e.type }}</span>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="amount">
+                    <th mat-header-cell *matHeaderCellDef>Amount</th>
+                    <td mat-cell *matCellDef="let e">
+                      <span class="amount-val">{{ e.amount | currency:'PKR ':'symbol':'1.0-0' }}</span>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="dueDate">
+                    <th mat-header-cell *matHeaderCellDef>Period</th>
+                    <td mat-cell *matCellDef="let e">
+                      <div class="due-date">{{ e.dueDate | date:'mediumDate' }}</div>
+                      <div class="recurring-badge" *ngIf="e.isRecurring" style="margin-top:3px">
+                        <mat-icon>repeat</mat-icon>{{ e.frequency }}
+                      </div>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef>Status</th>
+                    <td mat-cell *matCellDef="let e">
+                      <span class="status-badge" [ngClass]="getStatusClass(e.status)">{{ e.status }}</span>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="paidAt">
+                    <th mat-header-cell *matHeaderCellDef>Paid / Cancelled</th>
+                    <td mat-cell *matCellDef="let e">
+                      <span *ngIf="e.paidAt">{{ e.paidAt | date:'mediumDate' }}</span>
+                      <span class="no-val" *ngIf="!e.paidAt">—</span>
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="['party','type','amount','dueDate','status','paidAt']"></tr>
+                  <tr mat-row *matRowDef="let row; columns: ['party','type','amount','dueDate','status','paidAt'];"></tr>
+                  <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell" colspan="6">
+                      <div class="no-data">
+                        <mat-icon>history</mat-icon>
+                        <p>No history yet — click Search to load</p>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </mat-tab>
+
+            <!-- History: Expenses -->
+            <mat-tab label="Expenses">
+              <div class="history-filter-row">
+                <mat-form-field appearance="outline" class="hist-field">
+                  <mat-label>Category</mat-label>
+                  <mat-select [(ngModel)]="historyExpenseCategory">
+                    <mat-option value="">All Categories</mat-option>
+                    <mat-option *ngFor="let c of expenseCategories" [value]="c">{{ c }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="hist-field-wide">
+                  <mat-label>Search title or description</mat-label>
+                  <input matInput [(ngModel)]="historyExpenseSearch" placeholder="Search…">
+                  <mat-icon matSuffix>search</mat-icon>
+                </mat-form-field>
+                <div class="hist-actions">
+                  <button mat-raised-button color="primary" (click)="applyHistoryFilter()">
+                    <mat-icon>search</mat-icon> Search
+                  </button>
+                  <button mat-button (click)="resetHistoryFilter()">Reset</button>
+                </div>
+              </div>
+
+              <div class="table-wrap">
+                <table mat-table [dataSource]="historyExpenses">
+
+                  <ng-container matColumnDef="title">
+                    <th mat-header-cell *matHeaderCellDef>Expense</th>
+                    <td mat-cell *matCellDef="let e">
+                      <div class="expense-title-cell">
+                        <mat-icon class="cat-icon">{{ getCategoryIcon(e.category) }}</mat-icon>
+                        <div>
+                          <div class="exp-title">{{ e.title }}</div>
+                          <div class="exp-desc" *ngIf="e.description">{{ e.description }}</div>
+                        </div>
+                      </div>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="category">
+                    <th mat-header-cell *matHeaderCellDef>Category</th>
+                    <td mat-cell *matCellDef="let e">
+                      <span class="cat-badge">{{ e.category }}</span>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="amount">
+                    <th mat-header-cell *matHeaderCellDef>Amount</th>
+                    <td mat-cell *matCellDef="let e">
+                      <span class="amount-val expense-color">{{ e.amount | currency:'PKR ':'symbol':'1.0-0' }}</span>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="date">
+                    <th mat-header-cell *matHeaderCellDef>Period</th>
+                    <td mat-cell *matCellDef="let e">
+                      <div class="date-cell">{{ e.expenseDate | date:'mediumDate' }}</div>
+                      <div class="month-year">{{ e.monthYear }}</div>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="recurring">
+                    <th mat-header-cell *matHeaderCellDef>Type</th>
+                    <td mat-cell *matCellDef="let e">
+                      <span class="recurring-badge" *ngIf="e.isRecurring">
+                        <mat-icon>repeat</mat-icon>{{ e.frequency }}
+                      </span>
+                      <span class="no-val" *ngIf="!e.isRecurring">One-time</span>
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="['title','category','amount','date','recurring']"></tr>
+                  <tr mat-row *matRowDef="let row; columns: ['title','category','amount','date','recurring'];"></tr>
+                  <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell" colspan="5">
+                      <div class="no-data">
+                        <mat-icon>history</mat-icon>
+                        <p>No expense history yet — click Search to load</p>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </mat-tab>
+
+          </mat-tab-group>
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  </mat-card>
+
+</div>
+
+<!-- ══ Entry Form Drawer ════════════════════════════════════════ -->
+<div class="drawer-overlay" *ngIf="showEntryForm" (click)="closeEntryForm()"></div>
+<div class="drawer" [class.drawer-open]="showEntryForm">
+  <div class="drawer-header">
+    <div class="drawer-title">
+      <mat-icon>{{ editingEntry ? 'edit' : 'add_circle_outline' }}</mat-icon>
+      {{ editingEntry ? 'Edit Entry' : 'New Entry' }}
+    </div>
+    <button mat-icon-button (click)="closeEntryForm()"><mat-icon>close</mat-icon></button>
+  </div>
+  <div class="drawer-body">
+    <form [formGroup]="entryForm" (ngSubmit)="saveEntry()">
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Party Name</mat-label>
+        <input matInput formControlName="partyName" placeholder="Person or company name">
+        <mat-error>Required</mat-error>
+      </mat-form-field>
+
+      <div class="two-col-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Email (for reminders)</mat-label>
+          <input matInput formControlName="partyEmail" placeholder="email@example.com">
+          <mat-error>Invalid email</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Phone</mat-label>
+          <input matInput formControlName="partyPhone" placeholder="+92…">
+        </mat-form-field>
+      </div>
+
+      <div class="two-col-form" *ngIf="!editingEntry">
+        <mat-form-field appearance="outline">
+          <mat-label>Type</mat-label>
+          <mat-select formControlName="type">
+            <mat-option *ngFor="let t of paymentTypes" [value]="t">{{ t }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Payment Source</mat-label>
+          <input matInput formControlName="paymentSource" placeholder="Fiverr, Bank, Cash…">
+        </mat-form-field>
+      </div>
+
+      <div class="two-col-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Amount (PKR)</mat-label>
+          <input matInput type="number" formControlName="amount" min="0.01">
+          <mat-error>Required, min 0.01</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Due Date</mat-label>
+          <input matInput [matDatepicker]="duePicker" formControlName="dueDate">
+          <mat-datepicker-toggle matSuffix [for]="duePicker"></mat-datepicker-toggle>
+          <mat-datepicker #duePicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <input matInput formControlName="description" placeholder="What is this for?">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Notes</mat-label>
+        <textarea matInput formControlName="notes" rows="2"></textarea>
+      </mat-form-field>
+
+      <div class="recurring-section" *ngIf="!editingEntry">
+        <mat-slide-toggle formControlName="isRecurring" color="primary">Recurring Payment</mat-slide-toggle>
+
+        <ng-container *ngIf="entryForm.get('isRecurring')?.value">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Frequency</mat-label>
+            <mat-select formControlName="frequency">
+              <mat-option *ngFor="let f of frequencies" [value]="f">{{ f }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div class="never-ends-row">
+            <mat-checkbox formControlName="neverEnds" color="primary">Never ends — repeat indefinitely</mat-checkbox>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width" *ngIf="!entryForm.get('neverEnds')?.value">
+            <mat-label>Recurring End Date</mat-label>
+            <input matInput [matDatepicker]="recPicker" formControlName="recurringEndDate"
+              placeholder="When should recurrence stop?">
+            <mat-datepicker-toggle matSuffix [for]="recPicker"></mat-datepicker-toggle>
+            <mat-datepicker #recPicker></mat-datepicker>
+            <mat-hint>Entries will be generated up to this date</mat-hint>
+          </mat-form-field>
+
+          <div class="never-ends-hint" *ngIf="entryForm.get('neverEnds')?.value">
+            <mat-icon>info_outline</mat-icon>
+            Recurring entries will keep generating every {{ entryForm.get('frequency')?.value | lowercase }} with no end date.
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="drawer-actions">
+        <button mat-button type="button" (click)="closeEntryForm()">Cancel</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="entryForm.invalid">
+          {{ editingEntry ? 'Update' : 'Save' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══ Expense Form Drawer ══════════════════════════════════════ -->
+<div class="drawer-overlay" *ngIf="showExpenseForm" (click)="closeExpenseForm()"></div>
+<div class="drawer" [class.drawer-open]="showExpenseForm">
+  <div class="drawer-header">
+    <div class="drawer-title">
+      <mat-icon>{{ editingExpense ? 'edit' : 'add_circle_outline' }}</mat-icon>
+      {{ editingExpense ? 'Edit Expense' : 'Add Expense' }}
+    </div>
+    <button mat-icon-button (click)="closeExpenseForm()"><mat-icon>close</mat-icon></button>
+  </div>
+  <div class="drawer-body">
+    <form [formGroup]="expenseForm" (ngSubmit)="saveExpense()">
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Title</mat-label>
+        <input matInput formControlName="title" placeholder="e.g. Office Rent May">
+        <mat-error>Required</mat-error>
+      </mat-form-field>
+
+      <div class="two-col-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Amount (PKR)</mat-label>
+          <input matInput type="number" formControlName="amount" min="0.01">
+          <mat-error>Required</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Category</mat-label>
+          <mat-select formControlName="category">
+            <mat-option *ngFor="let c of expenseCategories" [value]="c">
+              {{ c }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Date</mat-label>
+        <input matInput [matDatepicker]="expPicker" formControlName="expenseDate">
+        <mat-datepicker-toggle matSuffix [for]="expPicker"></mat-datepicker-toggle>
+        <mat-datepicker #expPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <input matInput formControlName="description" placeholder="Details…">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Notes</mat-label>
+        <textarea matInput formControlName="notes" rows="2"></textarea>
+      </mat-form-field>
+
+      <div class="recurring-section" *ngIf="!editingExpense">
+        <mat-slide-toggle formControlName="isRecurring" color="primary">Recurring Expense</mat-slide-toggle>
+
+        <ng-container *ngIf="expenseForm.get('isRecurring')?.value">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Frequency</mat-label>
+            <mat-select formControlName="frequency">
+              <mat-option *ngFor="let f of frequencies" [value]="f">{{ f }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div class="never-ends-row">
+            <mat-checkbox formControlName="neverEnds" color="primary">Never ends — repeat indefinitely</mat-checkbox>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width" *ngIf="!expenseForm.get('neverEnds')?.value">
+            <mat-label>Recurring End Date</mat-label>
+            <input matInput [matDatepicker]="expRecPicker" formControlName="recurringEndDate"
+              placeholder="When should recurrence stop?">
+            <mat-datepicker-toggle matSuffix [for]="expRecPicker"></mat-datepicker-toggle>
+            <mat-datepicker #expRecPicker></mat-datepicker>
+            <mat-hint>Entries will be generated up to this date</mat-hint>
+          </mat-form-field>
+
+          <div class="never-ends-hint" *ngIf="expenseForm.get('neverEnds')?.value">
+            <mat-icon>info_outline</mat-icon>
+            Expense will repeat every {{ expenseForm.get('frequency')?.value | lowercase }} with no end date.
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="drawer-actions">
+        <button mat-button type="button" (click)="closeExpenseForm()">Cancel</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="expenseForm.invalid">
+          {{ editingExpense ? 'Update' : 'Add' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══ Pay Dialog ════════════════════════════════════════════════ -->
+<div class="pay-overlay" *ngIf="payingEntry" (click)="closePayDialog()"></div>
+<div class="pay-dialog" *ngIf="payingEntry">
+  <div class="pay-header">
+    <mat-icon>payments</mat-icon>
+    Record Payment
+  </div>
+  <div class="pay-body">
+    <div class="pay-info">
+      <span class="pay-party">{{ payingEntry.partyName }}</span>
+      <span class="pay-remaining">Remaining: {{ payingEntry.remainingAmount | currency:'PKR ':'symbol':'1.0-0' }}</span>
+    </div>
+    <form [formGroup]="payForm" (ngSubmit)="submitPayment()">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Amount to Record (PKR)</mat-label>
+        <input matInput type="number" formControlName="amount" min="0.01">
+        <mat-error>Required</mat-error>
+      </mat-form-field>
+      <div class="drawer-actions">
+        <button mat-button type="button" (click)="closePayDialog()">Cancel</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="payForm.invalid">
+          Record
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
