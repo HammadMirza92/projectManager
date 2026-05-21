@@ -90,6 +90,7 @@ export interface KhataExpenseCreate {
   notes?: string;
   isRecurring: boolean;
   frequency?: KhataPaymentFrequency;
+  recurringEndDate?: string;
 }
 
 export interface KhataExpenseUpdate {
@@ -99,6 +100,9 @@ export interface KhataExpenseUpdate {
   expenseDate?: string;
   description?: string;
   notes?: string;
+  isRecurring?: boolean;
+  frequency?: KhataPaymentFrequency;
+  recurringEndDate?: string;
 }
 
 export type KhataIncomeCategory = 'Salary' | 'Freelance' | 'RentalIncome' | 'BusinessProfit' | 'Investment' | 'SideProject' | 'Other';
@@ -154,6 +158,7 @@ export interface MonthlyExpenseSummary {
 
 export interface KhataDashboard {
   totalMonthlyExpenses: number;
+  totalMonthlyIncome: number;
   totalPendingReceivables: number;
   totalPendingPayables: number;
   totalOverdueReceivables: number;

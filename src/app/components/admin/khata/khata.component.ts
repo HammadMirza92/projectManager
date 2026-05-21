@@ -19,6 +19,18 @@ import {
 export class KhataComponent implements OnInit {
   activeTab = 0;
 
+  // Calculator
+  showCalculator = false;
+  calcDisplay = '0';
+  calcExpression = '';
+  calcResult = '';
+  calcDragX = 0;
+  calcDragY = 0;
+  calcHasDragged = false;
+  private calcDragging = false;
+  private calcDragOffsetX = 0;
+  private calcDragOffsetY = 0;
+
   // Dashboard
   dashboard: KhataDashboard | null = null;
   dashboardLoading = false;
@@ -253,9 +265,13 @@ export class KhataComponent implements OnInit {
 
     if (this.editingEntry) {
       this.khataService.updateEntry(this.editingEntry.id, {
-        partyName: v.partyName, partyEmail: v.partyEmail, partyPhone: v.partyPhone,
-        amount: v.amount, dueDate, paymentSource: v.paymentSource,
-        description: v.description, notes: v.notes,
+        partyName: v.partyName,
+        partyEmail: v.partyEmail || undefined,
+        partyPhone: v.partyPhone || undefined,
+        amount: v.amount, dueDate,
+        paymentSource: v.paymentSource || undefined,
+        description: v.description || undefined,
+        notes: v.notes || undefined,
         isRecurring: v.isRecurring, frequency: v.frequency, recurringEndDate
       }).subscribe({
         next: () => { this.snackBar.open('Entry updated', 'Close', { duration: 3000 }); this.closeEntryForm(); this.loadEntries(); this.loadDashboard(); },
@@ -507,7 +523,8 @@ export class KhataComponent implements OnInit {
     if (this.editingExpense) {
       this.khataService.updateExpense(this.editingExpense.id, {
         title: v.title, amount: v.amount, category: v.category,
-        expenseDate, description: v.description, notes: v.notes
+        expenseDate, description: v.description, notes: v.notes,
+        isRecurring: v.isRecurring, frequency: v.frequency
       }).subscribe({
         next: () => { this.snackBar.open('Expense updated', 'Close', { duration: 3000 }); this.closeExpenseForm(); this.loadExpenses(); this.loadExpenseSummary(); this.loadDashboard(); },
         error: () => this.snackBar.open('Failed to update expense', 'Close', { duration: 4000 })
@@ -516,7 +533,7 @@ export class KhataComponent implements OnInit {
       const payload: KhataExpenseCreate = {
         title: v.title, amount: v.amount, category: v.category,
         expenseDate, description: v.description, notes: v.notes,
-        isRecurring: v.isRecurring, frequency: v.frequency
+        isRecurring: v.isRecurring, frequency: v.frequency, recurringEndDate
       };
       this.khataService.createExpense(payload).subscribe({
         next: () => { this.snackBar.open('Expense added', 'Close', { duration: 3000 }); this.closeExpenseForm(); this.loadExpenses(); this.loadExpenseSummary(); this.loadDashboard(); },
@@ -744,5 +761,80 @@ export class KhataComponent implements OnInit {
 
   onTabChange(index: number): void {
     this.activeTab = index;
+  }
+
+  // ── Calculator ────────────────────────────────────────────────────────────
+
+  toggleCalculator(): void {
+    this.showCalculator = !this.showCalculator;
+    if (this.showCalculator) {
+      this.calcDisplay = '0';
+      this.calcExpression = '';
+      this.calcResult = '';
+      this.calcHasDragged = false;
+    }
+  }
+
+  calcPress(key: string): void {
+    if (key === 'C') {
+      this.calcDisplay = '0';
+      this.calcExpression = '';
+      this.calcResult = '';
+      return;
+    }
+    if (key === '⌫') {
+      this.calcExpression = this.calcExpression.slice(0, -1) || '';
+      this.calcDisplay = this.calcExpression || '0';
+      this.calcResult = '';
+      return;
+    }
+    if (key === '=') {
+      try {
+        // Replace × and ÷ for eval
+        const expr = this.calcExpression.replace(/×/g, '*').replace(/÷/g, '/').replace(/%/g, '/100');
+        // Safety: only allow numbers and operators
+        if (/[^0-9+\-*/.() ]/.test(expr)) { this.calcResult = 'Error'; return; }
+        // eslint-disable-next-line no-eval
+        const res = Function('"use strict"; return (' + expr + ')')();
+        const formatted = parseFloat(res.toFixed(10)).toString();
+        this.calcResult = formatted;
+        this.calcExpression = formatted;
+        this.calcDisplay = formatted;
+      } catch {
+        this.calcResult = 'Error';
+      }
+      return;
+    }
+    if (this.calcExpression === '0' && !isNaN(Number(key))) {
+      this.calcExpression = key;
+    } else {
+      this.calcExpression += key;
+    }
+    this.calcDisplay = this.calcExpression;
+    this.calcResult = '';
+  }
+
+  onCalcDragStart(event: MouseEvent): void {
+    this.calcDragging = true;
+    if (!this.calcHasDragged) {
+      const el = (event.currentTarget as HTMLElement).closest('.calc-popup') as HTMLElement;
+      const rect = el.getBoundingClientRect();
+      this.calcDragX = rect.left;
+      this.calcDragY = rect.top;
+      this.calcHasDragged = true;
+    }
+    this.calcDragOffsetX = event.clientX - this.calcDragX;
+    this.calcDragOffsetY = event.clientY - this.calcDragY;
+    event.preventDefault();
+  }
+
+  onCalcDragMove(event: MouseEvent): void {
+    if (!this.calcDragging) return;
+    this.calcDragX = event.clientX - this.calcDragOffsetX;
+    this.calcDragY = event.clientY - this.calcDragOffsetY;
+  }
+
+  onCalcDragEnd(): void {
+    this.calcDragging = false;
   }
 }
